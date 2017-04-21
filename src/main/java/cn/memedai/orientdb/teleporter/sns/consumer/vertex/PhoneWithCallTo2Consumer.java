@@ -47,16 +47,16 @@ public class PhoneWithCallTo2Consumer extends AbstractBlockingQueueConsumer {
                 dataMap.get("CREATE_TIME") == null ? null : dataMap.get("CREATE_TIME"),
         };
 
-        OResultSet ocrs = execute(tx, MessageFormat.format(SELECT_CALL_TO_SQL, fromPhoneRid, toPhoneRid));
-        if (ocrs != null && !ocrs.isEmpty()) {
-            //更新
-            ODocument doc = (ODocument) ocrs.get(0);
-            ORecordId oRecordId = doc.field("@rid");
-            execute(tx, MessageFormat.format(UPDATE_CALL_TO_SQL, oRecordId.getIdentity().toString()), args);
-        } else {
+//        OResultSet ocrs = execute(tx, MessageFormat.format(SELECT_CALL_TO_SQL, fromPhoneRid, toPhoneRid));
+//        if (ocrs != null && !ocrs.isEmpty()) {
+//            //更新
+//            ODocument doc = (ODocument) ocrs.get(0);
+//            ORecordId oRecordId = doc.field("@rid");
+//            execute(tx, MessageFormat.format(UPDATE_CALL_TO_SQL, oRecordId.getIdentity().toString()), args);
+//        } else {
             //新增
             execute(tx, MessageFormat.format(CREATE_CALL_TO_SQL, fromPhoneRid, toPhoneRid), args);
-        }
+//        }
 
     }
 

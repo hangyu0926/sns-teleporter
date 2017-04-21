@@ -1,6 +1,7 @@
 package cn.memedai.orientdb.teleporter.sns.main;
 
 import cn.memedai.orientdb.teleporter.sns.consumer.AbstractBlockingQueueConsumer;
+import cn.memedai.orientdb.teleporter.sns.consumer.DuplicatedPhoneCallTo2Consumer;
 import cn.memedai.orientdb.teleporter.sns.consumer.ReexecuteErrorSqlConsumer;
 import cn.memedai.orientdb.teleporter.sns.consumer.edge.*;
 import cn.memedai.orientdb.teleporter.sns.consumer.increment.*;
@@ -42,6 +43,11 @@ public class Teleporter2Increment extends Teleporter {
 
             //create edge
             submitStage2();
+
+            //delete 重复的CallTo
+            submit(DuplicatedPhoneCallTo2Consumer.class);
+
+            blockUntilPreviousFinish();
 
             //扫尾工作
             submitStage3();

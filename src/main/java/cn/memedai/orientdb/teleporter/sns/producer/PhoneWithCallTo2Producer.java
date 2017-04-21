@@ -13,7 +13,7 @@ import java.util.Date;
 public class PhoneWithCallTo2Producer extends AbstractDbProducer {
 
     protected String getSql() {
-        String sql = "select APPL_NO,PHONE_NO,CALL_CNT,CALL_LEN,CALL_IN_CNT,CALL_OUT_CNT,CREATE_TIME from network.ca_bur_operator_contact ";
+        String sql = "select ID,APPL_NO,PHONE_NO,CALL_CNT,CALL_LEN,CALL_IN_CNT,CALL_OUT_CNT,CREATE_TIME from network.ca_bur_operator_contact ";
         sql += "where CREATE_TIME>= '" + ConfigUtils.getDefaultLimitCreatedDatetime() + "'";
         return sql;
     }
