@@ -1,5 +1,8 @@
 package cn.memedai.orientdb.teleporter.sns.main;
 
+import cn.memedai.orientdb.teleporter.sns.consumer.DuplicatedPhoneCallTo2Consumer;
+import cn.memedai.orientdb.teleporter.sns.consumer.vertex.PhoneWithCallTo2Consumer;
+import cn.memedai.orientdb.teleporter.sns.producer.PhoneWithCallTo2Producer;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
 import cn.memedai.orientdb.teleporter.sns.utils.ConfigUtils;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
@@ -23,12 +26,17 @@ public class TeleporterTest extends Teleporter {
     private static final String SQL_PHONE = "update Phone set phone=? upsert return after where phone=?";
 
     public static void main(String[] args) throws SQLException, ExecutionException, InterruptedException {
-        LOGGER.debug("I'm testing!");
-        final ODatabaseDocumentTx tx = new ODatabaseDocumentTx(ConfigUtils.getProperty("toDbUrl"));
+//        LOGGER.debug("I'm testing!");
+//        final ODatabaseDocumentTx tx = new ODatabaseDocumentTx(ConfigUtils.getProperty("toDbUrl"));
+//
+//        tx.open(ConfigUtils.getProperty("toDbUserName"), ConfigUtils.getProperty("toDbPassword"));
+//        System.out.println(tx + "");
+//        System.out.println(getPhoneRid(tx,"13816749902"));
 
-        tx.open(ConfigUtils.getProperty("toDbUserName"), ConfigUtils.getProperty("toDbPassword"));
-        System.out.println(tx + "");
-        System.out.println(getPhoneRid(tx,"13816749902"));
+        submit(PhoneWithCallTo2Producer.class, PhoneWithCallTo2Consumer.class);
+        blockUntilPreviousFinish();
+        submit(DuplicatedPhoneCallTo2Consumer.class);
+        blockUntilPreviousFinish();
     }
 
     static String getPhoneRid(ODatabaseDocumentTx tx, String phone) {

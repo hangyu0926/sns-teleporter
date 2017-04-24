@@ -4,9 +4,7 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
 
 /**
  * Created by kisho on 2017/4/6.
@@ -43,6 +41,36 @@ public final class DbUtils {
             try {
                 connection.close();
                 LOGGER.info("xxx connection : " + connection);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void close(Statement stmt) {
+        if (stmt != null) {
+            try {
+                stmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void close(PreparedStatement pstmt) {
+        if (pstmt != null) {
+            try {
+                pstmt.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public static void close(ResultSet rs) {
+        if (rs != null) {
+            try {
+                rs.close();
             } catch (SQLException e) {
                 e.printStackTrace();
             }

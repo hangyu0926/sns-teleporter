@@ -21,6 +21,7 @@ public abstract class AbstractDbProducer extends AbstractProducer {
         Connection connection = getConnection();
         int tryConnectCount = 0;
         try {
+            onBefore(connection);
             int page = ConfigUtils.getInt("countPerPage");
             String sql = getSql() + " limit ?,?";
             while (true) {
@@ -67,6 +68,7 @@ public abstract class AbstractDbProducer extends AbstractProducer {
                     }
                 }
             }
+            onAfter(connection);
         } catch (SQLException e) {
             log.error("", e);
         } catch (InterruptedException e) {
@@ -107,6 +109,14 @@ public abstract class AbstractDbProducer extends AbstractProducer {
 
     public void setDataCountLock(DataCountLock dataCountLock) {
         this.dataCountLock = dataCountLock;
+    }
+
+    protected void onBefore(Connection connection) {
+
+    }
+
+    protected void onAfter(Connection connection) {
+
     }
 
 }
