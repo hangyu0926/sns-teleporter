@@ -30,10 +30,11 @@ public final class CacheUtils {
     public static final Map<String, String> CACHE_MEMBER_PHONERIDS = new ConcurrentHashMap(1500000);
 
     public static final Map<String, String> CACHE_REPORTERNO_PHONE = new ConcurrentHashMap(1500000);
+    public static final Map<String, String> CACHE_APPLYNO_PHONE = new ConcurrentHashMap(15000);
 
     public static final List<String> COMMAND_SQL = new Vector<String>(1000);
 
-    public static void setStoreInfoRid(String key, String value) {
+    public static void setStoreRid(String key, String value) {
         CACHE_STOREINFO_RID.put(key, value);
     }
 
@@ -154,8 +155,12 @@ public final class CacheUtils {
     }
 
 
-    public static void setCacheReporternoPhone(String key, String value) {
+    public static void setReporternoPhone(String key, String value) {
         CACHE_REPORTERNO_PHONE.put(key, value);
+    }
+
+    public static void setApplyNoPhone(String key, String value) {
+        CACHE_APPLYNO_PHONE.put(key, value);
     }
 
 }
