@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+				http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <context:annotation-config/>
+    <context:component-scan base-package="cn.memedai.orientdb.teleporter"/>
+
+    <import resource="applicationContext-sns-*.xml"/>
+
+    <bean id="deleteEdgesConsumer" class="cn.memedai.orientdb.teleporter.sns.full.consumer.DeleteEdgeConsumer"
+          scope="prototype">
+        <property name="edges">
+            <array>
+                <value>HasPhoneMark</value>
+            </array>
+        </property>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+    </bean>
+
+    <bean id="phoneWithPhoneMarkBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="phoneWithPhoneMarkProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="blockingQueue" ref="phoneWithPhoneMarkBlockingQueue"/>
+        <property name="sql"
+                  value="SELECT PHONE_NO, PHONE_TYPE  FROM network.ca_sys_phone_tag_merge  limit ?,?"/>
+    </bean>
+    <bean id="phoneWithPhoneMarkConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.full.consumer.PhoneAndPhoneMarkConsumer"
+          scope="prototype">
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+        <property name="blockingQueue" ref="phoneWithPhoneMarkBlockingQueue"/>
+        <property name="sql"
+                  value="update PhoneMark set mark=? upsert return after where mark=?"/>
+        <property name="sqlParameterNames">
+            <array>
+                <value>PHONE_TYPE</value>
+                <value>PHONE_TYPE</value>
+            </array>
+        </property>
+    </bean>
+
+    <util:map id="teleporterMap" key-type="java.lang.Integer" value-type="java.util.List">
+        <!-- key的大小决定着优先执行顺序-->
+        <entry key="10">
+            <list>
+                <ref bean="deleteEdgesConsumer"/>
+            </list>
+        </entry>
+
+        <entry key="20">
+            <list>
+                <ref bean="phoneWithPhoneMarkProducer"/>
+                <ref bean="phoneWithPhoneMarkConsumer"/>
+                <ref bean="phoneWithPhoneMarkConsumer"/>
+            </list>
+        </entry>
+
+        <entry key="30">
+            <list>
+                <ref bean="reexecuteErrorSqlConsumer"/>
+            </list>
+        </entry>
+
+    </util:map>
+
+</beans>

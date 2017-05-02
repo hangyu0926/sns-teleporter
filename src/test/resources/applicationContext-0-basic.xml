@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+				http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <context:annotation-config/>
+    <context:component-scan base-package="cn.memedai.orientdb.teleporter"/>
+
+    <import resource="applicationContext-sns-dataSource.xml"/>
+    <import resource="applicationContext-sns-properties.xml"/>
+
+
+    <bean id="phoneWithCallToCacheBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="phoneWithCallToCacheProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
+          scope="prototype">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="blockingQueue" ref="phoneWithCallToCacheBlockingQueue"/>
+        <property name="sql"
+                  value="SELECT b.REPORTNO,a.cellphone,a.apply_no FROM network.apply_info a LEFT JOIN mis_watson.D_JXL_PERSON b ON a.apply_no = b.APPL_NO  limit ?,?"/>
+    </bean>
+    <bean id="phoneWithCallToCacheConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.full.consumer.PhoneWithCallToCacheConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="phoneWithCallToCacheBlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+    </bean>
+
+
+    <bean id="phoneWithCall1BlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="phoneWithCallTo1Producer" class="cn.memedai.orientdb.teleporter.FileDataProducer"
+          scope="prototype">
+        <property name="filePath"
+                  value="#{snsProp.phoneWithCallTo1FilePath}"/>
+        <property name="blockingQueue" ref="phoneWithCall1BlockingQueue"/>
+        <property name="skipCount" value="#{snsProp.skipCount}"/>
+    </bean>
+    <bean id="phoneWithCallTo1Consumer"
+          class="cn.memedai.orientdb.teleporter.sns.full.consumer.PhoneWithCallTo1Consumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="phoneWithCall1BlockingQueue"/>
+    </bean>
+
+
+    <bean id="phoneWithCall2BlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="phoneWithCallTo2Producer"
+          class="cn.memedai.orientdb.teleporter.sns.common.consumer.PhoneWithCallTo2Producer"
+          scope="prototype">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="blockingQueue" ref="phoneWithCall2BlockingQueue"/>
+        <property name="sql"
+                  value="select APPL_NO,PHONE_NO,CALL_CNT,CALL_LEN,CALL_IN_CNT,CALL_OUT_CNT,CREATE_TIME from network.ca_bur_operator_contact limit ?,?"/>
+    </bean>
+    <bean id="phoneWithCallTo2Consumer"
+          class="cn.memedai.orientdb.teleporter.sns.full.consumer.PhoneWithCallTo2Consumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="phoneWithCall2BlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+    </bean>
+
+
+    <bean id="deleteDuplicatedCallToBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="deleteDuplicatedCallToProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="blockingQueue" ref="deleteDuplicatedCallToBlockingQueue"/>
+        <property name="sql"
+                  value="select cellphone from network.apply_info group by cellphone HAVING count(1)>1 limit ?,?"/>
+    </bean>
+    <bean id="deleteDuplicatedCallToConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.full.consumer.DuplicatedPhoneCallToConsumer"
+          scope="prototype">
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+        <property name="blockingQueue" ref="deleteDuplicatedCallToBlockingQueue"/>
+    </bean>
+
+
+    <bean id="phoneWithPhoneMarkBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="phoneWithPhoneMarkProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="blockingQueue" ref="phoneWithPhoneMarkBlockingQueue"/>
+        <property name="sql"
+                  value="SELECT PHONE_NO, PHONE_TYPE  FROM network.ca_sys_phone_tag_merge  limit ?,?"/>
+    </bean>
+    <bean id="phoneWithPhoneMarkConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.full.consumer.PhoneAndPhoneMarkConsumer"
+          scope="prototype">
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+        <property name="blockingQueue" ref="phoneWithPhoneMarkBlockingQueue"/>
+        <property name="sql"
+                  value="update PhoneMark set mark=? upsert return after where mark=?"/>
+        <property name="sqlParameterNames">
+            <array>
+                <value>PHONE_TYPE</value>
+                <value>PHONE_TYPE</value>
+            </array>
+        </property>
+    </bean>
+
+    <util:map id="teleporterMap" key-type="java.lang.Integer" value-type="java.util.List">
+        <!-- key的大小决定着优先执行顺序, 同一个key的producer和consumer会并发执行-->
+        <entry key="10">
+            <list>
+                <ref bean="phoneWithCallToCacheProducer"/>
+                <ref bean="phoneWithCallToCacheConsumer"/>
+            </list>
+        </entry>
+
+        <entry key="20">
+            <list>
+                <ref bean="phoneWithCallTo1Producer"/>
+                <ref bean="phoneWithCallTo1Consumer"/>
+                <ref bean="phoneWithCallTo1Consumer"/>
+
+                <ref bean="phoneWithCallTo2Producer"/>
+                <ref bean="phoneWithCallTo2Consumer"/>
+                <ref bean="phoneWithCallTo2Consumer"/>
+
+                <ref bean="phoneWithPhoneMarkProducer"/>
+                <ref bean="phoneWithPhoneMarkConsumer"/>
+                <ref bean="phoneWithPhoneMarkConsumer"/>
+            </list>
+        </entry>
+
+        <entry key="30">
+            <list>
+                <ref bean="deleteDuplicatedCallToProducer"/>
+                <ref bean="deleteDuplicatedCallToConsumer"/>
+            </list>
+        </entry>
+
+        <entry key="40">
+            <list>
+                <ref bean="reexecuteErrorSqlConsumer"/>
+            </list>
+        </entry>
+
+    </util:map>
+
+</beans>

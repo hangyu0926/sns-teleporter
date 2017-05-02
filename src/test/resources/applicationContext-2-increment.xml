@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+				http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <context:annotation-config/>
+    <context:component-scan base-package="cn.memedai.orientdb.teleporter"/>
+
+    <import resource="applicationContext-sns-dataSource.xml"/>
+    <import resource="applicationContext-sns-properties.xml"/>
+
+    <bean id="storeBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="10000"/>
+    </bean>
+    <bean id="storeProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="blockingQueue" ref="storeBlockingQueue"/>
+        <property name="sql"
+                  value="select a.STOREID,a.MERCHANTID,a.STORENAME,a.PROVINCE,a.CITY,b.MERCHANT_TEMPLATE_TYPE from MERCHANTAUDIT.ma_store_baseinfo a inner join MERCHANTAUDIT.ma_merchant_baseinfo b on a.merchantid = b.merchantid limit ?,?"/>
+    </bean>
+    <bean id="storeConsumer" class="cn.memedai.orientdb.teleporter.sns.common.consumer.StoreConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="storeBlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+        <property name="sql"
+                  value="update Store set storeId=?,merchantId=?,storeName=?,province=?,city=?,industryType=? upsert return after where storeId = ?"/>
+        <property name="sqlParameterNames">
+            <array>
+                <value>STOREID</value>
+                <value>MERCHANTID</value>
+                <value>STORENAME</value>
+                <value>PROVINCE</value>
+                <value>CITY</value>
+                <value>MERCHANT_TEMPLATE_TYPE</value>
+                <value>STOREID</value>
+            </array>
+        </property>
+    </bean>
+
+
+    <bean id="memberBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="memberProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
+          scope="prototype">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="blockingQueue" ref="memberBlockingQueue"/>
+        <property name="sql"
+                  value="select a.MEMBER_ID,a.MOBILE_NO,b.`NAME`,b.ID_NO from memedai.MEMBER a LEFT JOIN memedai.ID_CARD b on a.MEMBER_ID = b.MEMBER_ID limit ?,?"/>
+    </bean>
+    <bean id="memberIncrementConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.increment.consumer.MemberIncrementConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="memberBlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+        <property name="sql"
+                  value="update Member set memberId=?,name=?,idNo=?,isBlack=false upsert return after where memberId=?"/>
+        <property name="sqlParameterNames">
+            <array>
+                <value>MEMBER_ID</value>
+                <value>NAME</value>
+                <value>ID_NO</value>
+                <value>MEMBER_ID</value>
+            </array>
+        </property>
+    </bean>
+
+
+    <bean id="applyBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="applyProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
+          scope="prototype">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="blockingQueue" ref="applyBlockingQueue"/>
+        <property name="sql"
+                  value="SELECT cellphone,member_id,apply_no,created_datetime,apply_status,store_id,order_no FROM network.apply_info where created_datetime >='#{snsService.getStartDatetime('',1)}' or modified_datetime >='#{snsService.getStartDatetime('',1)}'  limit ?,?"/>
+    </bean>
+    <bean id="applyConsumer" class="cn.memedai.orientdb.teleporter.sns.common.consumer.ApplyConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="applyBlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+        <property name="sql"
+                  value="update Apply set applyNo=?,status=?,createdDatetime=? upsert return after where applyNo=?"/>
+        <property name="sqlParameterNames">
+            <array>
+                <value>apply_no</value>
+                <value>apply_status</value>
+                <value>created_datetime</value>
+                <value>apply_no</value>
+            </array>
+        </property>
+    </bean>
+
+
+    <bean id="orderBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="orderProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="blockingQueue" ref="orderBlockingQueue"/>
+        <property name="sql"
+                  value="SELECT mobile,member_id,order_no,created_datetime,status,store_id from network.money_box_order where created_datetime >='#{snsService.getStartDatetime('',1)}' or modified_datetime >='#{snsService.getStartDatetime('',1)}'  limit ?,?"/>
+    </bean>
+    <bean id="orderConsumer" class="cn.memedai.orientdb.teleporter.sns.common.consumer.OrderConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="orderBlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+        <property name="sql"
+                  value="update Order set orderNo=?,status=?,createdDatetime=? upsert return after where orderNo=?"/>
+        <property name="sqlParameterNames">
+            <array>
+                <value>order_no</value>
+                <value>status</value>
+                <value>created_datetime</value>
+                <value>order_no</value>
+            </array>
+        </property>
+    </bean>
+
+    <bean id="device2CaIncrementBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="device2CaIncrementProducer"
+          class="cn.memedai.orientdb.teleporter.sns.increment.producer.Device2CaIncrementProducer"
+          scope="prototype">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="blockingQueue" ref="device2CaIncrementBlockingQueue"/>
+        <property name="sql"
+                  value="SELECT APPL_NO,DEVICE_ID FROM network.ca_appl_member_device where DEVICE_ID is not null AND APPL_NO IN (#inDataList)"/>
+    </bean>
+    <bean id="device2CaIncrementConsumer" class="cn.memedai.orientdb.teleporter.sns.common.consumer.Device2CaConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="device2CaIncrementBlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+    </bean>
+
+
+    <bean id="ip2CaIncrementBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="ip2CaIncrementProducer"
+          class="cn.memedai.orientdb.teleporter.sns.increment.producer.Ip2CaIncrementProducer"
+          scope="prototype">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="blockingQueue" ref="ip2CaIncrementBlockingQueue"/>
+        <property name="sql"
+                  value="SELECT APPL_NO,IP,IP_CITY  FROM network.ca_appl_member_device where IP is not null and APPL_NO IN (#inDataList)"/>
+    </bean>
+    <bean id="ip2CaIncrementConsumer" class="cn.memedai.orientdb.teleporter.sns.common.consumer.Ip2CaConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="ip2CaIncrementBlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+    </bean>
+
+
+    <bean id="deviceAndIp2CtaIncrementBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="deviceAndIp2CtaIncrementProducer"
+          class="cn.memedai.orientdb.teleporter.sns.increment.producer.DeviceAndIp2CtaIncrementProducer">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="blockingQueue" ref="deviceAndIp2CtaIncrementBlockingQueue"/>
+        <property name="sql"
+                  value="SELECT ORDER_ID,DEVICE_ID,IP,IP_CITY from network.cta_order_deviceinfo where ip is not null AND ORDER_ID IN (#inDataList)"/>
+    </bean>
+    <bean id="deviceAndIp2CtaIncrementConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.common.consumer.DeviceAndIp2CtaConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="deviceAndIp2CtaIncrementBlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+    </bean>
+
+
+    <bean id="phoneWithCall2IncrementBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="phoneWithCallTo2IncrementProducer"
+          class="cn.memedai.orientdb.teleporter.sns.common.consumer.PhoneWithCallTo2Producer"
+          scope="prototype">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="blockingQueue" ref="phoneWithCall2IncrementBlockingQueue"/>
+        <property name="sql"
+                  value="select APPL_NO,PHONE_NO,CALL_CNT,CALL_LEN,CALL_IN_CNT,CALL_OUT_CNT,CREATE_TIME from network.ca_bur_operator_contact where #subSql limit ?,?"/>
+    </bean>
+    <bean id="phoneWithCallTo2IncrementConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.increment.consumer.PhoneWithCallTo2IncrementConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="phoneWithCall2IncrementBlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+    </bean>
+
+    <util:map id="teleporterMap" key-type="java.lang.Integer" value-type="java.util.List">
+        <!-- key的大小决定着优先执行顺序, 同一个key的producer和consumer会并发执行-->
+        <entry key="10">
+            <list>
+                <ref bean="storeProducer"/>
+                <ref bean="storeConsumer"/>
+
+                <ref bean="memberProducer"/>
+                <ref bean="memberIncrementConsumer"/>
+                <ref bean="memberIncrementConsumer"/>
+                <ref bean="memberIncrementConsumer"/>
+
+                <ref bean="applyProducer"/>
+                <ref bean="applyConsumer"/>
+
+                <ref bean="orderProducer"/>
+                <ref bean="orderConsumer"/>
+
+            </list>
+        </entry>
+
+        <entry key="20">
+            <list>
+                <ref bean="device2CaIncrementProducer"/>
+                <ref bean="device2CaIncrementConsumer"/>
+
+                <ref bean="ip2CaIncrementProducer"/>
+                <ref bean="ip2CaIncrementConsumer"/>
+
+                <ref bean="deviceAndIp2CtaIncrementProducer"/>
+                <ref bean="deviceAndIp2CtaIncrementConsumer"/>
+            </list>
+        </entry>
+
+        <entry key="30">
+            <list>
+                <ref bean="hasApplyIncrementConsumer"/>
+                <ref bean="hasDeviceIncrementConsumer"/>
+                <ref bean="hasIpIncrementConsumer"/>
+                <ref bean="hasOrderIncrementConsumer"/>
+                <ref bean="hasPhoneIncrementConsumer"/>
+                <ref bean="hasStoreIncrementConsumer"/>
+            </list>
+        </entry>
+
+        <entry key="40">
+            <list>
+                <ref bean="phoneWithCallTo2IncrementProducer"/>
+                <ref bean="phoneWithCallTo2IncrementConsumer"/>
+            </list>
+        </entry>
+
+        <entry key="50">
+            <list>
+                <ref bean="duplicatedPhoneCallToIncrementConsumer"/>
+            </list>
+        </entry>
+
+    </util:map>
+
+</beans>

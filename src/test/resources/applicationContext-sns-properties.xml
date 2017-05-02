@@ -1,0 +1,36 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+
+                http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <util:properties id="snsProp">
+        <prop key="defaultBlockingQueueSize">40000</prop>
+        <prop key="callToLastReadRecordPath">
+            \home\orientdb\migration_script\v2\callTo_lastReadRecord.properties
+        </prop>
+        <prop key="skipCount">0</prop>
+        <prop key="phoneWithCallTo1FilePath">C:\Users\kisho\Desktop\OrientDb\migration_script\D_JXL_CONTACTLIST.csv
+        </prop>
+    </util:properties>
+
+    <util:properties id="orientdbProp">
+        <prop key="url">remote:/localhost/sns</prop>
+        <prop key="userName">admin</prop>
+        <prop key="password">admin</prop>
+    </util:properties>
+
+    <util:properties id="mysqlProp">
+        <prop key="url">jdbc:mysql://115.29.177.124:3306/MERCHANTAUDIT</prop>
+        <prop key="userName">kisho.dai</prop>
+        <prop key="password">djK0OyeHP</prop>
+    </util:properties>
+
+    <util:properties id="sqlserverProp">
+        <prop key="url"></prop>
+        <prop key="userName"></prop>
+        <prop key="password"></prop>
+    </util:properties>
+
+</beans>
