@@ -15,7 +15,6 @@ package cn.memedai.orientdb.teleporter.sns.increment.consumer;
 import cn.memedai.orientdb.teleporter.sns.common.SnsService;
 import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsAbstractTxConsumer;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
-import com.orientechnologies.orient.core.sql.query.OResultSet;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -42,7 +41,7 @@ public class HasOrderIncrementConsumer extends SnsAbstractTxConsumer {
     @Override
     protected void process() {
 
-        for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERINFORID_MEMBERID.entrySet()) {
+        for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERRID_MEMBERID.entrySet()) {
             String toRid = entry.getKey();
             String memberId = entry.getValue();
             String fromRid = snsService.getMemberRid(getODatabaseDocumentTx(), memberId);
@@ -51,7 +50,7 @@ public class HasOrderIncrementConsumer extends SnsAbstractTxConsumer {
             }
         }
 
-        for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERINFORID_PHONERID.entrySet()) {
+        for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERRID_PHONERID.entrySet()) {
             String toRid = entry.getKey();
             String fromRid = entry.getValue();
             if (StringUtils.isNotBlank(fromRid)) {
@@ -62,7 +61,7 @@ public class HasOrderIncrementConsumer extends SnsAbstractTxConsumer {
         for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERNO_APPLYINFORID.entrySet()) {
             String fromRid = entry.getValue();
             String orderNo = entry.getKey();
-            String toRid = CacheUtils.getOrderInfoRid(orderNo);
+            String toRid = CacheUtils.getOrderRid(orderNo);
             if (StringUtils.isNotBlank(toRid)) {
                 createEdge(createApplyHasOrder, selectApplyHasOrder, fromRid, toRid);
             }

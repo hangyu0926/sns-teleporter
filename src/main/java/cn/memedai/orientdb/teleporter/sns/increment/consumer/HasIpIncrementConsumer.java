@@ -1,9 +1,8 @@
 package cn.memedai.orientdb.teleporter.sns.increment.consumer;
 
-import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsAbstractTxConsumer;
 import cn.memedai.orientdb.teleporter.sns.common.SnsService;
+import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsAbstractTxConsumer;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
-import com.orientechnologies.orient.core.sql.query.OResultSet;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -35,10 +34,10 @@ public class HasIpIncrementConsumer extends SnsAbstractTxConsumer {
         for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYNO_IPRID.entrySet()) {
             String applyNo = entry.getKey();
             String toRid = entry.getValue();
-            String fromRid = CacheUtils.getApplyInfoRid(applyNo);
+            String fromRid = CacheUtils.getApplyRid(applyNo);
             createEdge(createApplyHasIp, selectApplyHasIp, fromRid, toRid);
 
-            String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_APPLYINFORID_MEMBERID.get(fromRid));
+            String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_APPLYRID_MEMBERID.get(fromRid));
             if (StringUtils.isNotBlank(memberRid)) {
                 memberRidAndIpRidSet.add(memberRid + "|" + toRid);
             }
@@ -47,10 +46,10 @@ public class HasIpIncrementConsumer extends SnsAbstractTxConsumer {
         for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERNO_IPRID.entrySet()) {
             String orderNo = entry.getKey();
             String toRid = entry.getValue();
-            String fromRid = CacheUtils.getOrderInfoRid(orderNo);
+            String fromRid = CacheUtils.getOrderRid(orderNo);
             createEdge(createOrderHasIp, selectOrderHasIp, fromRid, toRid);
 
-            String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_ORDERINFORID_MEMBERID.get(fromRid));
+            String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_ORDERRID_MEMBERID.get(fromRid));
             if (StringUtils.isNotBlank(memberRid)) {
                 memberRidAndIpRidSet.add(memberRid + "|" + toRid);
             }

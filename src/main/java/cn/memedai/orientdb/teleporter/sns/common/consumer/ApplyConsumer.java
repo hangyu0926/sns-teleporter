@@ -36,18 +36,16 @@ public class ApplyConsumer extends BlockingQueueDataConsumer {
         String applyNo = (String) dataMap.get("apply_no");
 
         String applyInfoRid = getRid(docObj);
-        CacheUtils.setApplyInfoRid(applyNo, applyInfoRid);
+        CacheUtils.setApplyRid(applyNo, applyInfoRid);
 
-        //orderNo->ApplyInfo
         String orderNo = (String) dataMap.get("order_no");
         if (StringUtils.isNotBlank(orderNo)) {
-            CacheUtils.setOrderNoApplyInfoRid(orderNo, applyInfoRid);
+            CacheUtils.setOrderNoApplyRid(orderNo, applyInfoRid);
         }
 
-        //ApplyInfo->storeId
         String storeId = (String) dataMap.get("store_id");
         if (StringUtils.isNotBlank(storeId)) {
-            CacheUtils.setApplyInfoRidStoreId(applyInfoRid, storeId);
+            CacheUtils.setApplyRidStoreId(applyInfoRid, storeId);
         }
 
         String memberId = dataMap.get("member_id").toString();
@@ -55,13 +53,11 @@ public class ApplyConsumer extends BlockingQueueDataConsumer {
         if (StringUtils.isNotBlank(phone)) {
             String phoneRid = snsService.processMemberAndPhone(getODatabaseDocumentTx(), memberId, phone);
             if (StringUtils.isNotBlank(phoneRid)) {
-                //ApplyInfo->Phone
-                CacheUtils.setApplyInfoRidPhoneRid(applyInfoRid, phoneRid);
+                CacheUtils.setApplyRidPhoneRid(applyInfoRid, phoneRid);
             }
         }
 
-        //ApplyInfo->memberId
-        CacheUtils.setApplyInfoRidMemberId(applyInfoRid, memberId);
+        CacheUtils.setApplyRidMemberId(applyInfoRid, memberId);
 
         return getFirstODocumnet(docObj);
     }

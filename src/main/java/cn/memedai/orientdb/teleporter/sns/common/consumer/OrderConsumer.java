@@ -34,12 +34,11 @@ public class OrderConsumer extends BlockingQueueDataConsumer {
         Map<String, Object> dataMap = (Map<String, Object>) obj;
         String orderNo = (String) dataMap.get("order_no");
         String orderInfoRid = getRid(docObj);
-        CacheUtils.setOrderInfoRid(orderNo, orderInfoRid);
+        CacheUtils.setOrderRid(orderNo, orderInfoRid);
 
-        //OrderInfo->storeId
         String storeId = (String) dataMap.get("store_id");
         if (StringUtils.isNotBlank(storeId)) {
-            CacheUtils.setOrderInfoRidStoreId(orderInfoRid, storeId);
+            CacheUtils.setOrderRidStoreId(orderInfoRid, storeId);
         }
 
         String memberId = dataMap.get("member_id").toString();
@@ -47,13 +46,11 @@ public class OrderConsumer extends BlockingQueueDataConsumer {
         if (StringUtils.isNotBlank(phone)) {
             String phoneRid = snsService.processMemberAndPhone(getODatabaseDocumentTx(), memberId, phone);
             if (StringUtils.isNotBlank(phoneRid)) {
-                //OrderInfo->Phone
-                CacheUtils.setOrderInfoRidPhoneRid(orderInfoRid, phoneRid);
+                CacheUtils.setOrderRidPhoneRid(orderInfoRid, phoneRid);
             }
         }
 
-        //OrderInfo->memberId
-        CacheUtils.setOrderInfoRidMemberId(orderInfoRid, memberId);
+        CacheUtils.setOrderRidMemberId(orderInfoRid, memberId);
 
         return getFirstODocumnet(docObj);
     }

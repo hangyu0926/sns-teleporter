@@ -8,13 +8,13 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public final class CacheUtils {
 
-    public static final Map<String, String> CACHE_STOREINFO_RID = new ConcurrentHashMap<String, String>(4000);
-    public static final Map<String, String> CACHE_APPLYINFO_RID = new ConcurrentHashMap(50000);
-    public static final Map<String, String> CACHE_ORDERINFO_RID = new ConcurrentHashMap(50000);
-    public static final Map<String, String> CACHE_APPLYINFORID_STOREID = new ConcurrentHashMap(50000);
-    public static final Map<String, String> CACHE_ORDERINFORID_STOREID = new ConcurrentHashMap(50000);
+    public static final Map<String, String> CACHE_STORE_RID = new ConcurrentHashMap<String, String>(4000);
+    public static final Map<String, String> CACHE_APPLY_RID = new ConcurrentHashMap(50000);
+    public static final Map<String, String> CACHE_ORDER_RID = new ConcurrentHashMap(50000);
+    public static final Map<String, String> CACHE_APPLYRID_STOREID = new ConcurrentHashMap(50000);
+    public static final Map<String, String> CACHE_ORDERRID_STOREID = new ConcurrentHashMap(50000);
     public static final Map<String, String> CACHE_ORDERNO_APPLYINFORID = new ConcurrentHashMap(50000);
-    public static final Map<String, String> CACHE_DEVICEINFO_RID = new ConcurrentHashMap(45000);
+    public static final Map<String, String> CACHE_DEVICE_RID = new ConcurrentHashMap(45000);
     public static final Map<String, String> CACHE_APPLYNO_DEVICERID = new ConcurrentHashMap(50000);
     public static final Map<String, String> CACHE_IP_RID = new ConcurrentHashMap(350000);
     public static final Map<String, String> CACHE_APPLYNO_IPRID = new ConcurrentHashMap(500000);
@@ -23,47 +23,46 @@ public final class CacheUtils {
     public static final Map<String, String> CACHE_PHONE_MARK_RID = new ConcurrentHashMap();
     public static final Map<String, String> CACHE_PHONE_RID = new ConcurrentHashMap(1000000);
     public static final Map<String, String> CACHE_MEMBER_RID = new ConcurrentHashMap(1500000);
-    public static final Map<String, String> CACHE_APPLYINFORID_MEMBERID = new ConcurrentHashMap(50000);
-    public static final Map<String, String> CACHE_ORDERINFORID_MEMBERID = new ConcurrentHashMap(50000);
-    public static final Map<String, String> CACHE_APPLYINFORID_PHONERID = new ConcurrentHashMap(50000);
-    public static final Map<String, String> CACHE_ORDERINFORID_PHONERID = new ConcurrentHashMap(50000);
+    public static final Map<String, String> CACHE_APPLYRID_MEMBERID = new ConcurrentHashMap(50000);
+    public static final Map<String, String> CACHE_ORDERRID_MEMBERID = new ConcurrentHashMap(50000);
+    public static final Map<String, String> CACHE_APPLYRID_PHONERID = new ConcurrentHashMap(50000);
+    public static final Map<String, String> CACHE_ORDERRID_PHONERID = new ConcurrentHashMap(50000);
     public static final Map<String, String> CACHE_MEMBER_PHONERIDS = new ConcurrentHashMap(1500000);
 
     public static final Map<String, String> CACHE_REPORTERNO_PHONE = new ConcurrentHashMap(1500000);
     public static final Map<String, String> CACHE_APPLYNO_PHONE = new ConcurrentHashMap(15000);
 
-//    public static final List<String> COMMAND_SQL = new Vector<String>(1000);
 
     public static void setStoreRid(String key, String value) {
-        CACHE_STOREINFO_RID.put(key, value);
+        CACHE_STORE_RID.put(key, value);
     }
 
-    public static String getStoreInfoRid(String key) {
-        return CACHE_STOREINFO_RID.get(key);
+    public static String getStoreRid(String key) {
+        return CACHE_STORE_RID.get(key);
     }
 
-    public static void setApplyInfoRid(String key, String value) {
-        CACHE_APPLYINFO_RID.put(key, value);
+    public static void setApplyRid(String key, String value) {
+        CACHE_APPLY_RID.put(key, value);
     }
 
-    public static String getApplyInfoRid(String key) {
-        return CACHE_APPLYINFO_RID.get(key);
+    public static String getApplyRid(String key) {
+        return CACHE_APPLY_RID.get(key);
     }
 
-    public static void setOrderInfoRid(String key, String value) {
-        CACHE_ORDERINFO_RID.put(key, value);
+    public static void setOrderRid(String key, String value) {
+        CACHE_ORDER_RID.put(key, value);
     }
 
-    public static String getOrderInfoRid(String key) {
-        return CACHE_ORDERINFO_RID.get(key);
+    public static String getOrderRid(String key) {
+        return CACHE_ORDER_RID.get(key);
     }
 
     public static void setDeviceRid(String key, String value) {
-        CACHE_DEVICEINFO_RID.put(key, value);
+        CACHE_DEVICE_RID.put(key, value);
     }
 
     public static String getDeviceRid(String key) {
-        return CACHE_DEVICEINFO_RID.get(key);
+        return CACHE_DEVICE_RID.get(key);
     }
 
     public static void setIpRid(String key, String value) {
@@ -74,15 +73,15 @@ public final class CacheUtils {
         return CACHE_IP_RID.get(key);
     }
 
-    public static void setApplyInfoRidStoreId(String key, String value) {
-        CACHE_APPLYINFORID_STOREID.put(key, value);
+    public static void setApplyRidStoreId(String key, String value) {
+        CACHE_APPLYRID_STOREID.put(key, value);
     }
 
-    public static void setOrderInfoRidStoreId(String key, String value) {
-        CACHE_ORDERINFORID_STOREID.put(key, value);
+    public static void setOrderRidStoreId(String key, String value) {
+        CACHE_ORDERRID_STOREID.put(key, value);
     }
 
-    public static void setOrderNoApplyInfoRid(String key, String value) {
+    public static void setOrderNoApplyRid(String key, String value) {
         CACHE_ORDERNO_APPLYINFORID.put(key, value);
     }
 
@@ -126,24 +125,24 @@ public final class CacheUtils {
         return CACHE_MEMBER_RID.get(key);
     }
 
-    public static void setApplyInfoRidMemberId(String key, String value) {
-        CACHE_APPLYINFORID_MEMBERID.put(key, value);
+    public static void setApplyRidMemberId(String key, String value) {
+        CACHE_APPLYRID_MEMBERID.put(key, value);
     }
 
-    public static void setOrderInfoRidMemberId(String key, String value) {
-        CACHE_ORDERINFORID_MEMBERID.put(key, value);
+    public static void setOrderRidMemberId(String key, String value) {
+        CACHE_ORDERRID_MEMBERID.put(key, value);
     }
 
-    public static void setApplyInfoRidPhoneRid(String key, String value) {
-        CACHE_APPLYINFORID_PHONERID.put(key, value);
+    public static void setApplyRidPhoneRid(String key, String value) {
+        CACHE_APPLYRID_PHONERID.put(key, value);
     }
 
-    public static String getApplyInfoRidPhoneRid(String key) {
-        return CACHE_APPLYINFORID_PHONERID.get(key);
+    public static String getApplyRidPhoneRid(String key) {
+        return CACHE_APPLYRID_PHONERID.get(key);
     }
 
-    public static void setOrderInfoRidPhoneRid(String key, String value) {
-        CACHE_ORDERINFORID_PHONERID.put(key, value);
+    public static void setOrderRidPhoneRid(String key, String value) {
+        CACHE_ORDERRID_PHONERID.put(key, value);
     }
 
     public static void setMemberPhoneRids(String key, String value) {

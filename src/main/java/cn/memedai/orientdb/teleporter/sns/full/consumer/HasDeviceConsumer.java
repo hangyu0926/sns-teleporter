@@ -42,11 +42,11 @@ public class HasDeviceConsumer extends SnsAbstractTxConsumer {
         for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYNO_DEVICERID.entrySet()) {
             String applyNo = entry.getKey();
             String toRid = entry.getValue();
-            String fromRid = CacheUtils.getApplyInfoRid(applyNo);
+            String fromRid = CacheUtils.getApplyRid(applyNo);
             if (StringUtils.isNotBlank(fromRid)) {
                 //Apply-ApplyHasDevice->Device
                 execute(SQL_APPLYHASDEVICE, fromRid, toRid);
-                String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_APPLYINFORID_MEMBERID.get(fromRid));
+                String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_APPLYRID_MEMBERID.get(fromRid));
                 if (StringUtils.isNotBlank(memberRid)) {
                     memberRidAndDeviceRidSet.add(memberRid + "|" + toRid);
                 }
@@ -57,11 +57,11 @@ public class HasDeviceConsumer extends SnsAbstractTxConsumer {
         for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERNO_DEVICERID.entrySet()) {
             String orderNo = entry.getKey();
             String toRid = entry.getValue();
-            String fromRid = CacheUtils.getOrderInfoRid(orderNo);
+            String fromRid = CacheUtils.getOrderRid(orderNo);
             if (StringUtils.isNotBlank(fromRid)) {
                 //Order-OrderHasDevice->Device
                 execute(SQL_ORDERHASDEVICE, fromRid, toRid);
-                String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_ORDERINFORID_MEMBERID.get(fromRid));
+                String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_ORDERRID_MEMBERID.get(fromRid));
                 if (StringUtils.isNotBlank(memberRid)) {
                     memberRidAndDeviceRidSet.add(memberRid + "|" + toRid);
                 }

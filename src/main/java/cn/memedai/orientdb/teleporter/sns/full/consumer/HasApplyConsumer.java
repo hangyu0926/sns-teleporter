@@ -31,7 +31,7 @@ public class HasApplyConsumer extends SnsAbstractTxConsumer {
     @Override
     protected void process() {
 
-        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYINFORID_MEMBERID.entrySet()) {
+        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYRID_MEMBERID.entrySet()) {
             String memberId = entry.getValue();
             String fromRid = CacheUtils.getMemberRid(memberId);
             String toRid = entry.getKey();
@@ -41,7 +41,7 @@ public class HasApplyConsumer extends SnsAbstractTxConsumer {
             }
         }
 
-        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYINFORID_PHONERID.entrySet()) {
+        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYRID_PHONERID.entrySet()) {
             String fromRid = entry.getValue();
             String toRid = entry.getKey();
             //Phone-PhoneHasApply->ApplyInfo

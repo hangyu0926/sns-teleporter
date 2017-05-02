@@ -32,7 +32,7 @@ public class HasOrderConsumer extends SnsAbstractTxConsumer {
     @Override
     protected void process() {
 
-        for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERINFORID_MEMBERID.entrySet()) {
+        for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERRID_MEMBERID.entrySet()) {
             String toRid = entry.getKey();
             String memberId = entry.getValue();
             String fromRid = CacheUtils.getMemberRid(memberId);
@@ -41,7 +41,7 @@ public class HasOrderConsumer extends SnsAbstractTxConsumer {
             }
         }
 
-        for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERINFORID_PHONERID.entrySet()) {
+        for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERRID_PHONERID.entrySet()) {
             String toRid = entry.getKey();
             String fromRid = entry.getValue();
             execute(createPhoneHasOrder, fromRid, toRid);
@@ -50,7 +50,7 @@ public class HasOrderConsumer extends SnsAbstractTxConsumer {
         for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERNO_APPLYINFORID.entrySet()) {
             String fromRid = entry.getValue();
             String orderNo = entry.getKey();
-            String toRid = CacheUtils.getOrderInfoRid(orderNo);
+            String toRid = CacheUtils.getOrderRid(orderNo);
             if (StringUtils.isNotBlank(toRid)) {
                 execute(createApplyHasOrder, fromRid, toRid);
             }

@@ -38,14 +38,14 @@ public class HasApplyIncrementConsumer extends SnsAbstractTxConsumer {
     @Override
     protected void process() {
 
-        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYINFORID_MEMBERID.entrySet()) {
+        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYRID_MEMBERID.entrySet()) {
             String memberId = entry.getValue();
             String fromRid = snsService.getMemberRid(getODatabaseDocumentTx(), memberId);
             String toRid = entry.getKey();
             createEdge(createMemberHasApply, selectMemberHasApply, fromRid, toRid);
         }
 
-        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYINFORID_PHONERID.entrySet()) {
+        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYRID_PHONERID.entrySet()) {
             String fromRid = entry.getValue();
             String toRid = entry.getKey();
             createEdge(createPhoneHasApply, selectPhoneHasApply, fromRid, toRid);

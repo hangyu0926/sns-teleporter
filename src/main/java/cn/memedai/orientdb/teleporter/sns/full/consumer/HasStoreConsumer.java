@@ -30,11 +30,11 @@ public class HasStoreConsumer extends SnsAbstractTxConsumer {
 
     @Override
     protected void process() {
-        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYINFORID_STOREID.entrySet()) {
+        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYRID_STOREID.entrySet()) {
             String fromRid = entry.getKey();
             String storeId = entry.getValue();
             //ApplyInfo-HasStore->StoreInfo
-            String toRid = CacheUtils.getStoreInfoRid(storeId);
+            String toRid = CacheUtils.getStoreRid(storeId);
             if (StringUtils.isBlank(toRid)) {
                 log.info("storeId : " + storeId + " does not exist!");
             } else {
@@ -42,11 +42,11 @@ public class HasStoreConsumer extends SnsAbstractTxConsumer {
             }
         }
 
-        for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERINFORID_STOREID.entrySet()) {
+        for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERRID_STOREID.entrySet()) {
             String fromRid = entry.getKey();
             String storeId = entry.getValue();
             //OrderInfo-HasStore->StoreInfo
-            String toRid = CacheUtils.getStoreInfoRid(storeId);
+            String toRid = CacheUtils.getStoreRid(storeId);
             if (StringUtils.isBlank(toRid)) {
                 log.info("storeId : " + storeId + " does not exist!");
             } else {

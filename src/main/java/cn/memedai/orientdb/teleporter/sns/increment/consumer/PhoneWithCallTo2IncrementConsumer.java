@@ -42,13 +42,13 @@ public class PhoneWithCallTo2IncrementConsumer extends BlockingQueueDataConsumer
             return null;
         }
 
-        String applyInfoRid = CacheUtils.getApplyInfoRid(applyNo);
+        String applyInfoRid = CacheUtils.getApplyRid(applyNo);
         if (StringUtils.isBlank(applyInfoRid)) {
             return null;
         }
 
         String toPhoneRid = snsService.getPhoneRid(getODatabaseDocumentTx(), toPhone);
-        String fromPhoneRid = CacheUtils.getApplyInfoRidPhoneRid(applyInfoRid);
+        String fromPhoneRid = CacheUtils.getApplyRidPhoneRid(applyInfoRid);
         if (StringUtils.isBlank(fromPhoneRid) || StringUtils.isBlank(toPhoneRid)) {
             return null;
         }

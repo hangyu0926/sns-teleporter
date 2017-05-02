@@ -31,7 +31,7 @@ public class DuplicatedPhoneCallToIncrementConsumer extends SnsAbstractTxConsume
     private static final String SQL_CALLTO = "select expand($c) from (select from V limit 1) let $a = (select expand(in_CallTo) from {0}), $b = (select expand(out_CallTo) from {1}), $c = unionall($a,$b)";
 
     protected void process() {
-        Collection<String> collection = CacheUtils.CACHE_APPLYINFORID_PHONERID.values();
+        Collection<String> collection = CacheUtils.CACHE_APPLYRID_PHONERID.values();
         if (!collection.isEmpty()) {
             Set<String> phoneRids = new HashSet<String>();
             phoneRids.addAll(collection);

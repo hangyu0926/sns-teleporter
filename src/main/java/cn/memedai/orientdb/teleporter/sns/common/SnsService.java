@@ -127,7 +127,7 @@ public class SnsService {
     }
 
     public String getStoreRid(ODatabaseDocumentTx tx, String storeId) {
-        String storeRid = CacheUtils.getStoreInfoRid(storeId);
+        String storeRid = CacheUtils.getStoreRid(storeId);
         if (StringUtils.isBlank(storeRid)) {
             storeRid = getRid(execute(tx, SELECT_STORE_SQL, storeId));
             if (StringUtils.isNotBlank(storeRid)) {

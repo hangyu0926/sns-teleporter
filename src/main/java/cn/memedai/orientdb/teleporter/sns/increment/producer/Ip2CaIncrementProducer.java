@@ -22,7 +22,7 @@ public class Ip2CaIncrementProducer extends SnsJdbcDataProducer {
 
     @Override
     protected void onStart() {
-        setInSqlData(CacheUtils.CACHE_APPLYINFO_RID.keySet().toArray());
+        setInSqlData(CacheUtils.CACHE_APPLY_RID.keySet().toArray());
     }
 
 }

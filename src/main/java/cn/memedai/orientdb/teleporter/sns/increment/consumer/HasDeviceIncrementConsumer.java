@@ -46,10 +46,10 @@ public class HasDeviceIncrementConsumer extends SnsAbstractTxConsumer {
             //Apply-ApplyHasDevice->Device
             String applyNo = entry.getKey();
             String toRid = entry.getValue();
-            String fromRid = CacheUtils.getApplyInfoRid(applyNo);
+            String fromRid = CacheUtils.getApplyRid(applyNo);
             createEdge(createApplyHasDevice, selectApplyHasDevice, fromRid, toRid);
 
-             String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_APPLYINFORID_MEMBERID.get(fromRid));
+             String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_APPLYRID_MEMBERID.get(fromRid));
             if (StringUtils.isNotBlank(memberRid)) {
                 memberRidAndDeviceRidSet.add(memberRid + "|" + toRid);
             }
@@ -59,10 +59,10 @@ public class HasDeviceIncrementConsumer extends SnsAbstractTxConsumer {
             //Order-OrderHasDevice->Device
             String orderNo = entry.getKey();
             String toRid = entry.getValue();
-            String fromRid = CacheUtils.getOrderInfoRid(orderNo);
+            String fromRid = CacheUtils.getOrderRid(orderNo);
             createEdge(createOrderHasDevice, selectOrderHasDevice, fromRid, toRid);
 
-            String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_ORDERINFORID_MEMBERID.get(fromRid));
+            String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_ORDERRID_MEMBERID.get(fromRid));
             if (StringUtils.isNotBlank(memberRid)) {
                 memberRidAndDeviceRidSet.add(memberRid + "|" + toRid);
             }

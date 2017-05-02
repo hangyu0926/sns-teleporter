@@ -37,14 +37,14 @@ public class HasStoreIncrementConsumer extends SnsAbstractTxConsumer {
 
     @Override
     protected void process() {
-        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYINFORID_STOREID.entrySet()) {
+        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYRID_STOREID.entrySet()) {
             String fromRid = entry.getKey();
             String storeId = entry.getValue();
-            String toRid = CacheUtils.getStoreInfoRid(storeId);
+            String toRid = CacheUtils.getStoreRid(storeId);
             createEdge(createApplyHasStore, selectApplyHasStore, fromRid, toRid);
         }
 
-        for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERINFORID_STOREID.entrySet()) {
+        for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERRID_STOREID.entrySet()) {
             String fromRid = entry.getKey();
             String storeId = entry.getValue();
             String toRid = snsService.getStoreRid(getODatabaseDocumentTx(), storeId);
