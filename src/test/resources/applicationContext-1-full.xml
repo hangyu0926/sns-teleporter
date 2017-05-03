@@ -188,12 +188,12 @@
 
         <entry key="50">
             <list>
-                <ref bean="hasStoreFullConsumerCommon"/>
-                <ref bean="hasOrderFullConsumerCommon"/>
-                <ref bean="hasIpFullConsumerCommon"/>
-                <ref bean="hasDeviceFullConsumerCommon"/>
-                <ref bean="hasApplyFullConsumerCommon"/>
-                <ref bean="hasPhoneFullConsumerCommon"/>
+                <ref bean="hasStoreFullConsumer"/>
+                <ref bean="hasOrderFullConsumer"/>
+                <ref bean="hasIpFullConsumer"/>
+                <ref bean="hasDeviceFullConsumer"/>
+                <ref bean="hasApplyFullConsumer"/>
+                <ref bean="hasPhoneFullConsumer"/>
             </list>
         </entry>
 

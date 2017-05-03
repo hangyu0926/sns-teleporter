@@ -23,7 +23,7 @@ import java.util.Map;
  * Created by kisho on 2017/4/7.
  */
 @Service
-public class HasStoreFullConsumerCommon extends SnsCommonAbstractTxConsumer {
+public class HasStoreFullConsumer extends SnsCommonAbstractTxConsumer {
 
     private String createApplyHasStore = "create edge ApplyHasStore from {0} to {1} retry 100";
     private String createOrderHasStore = "create edge OrderHasStore from {0} to {1} retry 100";

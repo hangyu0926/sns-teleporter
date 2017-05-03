@@ -27,51 +27,55 @@ import java.util.Set;
  * Created by kisho on 2017/4/7.
  */
 @Service
-public class HasIpFullConsumerCommon extends SnsCommonAbstractTxConsumer {
+public class HasDeviceFullConsumer extends SnsCommonAbstractTxConsumer {
 
-    private String createApplyHasIp = "create edge ApplyHasIp from {0} to {1} retry 100";
-    private String createOrderHasIp = "create edge OrderHasIp from {0} to {1} retry 100";
-    private String createMemberHasIp = "create edge MemberHasIp from {0} to {1} retry 100";
+    private String SQL_APPLYHASDEVICE = "create edge ApplyHasDevice from {0} to {1} retry 100";
+    private String SQL_ORDERHASDEVICE = "create edge OrderHasDevice from {0} to {1} retry 100";
+    private String SQL_MEMBERHASDEVICE = "create edge MemberHasDevice from {0} to {1} retry 100";
 
     @Resource
     private SnsService snsService;
 
     @Override
     protected void process() {
-        Set<String> memberRidAndIpRidSet = new HashSet<String>();
-        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYNO_IPRID.entrySet()) {
+        Set<String> memberRidAndDeviceRidSet = new HashSet<String>();
+        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYNO_DEVICERID.entrySet()) {
             String applyNo = entry.getKey();
             String toRid = entry.getValue();
             String fromRid = CacheUtils.getApplyRid(applyNo);
             if (StringUtils.isNotBlank(fromRid)) {
-                execute(createApplyHasIp, fromRid, toRid);
+                //Apply-ApplyHasDevice->Device
+                execute(SQL_APPLYHASDEVICE, fromRid, toRid);
                 String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_APPLYRID_MEMBERID.get(fromRid));
                 if (StringUtils.isNotBlank(memberRid)) {
-                    memberRidAndIpRidSet.add(memberRid + "|" + toRid);
+                    memberRidAndDeviceRidSet.add(memberRid + "|" + toRid);
                 }
             }
+
         }
 
-        for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERNO_IPRID.entrySet()) {
+        for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERNO_DEVICERID.entrySet()) {
             String orderNo = entry.getKey();
             String toRid = entry.getValue();
             String fromRid = CacheUtils.getOrderRid(orderNo);
             if (StringUtils.isNotBlank(fromRid)) {
-                execute(createOrderHasIp, fromRid, toRid);
+                //Order-OrderHasDevice->Device
+                execute(SQL_ORDERHASDEVICE, fromRid, toRid);
                 String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_ORDERRID_MEMBERID.get(fromRid));
                 if (StringUtils.isNotBlank(memberRid)) {
-                    memberRidAndIpRidSet.add(memberRid + "|" + toRid);
+                    memberRidAndDeviceRidSet.add(memberRid + "|" + toRid);
                 }
             }
+
         }
 
-        if (!memberRidAndIpRidSet.isEmpty()) {
-            for (String memberRidAndIpRid : memberRidAndIpRidSet) {
-                String[] strArr = memberRidAndIpRid.split("\\|");
+        if (!memberRidAndDeviceRidSet.isEmpty()) {
+            for (String memberRidAndDeviceRid : memberRidAndDeviceRidSet) {
+                String[] strArr = memberRidAndDeviceRid.split("\\|");
                 String memberRid = strArr[0];
-                String IpRid = strArr[1];
-                //Member-MemberHasIp->Ip
-                execute(createMemberHasIp, memberRid, IpRid);
+                String deviceRid = strArr[1];
+                //Member-MemberHasDevice->Device
+                execute(SQL_MEMBERHASDEVICE, memberRid, deviceRid);
             }
         }
     }

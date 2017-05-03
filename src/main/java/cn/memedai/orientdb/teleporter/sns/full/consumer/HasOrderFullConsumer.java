@@ -23,29 +23,37 @@ import java.util.Map;
  * Created by kisho on 2017/4/7.
  */
 @Service
-public class HasApplyFullConsumerCommon extends SnsCommonAbstractTxConsumer {
+public class HasOrderFullConsumer extends SnsCommonAbstractTxConsumer {
 
-    private String createMemberHasApply = "create edge MemberHasApply from {0} to {1} retry 100";
-    private String createPhoneHasApply = "create edge PhoneHasApply from {0} to {1} retry 100";
+    private String createApplyHasOrder = "create edge ApplyHasOrder from {0} to {1} retry 100";
+    private String createPhoneHasOrder = "create edge PhoneHasOrder from {0} to {1} retry 100";
+    private String createMemberHasOrder = "create edge MemberHasOrder from {0} to {1} retry 100";
 
     @Override
     protected void process() {
 
-        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYRID_MEMBERID.entrySet()) {
+        for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERRID_MEMBERID.entrySet()) {
+            String toRid = entry.getKey();
             String memberId = entry.getValue();
             String fromRid = CacheUtils.getMemberRid(memberId);
-            String toRid = entry.getKey();
             if (StringUtils.isNotBlank(fromRid)) {
-                //Member-MemberHasApply->ApplyInfo
-                execute(createMemberHasApply, fromRid, toRid);
+                execute(createMemberHasOrder, fromRid, toRid);
             }
         }
 
-        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYRID_PHONERID.entrySet()) {
-            String fromRid = entry.getValue();
+        for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERRID_PHONERID.entrySet()) {
             String toRid = entry.getKey();
-            //Phone-PhoneHasApply->ApplyInfo
-            execute(createPhoneHasApply, fromRid, toRid);
+            String fromRid = entry.getValue();
+            execute(createPhoneHasOrder, fromRid, toRid);
+        }
+
+        for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERNO_APPLYINFORID.entrySet()) {
+            String fromRid = entry.getValue();
+            String orderNo = entry.getKey();
+            String toRid = CacheUtils.getOrderRid(orderNo);
+            if (StringUtils.isNotBlank(toRid)) {
+                execute(createApplyHasOrder, fromRid, toRid);
+            }
         }
     }
 

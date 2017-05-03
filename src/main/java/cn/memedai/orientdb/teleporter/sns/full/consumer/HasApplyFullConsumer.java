@@ -23,22 +23,29 @@ import java.util.Map;
  * Created by kisho on 2017/4/7.
  */
 @Service
-public class HasPhoneFullConsumerCommon extends SnsCommonAbstractTxConsumer {
+public class HasApplyFullConsumer extends SnsCommonAbstractTxConsumer {
 
-    private static final String SQL_HASPHONE = "create edge HasPhone from {0} to {1} retry 100";
+    private String createMemberHasApply = "create edge MemberHasApply from {0} to {1} retry 100";
+    private String createPhoneHasApply = "create edge PhoneHasApply from {0} to {1} retry 100";
 
     @Override
     protected void process() {
-        for (Map.Entry<String, String> entry : CacheUtils.CACHE_MEMBER_PHONERIDS.entrySet()) {
-            String memberId = entry.getKey();
-            String memberRid = CacheUtils.getMemberRid(memberId);
-            if (StringUtils.isNotBlank(memberRid)) {
-                String phoneRids = entry.getValue();
-                String[] phoneRidArr = phoneRids.split("\\|");
-                for (String phoneRid : phoneRidArr) {
-                    execute(SQL_HASPHONE, memberRid, phoneRid);
-                }
+
+        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYRID_MEMBERID.entrySet()) {
+            String memberId = entry.getValue();
+            String fromRid = CacheUtils.getMemberRid(memberId);
+            String toRid = entry.getKey();
+            if (StringUtils.isNotBlank(fromRid)) {
+                //Member-MemberHasApply->ApplyInfo
+                execute(createMemberHasApply, fromRid, toRid);
             }
+        }
+
+        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYRID_PHONERID.entrySet()) {
+            String fromRid = entry.getValue();
+            String toRid = entry.getKey();
+            //Phone-PhoneHasApply->ApplyInfo
+            execute(createPhoneHasApply, fromRid, toRid);
         }
     }
 
