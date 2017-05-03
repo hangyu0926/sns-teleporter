@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <import resource="applicationContext-sns-dataSource.xml"/>
+    <import resource="applicationContext-sns-properties.xml"/>
+
+    <bean id="phoneWithCall2BlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="phoneWithCallTo2FullConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.full.consumer.PhoneWithCallTo2Consumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="phoneWithCall2BlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+    </bean>
+
+
+    <bean id="phoneWithCallToCacheBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="phoneWithCallToCacheProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
+          scope="prototype">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="blockingQueue" ref="phoneWithCallToCacheBlockingQueue"/>
+        <property name="sql"
+                  value="#{snsSqlProp.phoneWithCallToCache}"/>
+    </bean>
+    <bean id="phoneWithCallToCacheConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.full.consumer.PhoneWithCallToCacheFullConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="phoneWithCallToCacheBlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+    </bean>
+
+
+    <bean id="deleteDuplicatedCallToBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="deleteDuplicatedCallToProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="blockingQueue" ref="deleteDuplicatedCallToBlockingQueue"/>
+        <property name="sql"
+                  value="select cellphone from network.apply_info group by cellphone HAVING count(1)>1 limit ?,?"/>
+    </bean>
+    <bean id="deleteDuplicatedCallToConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.full.consumer.DuplicatedPhoneCallToFullConsumer"
+          scope="prototype">
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+        <property name="blockingQueue" ref="deleteDuplicatedCallToBlockingQueue"/>
+    </bean>
+
+
+</beans>
