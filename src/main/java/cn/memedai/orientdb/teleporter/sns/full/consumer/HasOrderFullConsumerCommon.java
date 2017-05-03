@@ -12,7 +12,7 @@
  */
 package cn.memedai.orientdb.teleporter.sns.full.consumer;
 
-import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsAbstractTxConsumer;
+import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsCommonAbstractTxConsumer;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
@@ -23,7 +23,7 @@ import java.util.Map;
  * Created by kisho on 2017/4/7.
  */
 @Service
-public class HasOrderConsumer extends SnsAbstractTxConsumer {
+public class HasOrderFullConsumerCommon extends SnsCommonAbstractTxConsumer {
 
     private String createApplyHasOrder = "create edge ApplyHasOrder from {0} to {1} retry 100";
     private String createPhoneHasOrder = "create edge PhoneHasOrder from {0} to {1} retry 100";

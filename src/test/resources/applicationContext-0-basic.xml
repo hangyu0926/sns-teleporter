@@ -7,33 +7,36 @@
 				http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
                 http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
+    <!--迁移CallTo及手机标签等支持增量及不变的数据，作为一个数据基线 -->
+
     <context:annotation-config/>
     <context:component-scan base-package="cn.memedai.orientdb.teleporter"/>
 
     <import resource="applicationContext-sns-dataSource.xml"/>
     <import resource="applicationContext-sns-properties.xml"/>
     <import resource="applicationContext-sns-common.xml"/>
+    <import resource="applicationContext-sns-full-common.xml"/>
 
 
     <bean id="phoneWithCall1BlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
         <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
     </bean>
-    <bean id="phoneWithCallTo1Producer" class="cn.memedai.orientdb.teleporter.FileDataProducer"
+    <bean id="phoneWithCallTo1FullProducer" class="cn.memedai.orientdb.teleporter.FileDataProducer"
           scope="prototype">
         <property name="filePath"
                   value="#{snsProp.phoneWithCallTo1FilePath}"/>
         <property name="blockingQueue" ref="phoneWithCall1BlockingQueue"/>
         <property name="skipCount" value="#{snsProp.skipCount}"/>
     </bean>
-    <bean id="phoneWithCallTo1Consumer"
-          class="cn.memedai.orientdb.teleporter.sns.full.consumer.PhoneWithCallTo1Consumer"
+    <bean id="phoneWithCallTo1FullConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.full.consumer.PhoneWithCallTo1FullConsumer"
           scope="prototype">
         <property name="blockingQueue" ref="phoneWithCall1BlockingQueue"/>
     </bean>
 
 
-    <bean id="phoneWithCallTo2Producer"
-          class="cn.memedai.orientdb.teleporter.sns.common.consumer.PhoneWithCallTo2Producer"
+    <bean id="phoneWithCallTo2FullProducer"
+          class="cn.memedai.orientdb.teleporter.sns.common.producer.PhoneWithCallTo2CommonProducer"
           scope="prototype">
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
         <property name="blockingQueue" ref="phoneWithCall2BlockingQueue"/>
@@ -42,12 +45,13 @@
     </bean>
 
 
-    <bean id="phoneWithPhoneMarkAndPhoneSourceProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
+    <bean id="phoneWithPhoneMarkAndPhoneSourceFullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
         <property name="blockingQueue" ref="phoneWithPhoneMarkAndPhoneSourceBlockingQueue"/>
         <property name="sql"
                   value="#{snsSqlProp.phoneWithPhoneMarkAndPhoneSource}  limit ?,?"/>
     </bean>
+
 
     <util:map id="teleporterMap" key-type="java.lang.Integer" value-type="java.util.List">
         <!-- key的大小决定着优先执行顺序, 同一个key的producer和consumer会并发执行-->
@@ -60,17 +64,17 @@
 
         <entry key="20">
             <list>
-                <ref bean="phoneWithCallTo1Producer"/>
-                <ref bean="phoneWithCallTo1Consumer"/>
-                <ref bean="phoneWithCallTo1Consumer"/>
+                <ref bean="phoneWithCallTo1FullProducer"/>
+                <ref bean="phoneWithCallTo1FullConsumer"/>
+                <ref bean="phoneWithCallTo1FullConsumer"/>
 
-                <ref bean="phoneWithCallTo2Producer"/>
-                <ref bean="phoneWithCallTo2Consumer"/>
-                <ref bean="phoneWithCallTo2Consumer"/>
+                <ref bean="phoneWithCallTo2FullProducer"/>
+                <ref bean="phoneWithCallTo2FullConsumer"/>
+                <ref bean="phoneWithCallTo2FullConsumer"/>
 
-                <ref bean="phoneWithPhoneMarkAndPhoneSourceProducer"/>
-                <ref bean="phoneWithPhoneMarkAndPhoneSourceConsumer"/>
-                <ref bean="phoneWithPhoneMarkAndPhoneSourceConsumer"/>
+                <ref bean="phoneWithPhoneMarkAndPhoneSourceFullProducer"/>
+                <ref bean="phoneWithPhoneMarkAndPhoneSourceCommonConsumer"/>
+                <ref bean="phoneWithPhoneMarkAndPhoneSourceCommonConsumer"/>
             </list>
         </entry>
 
@@ -78,12 +82,6 @@
             <list>
                 <ref bean="deleteDuplicatedCallToProducer"/>
                 <ref bean="deleteDuplicatedCallToConsumer"/>
-            </list>
-        </entry>
-
-        <entry key="40">
-            <list>
-                <ref bean="reexecuteErrorSqlConsumer"/>
             </list>
         </entry>
 

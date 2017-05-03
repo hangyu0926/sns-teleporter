@@ -13,7 +13,7 @@
 package cn.memedai.orientdb.teleporter.sns.increment.consumer;
 
 import cn.memedai.orientdb.teleporter.sns.common.SnsService;
-import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsAbstractTxConsumer;
+import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsCommonAbstractTxConsumer;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
 import com.orientechnologies.orient.core.sql.query.OResultSet;
 import org.apache.commons.lang.StringUtils;
@@ -26,7 +26,7 @@ import java.util.Map;
  * Created by kisho on 2017/4/7.
  */
 @Service
-public class HasPhoneIncrementConsumer extends SnsAbstractTxConsumer {
+public class HasPhoneIncrementConsumer extends SnsCommonAbstractTxConsumer {
 
     private static final String CREATE_HASPHONE_SQL = "create edge HasPhone from {0} to {1} retry 100";
     private static final String SELECT_HASPHONE_SQL = "select from (select expand(out_HasPhone) from {0}) where in = {1}";

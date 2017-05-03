@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * Created by kisho on 2017/4/6.
  */
-public class PhoneWithCallToCacheConsumer extends BlockingQueueDataConsumer {
+public class PhoneWithCallToCacheFullConsumer extends BlockingQueueDataConsumer {
 
     @Override
     protected Object process(Object obj) {

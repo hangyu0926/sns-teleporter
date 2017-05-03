@@ -13,7 +13,7 @@
 package cn.memedai.orientdb.teleporter.sns.increment.consumer;
 
 import cn.memedai.orientdb.teleporter.sns.common.SnsService;
-import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsAbstractTxConsumer;
+import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsCommonAbstractTxConsumer;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
@@ -27,7 +27,7 @@ import java.util.Set;
  * Created by kisho on 2017/4/7.
  */
 @Service
-public class HasDeviceIncrementConsumer extends SnsAbstractTxConsumer {
+public class HasDeviceIncrementConsumer extends SnsCommonAbstractTxConsumer {
 
     private String createApplyHasDevice = "create edge ApplyHasDevice from {0} to {1} retry 100";
     private String createOrderHasDevice = "create edge OrderHasDevice from {0} to {1} retry 100";
@@ -41,25 +41,26 @@ public class HasDeviceIncrementConsumer extends SnsAbstractTxConsumer {
     private SnsService snsService;
 
     protected void process() {
-        Set<String> memberRidAndDeviceRidSet = new HashSet<String>();
+        Set<String> memberRidAndDeviceRidSet = new HashSet<>();
         for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYNO_DEVICERID.entrySet()) {
-            //Apply-ApplyHasDevice->Device
             String applyNo = entry.getKey();
             String toRid = entry.getValue();
             String fromRid = CacheUtils.getApplyRid(applyNo);
             createEdge(createApplyHasDevice, selectApplyHasDevice, fromRid, toRid);
 
-             String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_APPLYRID_MEMBERID.get(fromRid));
+            String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_APPLYRID_MEMBERID.get(fromRid));
             if (StringUtils.isNotBlank(memberRid)) {
                 memberRidAndDeviceRidSet.add(memberRid + "|" + toRid);
             }
         }
 
         for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERNO_DEVICERID.entrySet()) {
-            //Order-OrderHasDevice->Device
             String orderNo = entry.getKey();
             String toRid = entry.getValue();
             String fromRid = CacheUtils.getOrderRid(orderNo);
+            if (StringUtils.isBlank(fromRid)) {
+                continue;
+            }
             createEdge(createOrderHasDevice, selectOrderHasDevice, fromRid, toRid);
 
             String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_ORDERRID_MEMBERID.get(fromRid));
@@ -73,7 +74,6 @@ public class HasDeviceIncrementConsumer extends SnsAbstractTxConsumer {
                 String[] strArr = memberRidAndDeviceRid.split("\\|");
                 String memberRid = strArr[0];
                 String deviceRid = strArr[1];
-                //Member-MemberHasDevice->Device
                 createEdge(createMemberHasDevice, selectMemberHasDevice, memberRid, deviceRid);
             }
         }

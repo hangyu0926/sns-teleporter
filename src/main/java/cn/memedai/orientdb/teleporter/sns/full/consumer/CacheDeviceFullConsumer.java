@@ -18,22 +18,19 @@ import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OResultSet;
 import org.springframework.stereotype.Service;
 
-/**
- * Created by kisho on 2017/4/6.
- */
 @Service
-public class CacheIpConsumer extends AbstractDataConsumer {
+public class CacheDeviceFullConsumer extends AbstractDataConsumer {
 
     public void run() {
         long startTime = System.currentTimeMillis();
-        OResultSet ocrs = execute("select from Ip");
+        OResultSet ocrs = execute("select from Device");
         if (ocrs != null && !ocrs.isEmpty()) {
             for (int i = 0; i < ocrs.size(); i++) {
                 ODocument doc = (ODocument) ocrs.get(i);
-                CacheUtils.setIpRid((String) doc.field("ip"), doc.field("@rid").toString());
+                CacheUtils.setDeviceRid((String) doc.field("deviceId"), doc.field("@rid").toString());
             }
         }
-        log.debug("cache Ip use time : {}ms", (System.currentTimeMillis() - startTime));
+        log.debug("cache Device use time : {}ms", (System.currentTimeMillis() - startTime));
     }
 
 }

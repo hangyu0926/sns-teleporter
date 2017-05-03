@@ -26,7 +26,7 @@ import java.util.Map;
  * Created by kisho on 2017/4/6.
  */
 @Service
-public class PhoneWithCallTo1Consumer extends BlockingQueueDataConsumer {
+public class PhoneWithCallTo1FullConsumer extends BlockingQueueDataConsumer {
 
     private static final String CREATE_CALL_TO_SQL = "create edge CallTo from {0} to {1} set callCnt = ?,callLen=?,callInCnt=?,callOutCnt=?,reportTime=? retry 100";
 

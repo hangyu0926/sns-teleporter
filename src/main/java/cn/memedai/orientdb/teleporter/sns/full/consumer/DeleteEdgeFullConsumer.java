@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
  * Created by kisho on 2017/4/6.
  */
 @Service
-public class DeleteEdgeConsumer extends AbstractDataConsumer {
+public class DeleteEdgeFullConsumer extends AbstractDataConsumer {
 
     private String[] edges;
 

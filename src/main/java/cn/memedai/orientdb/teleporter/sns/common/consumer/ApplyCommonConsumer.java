@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * Created by kisho on 2017/4/6.
  */
-public class OrderConsumer extends BlockingQueueDataConsumer {
+public class ApplyCommonConsumer extends BlockingQueueDataConsumer {
 
     @Resource
     private SnsService snsService;
@@ -31,26 +31,33 @@ public class OrderConsumer extends BlockingQueueDataConsumer {
     @Override
     protected Object process(Object obj) {
         Object docObj = super.process(obj);
+
         Map<String, Object> dataMap = (Map<String, Object>) obj;
+        String applyNo = (String) dataMap.get("apply_no");
+
+        String applyInfoRid = getRid(docObj);
+        CacheUtils.setApplyRid(applyNo, applyInfoRid);
+
         String orderNo = (String) dataMap.get("order_no");
-        String orderInfoRid = getRid(docObj);
-        CacheUtils.setOrderRid(orderNo, orderInfoRid);
+        if (StringUtils.isNotBlank(orderNo)) {
+            CacheUtils.setOrderNoApplyRid(orderNo, applyInfoRid);
+        }
 
         String storeId = (String) dataMap.get("store_id");
         if (StringUtils.isNotBlank(storeId)) {
-            CacheUtils.setOrderRidStoreId(orderInfoRid, storeId);
+            CacheUtils.setApplyRidStoreId(applyInfoRid, storeId);
         }
 
         String memberId = dataMap.get("member_id").toString();
-        String phone = (String) dataMap.get("mobile");
+        String phone = (String) dataMap.get("cellphone");
         if (StringUtils.isNotBlank(phone)) {
             String phoneRid = snsService.processMemberAndPhone(getODatabaseDocumentTx(), memberId, phone);
             if (StringUtils.isNotBlank(phoneRid)) {
-                CacheUtils.setOrderRidPhoneRid(orderInfoRid, phoneRid);
+                CacheUtils.setApplyRidPhoneRid(applyInfoRid, phoneRid);
             }
         }
 
-        CacheUtils.setOrderRidMemberId(orderInfoRid, memberId);
+        CacheUtils.setApplyRidMemberId(applyInfoRid, memberId);
 
         return getFirstODocumnet(docObj);
     }

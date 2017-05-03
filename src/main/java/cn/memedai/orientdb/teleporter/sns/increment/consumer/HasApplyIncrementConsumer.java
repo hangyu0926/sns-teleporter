@@ -13,8 +13,9 @@
 package cn.memedai.orientdb.teleporter.sns.increment.consumer;
 
 import cn.memedai.orientdb.teleporter.sns.common.SnsService;
-import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsAbstractTxConsumer;
+import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsCommonAbstractTxConsumer;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -24,7 +25,7 @@ import java.util.Map;
  * Created by kisho on 2017/4/7.
  */
 @Service
-public class HasApplyIncrementConsumer extends SnsAbstractTxConsumer {
+public class HasApplyIncrementConsumer extends SnsCommonAbstractTxConsumer {
 
     private String createPhoneHasApply = "create edge PhoneHasApply from {0} to {1} retry 100";
     private String createMemberHasApply = "create edge MemberHasApply from {0} to {1} retry 100";
@@ -41,6 +42,9 @@ public class HasApplyIncrementConsumer extends SnsAbstractTxConsumer {
         for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYRID_MEMBERID.entrySet()) {
             String memberId = entry.getValue();
             String fromRid = snsService.getMemberRid(getODatabaseDocumentTx(), memberId);
+            if (StringUtils.isBlank(fromRid)) {
+                continue;
+            }
             String toRid = entry.getKey();
             createEdge(createMemberHasApply, selectMemberHasApply, fromRid, toRid);
         }

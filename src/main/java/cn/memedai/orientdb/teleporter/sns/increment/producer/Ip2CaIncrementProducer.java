@@ -12,13 +12,13 @@
  */
 package cn.memedai.orientdb.teleporter.sns.increment.producer;
 
-import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsJdbcDataProducer;
+import cn.memedai.orientdb.teleporter.sns.common.producer.SnsCommonJdbcDataProducer;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
 
 /**
  * Created by kisho on 2017/4/6.
  */
-public class Ip2CaIncrementProducer extends SnsJdbcDataProducer {
+public class Ip2CaIncrementProducer extends SnsCommonJdbcDataProducer {
 
     @Override
     protected void onStart() {

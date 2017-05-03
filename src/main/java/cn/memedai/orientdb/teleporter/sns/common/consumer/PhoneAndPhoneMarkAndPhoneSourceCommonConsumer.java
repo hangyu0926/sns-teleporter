@@ -26,7 +26,7 @@ import java.util.Map;
  * Created by kisho on 2017/4/6.
  */
 
-public class PhoneAndPhoneMarkAndPhoneSourceConsumer extends BlockingQueueDataConsumer {
+public class PhoneAndPhoneMarkAndPhoneSourceCommonConsumer extends BlockingQueueDataConsumer {
 
     private static final String UPDATE_PHONE_MARK = "update PhoneMark set mark=? upsert return after where mark=?";
     private static final String CREATE_HASPHONEMARK = "create edge HasPhoneMark from {0} to {1}";

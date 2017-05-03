@@ -10,7 +10,7 @@
  * written permission of Shanghai Mi-Me Financial Information Service Co., Ltd.
  * -------------------------------------------------------------------------------------
  */
-package cn.memedai.orientdb.teleporter.sns.common.consumer;
+package cn.memedai.orientdb.teleporter.sns.common.producer;
 
 import cn.memedai.orientdb.teleporter.Constants;
 import cn.memedai.orientdb.teleporter.JdbcDataProducer;
@@ -21,7 +21,7 @@ import java.util.Map;
 /**
  * Created by kisho on 2017/4/6.
  */
-public abstract class SnsJdbcDataProducer extends JdbcDataProducer {
+public abstract class SnsCommonJdbcDataProducer extends JdbcDataProducer {
 
     protected static final String IN_DATA_LIST = "#inDataList";
 

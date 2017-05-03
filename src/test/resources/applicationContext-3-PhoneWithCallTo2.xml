@@ -12,10 +12,10 @@
 
     <import resource="applicationContext-sns-dataSource.xml"/>
     <import resource="applicationContext-sns-properties.xml"/>
-    <import resource="applicationContext-sns-common.xml"/>
+    <import resource="applicationContext-sns-full-common.xml"/>
 
     <bean id="phoneWithCallTo2Producer"
-          class="cn.memedai.orientdb.teleporter.sns.common.consumer.PhoneWithCallTo2Producer"
+          class="cn.memedai.orientdb.teleporter.sns.common.producer.PhoneWithCallTo2CommonProducer"
           scope="prototype">
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
         <property name="blockingQueue" ref="phoneWithCall2BlockingQueue"/>
@@ -35,7 +35,7 @@
         <entry key="20">
             <list>
                 <ref bean="phoneWithCallTo2Producer"/>
-                <ref bean="phoneWithCallTo2Consumer"/>
+                <ref bean="phoneWithCallTo2FullConsumer"/>
             </list>
         </entry>
 

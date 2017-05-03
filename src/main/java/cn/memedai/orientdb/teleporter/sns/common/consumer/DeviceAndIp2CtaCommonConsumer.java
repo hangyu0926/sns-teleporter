@@ -22,7 +22,7 @@ import java.util.Map;
 /**
  * Created by kisho on 2017/4/6.
  */
-public class DeviceAndIp2CtaConsumer extends BlockingQueueDataConsumer {
+public class DeviceAndIp2CtaCommonConsumer extends BlockingQueueDataConsumer {
 
     private static final String SQL_DEVICE = "update Device set deviceId=? upsert return after where deviceId=?";
 

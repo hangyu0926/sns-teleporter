@@ -10,9 +10,9 @@
     <context:annotation-config/>
     <context:component-scan base-package="cn.memedai.orientdb.teleporter"/>
 
-    <import resource="applicationContext-sns-common.xml"/>
     <import resource="applicationContext-sns-dataSource.xml"/>
     <import resource="applicationContext-sns-properties.xml"/>
+    <import resource="applicationContext-sns-common.xml"/>
 
     <bean id="memberBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
         <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
@@ -97,21 +97,30 @@
     </bean>
 
 
+    <bean id="phoneWithCall2BlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
     <bean id="phoneWithCallTo2IncrementProducer"
-          class="cn.memedai.orientdb.teleporter.sns.common.consumer.PhoneWithCallTo2Producer"
+          class="cn.memedai.orientdb.teleporter.sns.common.producer.PhoneWithCallTo2CommonProducer"
           scope="prototype">
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
         <property name="blockingQueue" ref="phoneWithCall2BlockingQueue"/>
         <property name="sql"
                   value="#{snsSqlProp.phoneWithCallTo2} where #subSql limit ?,?"/>
     </bean>
+    <bean id="phoneWithCallTo2IncrementConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.increment.consumer.PhoneWithCallTo2IncrementConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="phoneWithCall2BlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+    </bean>
 
     <util:map id="teleporterMap" key-type="java.lang.Integer" value-type="java.util.List">
         <!-- key的大小决定着优先执行顺序, 同一个key的producer和consumer会并发执行-->
         <entry key="10">
             <list>
-                <ref bean="storeProducer"/>
-                <ref bean="storeConsumer"/>
+                <ref bean="storeCommonProducer"/>
+                <ref bean="storeCommonConsumer"/>
 
                 <ref bean="memberIncrementProducer"/>
                 <ref bean="memberIncrementConsumer"/>
@@ -119,31 +128,31 @@
                 <ref bean="memberIncrementConsumer"/>
 
                 <ref bean="applyIncrementProducer"/>
-                <ref bean="applyConsumer"/>
+                <ref bean="applyCommonConsumer"/>
 
                 <ref bean="orderIncrementProducer"/>
-                <ref bean="orderConsumer"/>
+                <ref bean="orderCommonConsumer"/>
 
-                <ref bean="updateMemberOverdueToDefaultConsumer"/>
+                <ref bean="updateMemberOverdueToDefaultCommonConsumer"/>
 
                 <ref bean="phoneWithPhoneMarkAndPhoneSourceProducer"/>
-                <ref bean="phoneWithPhoneMarkAndPhoneSourceConsumer"/>
+                <ref bean="phoneWithPhoneMarkAndPhoneSourceCommonConsumer"/>
             </list>
         </entry>
 
         <entry key="20">
             <list>
-                <ref bean="memberOverdueProducer"/>
-                <ref bean="memberOverdueConsumer"/>
+                <ref bean="memberOverdueCommonProducer"/>
+                <ref bean="memberOverdueCommonConsumer"/>
 
                 <ref bean="device2CaIncrementProducer"/>
-                <ref bean="device2CaConsumer"/>
+                <ref bean="device2CaCommonConsumer"/>
 
                 <ref bean="ip2CaIncrementProducer"/>
-                <ref bean="ip2CaConsumer"/>
+                <ref bean="ip2CaCommonConsumer"/>
 
                 <ref bean="deviceAndIp2CtaIncrementProducer"/>
-                <ref bean="deviceAndIp2CtaConsumer"/>
+                <ref bean="deviceAndIp2CtaCommonConsumer"/>
             </list>
         </entry>
 
@@ -161,7 +170,7 @@
         <entry key="40">
             <list>
                 <ref bean="phoneWithCallTo2IncrementProducer"/>
-                <ref bean="phoneWithCallTo2Consumer"/>
+                <ref bean="phoneWithCallTo2IncrementConsumer"/>
             </list>
         </entry>
 

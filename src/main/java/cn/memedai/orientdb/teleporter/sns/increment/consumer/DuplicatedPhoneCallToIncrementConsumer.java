@@ -13,7 +13,7 @@
 package cn.memedai.orientdb.teleporter.sns.increment.consumer;
 
 import cn.memedai.orientdb.teleporter.OrientSqlUtils;
-import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsAbstractTxConsumer;
+import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsCommonAbstractTxConsumer;
 import cn.memedai.orientdb.teleporter.sns.common.model.CallTo;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
 import com.orientechnologies.orient.core.id.ORecordId;
@@ -27,7 +27,7 @@ import java.util.*;
  * Created by kisho on 2017/4/6.
  */
 @Service
-public class DuplicatedPhoneCallToIncrementConsumer extends SnsAbstractTxConsumer {
+public class DuplicatedPhoneCallToIncrementConsumer extends SnsCommonAbstractTxConsumer {
 
     private static final String SQL_CALLTO = "select expand($c) from (select from V limit 1) let $a = (select expand(in_CallTo) from {0}), $b = (select expand(out_CallTo) from {1}), $c = unionall($a,$b)";
 

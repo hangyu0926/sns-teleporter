@@ -21,7 +21,7 @@ import java.text.MessageFormat;
 /**
  * Created by kisho on 2017/4/27.
  */
-public abstract class SnsAbstractTxConsumer extends AbstractTxConsumer {
+public abstract class SnsCommonAbstractTxConsumer extends AbstractTxConsumer {
 
     @Override
     protected <RET> RET execute(String sql, Object... args) {

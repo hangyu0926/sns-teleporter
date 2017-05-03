@@ -16,7 +16,6 @@ import cn.memedai.orientdb.teleporter.BlockingQueueDataConsumer;
 import cn.memedai.orientdb.teleporter.sns.common.SnsService;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.Map;
@@ -24,7 +23,7 @@ import java.util.Map;
 /**
  * Created by kisho on 2017/4/6.
  */
-public class DeviceAndIp1Consumer extends BlockingQueueDataConsumer {
+public class DeviceAndIp1FullConsumer extends BlockingQueueDataConsumer {
 
     @Resource
     private SnsService snsService;

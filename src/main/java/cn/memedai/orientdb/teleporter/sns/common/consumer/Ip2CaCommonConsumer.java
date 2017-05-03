@@ -21,17 +21,19 @@ import java.util.Map;
 /**
  * Created by kisho on 2017/4/6.
  */
-public class Device2CaConsumer extends BlockingQueueDataConsumer {
+public class Ip2CaCommonConsumer extends BlockingQueueDataConsumer {
 
     @Resource
     private SnsService snsService;
 
+    @Override
     protected Object process(Object obj) {
         Map<String, Object> dataMap = (Map<String, Object>) obj;
         String applyNo = (String) dataMap.get("APPL_NO");
 
-        String deviceId = (String) dataMap.get("DEVICE_ID");
-        snsService.processApplyAndDevice(getODatabaseDocumentTx(), applyNo, deviceId);
+        String ip = (String) dataMap.get("IP");
+        String ipCity = (String) dataMap.get("IP_CITY");
+        snsService.processApplyAndIp(getODatabaseDocumentTx(), applyNo, ip, ipCity);
         return null;
     }
 

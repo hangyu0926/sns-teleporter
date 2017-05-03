@@ -10,11 +10,12 @@
     <context:annotation-config/>
     <context:component-scan base-package="cn.memedai.orientdb.teleporter"/>
 
-    <import resource="applicationContext-sns-common.xml"/>
     <import resource="applicationContext-sns-dataSource.xml"/>
     <import resource="applicationContext-sns-properties.xml"/>
+    <import resource="applicationContext-sns-common.xml"/>
+    <import resource="applicationContext-sns-full-common.xml"/>
 
-    <bean id="deleteEdgesConsumer" class="cn.memedai.orientdb.teleporter.sns.full.consumer.DeleteEdgeConsumer"
+    <bean id="deleteEdgesFullConsumer" class="cn.memedai.orientdb.teleporter.sns.full.consumer.DeleteEdgeFullConsumer"
           scope="prototype">
         <property name="edges">
             <array>
@@ -34,14 +35,14 @@
     <bean id="memberBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
         <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
     </bean>
-    <bean id="memberProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
+    <bean id="memberFullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
           scope="prototype">
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
         <property name="blockingQueue" ref="memberBlockingQueue"/>
         <property name="sql"
                   value="#{snsSqlProp.member}"/>
     </bean>
-    <bean id="memberConsumer" class="cn.memedai.orientdb.teleporter.sns.full.consumer.MemberConsumer"
+    <bean id="memberFullConsumer" class="cn.memedai.orientdb.teleporter.sns.full.consumer.MemberFullConsumer"
           scope="prototype">
         <property name="documentTxFactory" ref="documentTxFactory"/>
         <property name="blockingQueue" ref="memberBlockingQueue"/>
@@ -59,7 +60,7 @@
         </property>
     </bean>
 
-    <bean id="applyProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
+    <bean id="applyFullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
           scope="prototype">
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
         <property name="blockingQueue" ref="applyBlockingQueue"/>
@@ -68,7 +69,7 @@
     </bean>
 
 
-    <bean id="orderProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
+    <bean id="orderFullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
         <property name="blockingQueue" ref="orderBlockingQueue"/>
         <property name="sql"
@@ -79,21 +80,21 @@
     <bean id="deviceAndIp1BlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
         <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
     </bean>
-    <bean id="deviceAndIp1Producer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
+    <bean id="deviceAndIp1FullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
         <property name="blockingQueue" ref="deviceAndIp1BlockingQueue"/>
         <property name="sql"
                   value="SELECT APPL_NO,DEVICE_ID,IP,IP_CITY FROM memedai.A_APPL where device_id is not null or ip is not null  limit ?,?"/>
     </bean>
-    <bean id="deviceAndIp1Consumer"
-          class="cn.memedai.orientdb.teleporter.sns.full.consumer.DeviceAndIp1Consumer"
+    <bean id="deviceAndIp1FullConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.full.consumer.DeviceAndIp1FullConsumer"
           scope="prototype">
         <property name="documentTxFactory" ref="documentTxFactory"/>
         <property name="blockingQueue" ref="deviceAndIp1BlockingQueue"/>
     </bean>
 
 
-    <bean id="device2CaProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
+    <bean id="device2CaFullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
         <property name="blockingQueue" ref="device2CaBlockingQueue"/>
         <property name="sql"
@@ -101,7 +102,7 @@
     </bean>
 
 
-    <bean id="ip2CaProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
+    <bean id="ip2CaFullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
           scope="prototype">
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
         <property name="blockingQueue" ref="ip2CaBlockingQueue"/>
@@ -110,7 +111,7 @@
     </bean>
 
 
-    <bean id="deviceAndIp2CtaProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
+    <bean id="deviceAndIp2CtaFullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
           scope="prototype">
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
         <property name="blockingQueue" ref="deviceAndIp2CtaBlockingQueue"/>
@@ -119,7 +120,7 @@
     </bean>
 
 
-    <bean id="phoneWithPhoneMarkAndPhoneSourceProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
+    <bean id="phoneWithPhoneMarkAndPhoneSourceFullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
         <property name="blockingQueue" ref="phoneWithPhoneMarkAndPhoneSourceBlockingQueue"/>
         <property name="sql"
@@ -131,68 +132,68 @@
         <!-- key的大小决定着优先执行顺序-->
         <entry key="10">
             <list>
-                <ref bean="deleteEdgesConsumer"/>
+                <ref bean="deleteEdgesFullConsumer"/>
             </list>
         </entry>
 
         <entry key="20">
             <list>
-                <ref bean="cacheDeviceConsumer"/>
-                <ref bean="cacheIpConsumer"/>
+                <ref bean="cacheDeviceFullConsumer"/>
+                <ref bean="cacheIpFullConsumer"/>
             </list>
         </entry>
 
         <entry key="30">
             <list>
-                <ref bean="storeProducer"/>
-                <ref bean="storeConsumer"/>
+                <ref bean="storeCommonProducer"/>
+                <ref bean="storeCommonConsumer"/>
 
-                <ref bean="memberProducer"/>
-                <ref bean="memberConsumer"/>
-                <ref bean="memberConsumer"/>
-                <ref bean="memberConsumer"/>
+                <ref bean="memberFullProducer"/>
+                <ref bean="memberFullConsumer"/>
+                <ref bean="memberFullConsumer"/>
+                <ref bean="memberFullConsumer"/>
 
-                <ref bean="applyProducer"/>
-                <ref bean="applyConsumer"/>
+                <ref bean="applyFullProducer"/>
+                <ref bean="applyCommonConsumer"/>
 
-                <ref bean="orderProducer"/>
-                <ref bean="orderConsumer"/>
+                <ref bean="orderFullProducer"/>
+                <ref bean="orderCommonConsumer"/>
 
-                <ref bean="updateMemberOverdueToDefaultConsumer"/>
+                <ref bean="updateMemberOverdueToDefaultCommonConsumer"/>
 
-                <ref bean="phoneWithPhoneMarkAndPhoneSourceProducer"/>
-                <ref bean="phoneWithPhoneMarkAndPhoneSourceConsumer"/>
-                <ref bean="phoneWithPhoneMarkAndPhoneSourceConsumer"/>
+                <ref bean="phoneWithPhoneMarkAndPhoneSourceFullProducer"/>
+                <ref bean="phoneWithPhoneMarkAndPhoneSourceCommonConsumer"/>
+                <ref bean="phoneWithPhoneMarkAndPhoneSourceCommonConsumer"/>
             </list>
         </entry>
 
         <entry key="40">
             <list>
-                <ref bean="memberOverdueProducer"/>
-                <ref bean="memberOverdueConsumer"/>
+                <ref bean="memberOverdueCommonProducer"/>
+                <ref bean="memberOverdueCommonConsumer"/>
 
-                <ref bean="device2CaProducer"/>
-                <ref bean="device2CaConsumer"/>
+                <ref bean="device2CaFullProducer"/>
+                <ref bean="device2CaCommonConsumer"/>
 
-                <ref bean="ip2CaProducer"/>
-                <ref bean="ip2CaConsumer"/>
+                <ref bean="ip2CaFullProducer"/>
+                <ref bean="ip2CaCommonConsumer"/>
 
-                <ref bean="deviceAndIp1Producer"/>
-                <ref bean="deviceAndIp1Consumer"/>
+                <ref bean="deviceAndIp1FullProducer"/>
+                <ref bean="deviceAndIp1FullConsumer"/>
 
-                <ref bean="deviceAndIp2CtaProducer"/>
-                <ref bean="deviceAndIp2CtaConsumer"/>
+                <ref bean="deviceAndIp2CtaFullProducer"/>
+                <ref bean="deviceAndIp2CtaCommonConsumer"/>
             </list>
         </entry>
 
         <entry key="50">
             <list>
-                <ref bean="hasStoreConsumer"/>
-                <ref bean="hasOrderConsumer"/>
-                <ref bean="hasIpConsumer"/>
-                <ref bean="hasDeviceConsumer"/>
-                <ref bean="hasApplyConsumer"/>
-                <ref bean="hasPhoneConsumer"/>
+                <ref bean="hasStoreFullConsumerCommon"/>
+                <ref bean="hasOrderFullConsumerCommon"/>
+                <ref bean="hasIpFullConsumerCommon"/>
+                <ref bean="hasDeviceFullConsumerCommon"/>
+                <ref bean="hasApplyFullConsumerCommon"/>
+                <ref bean="hasPhoneFullConsumerCommon"/>
             </list>
         </entry>
 

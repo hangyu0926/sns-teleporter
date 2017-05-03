@@ -1,7 +1,7 @@
 package cn.memedai.orientdb.teleporter.sns.increment.consumer;
 
 import cn.memedai.orientdb.teleporter.sns.common.SnsService;
-import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsAbstractTxConsumer;
+import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsCommonAbstractTxConsumer;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
@@ -15,7 +15,7 @@ import java.util.Set;
  * Created by kisho on 2017/4/7.
  */
 @Service("hasIpIncrementConsumer")
-public class HasIpIncrementConsumer extends SnsAbstractTxConsumer {
+public class HasIpIncrementConsumer extends SnsCommonAbstractTxConsumer {
 
     private String createApplyHasIp = "create edge ApplyHasIp from {0} to {1} retry 100";
     private String createOrderHasIp = "create edge OrderHasIp from {0} to {1} retry 100";
@@ -35,6 +35,9 @@ public class HasIpIncrementConsumer extends SnsAbstractTxConsumer {
             String applyNo = entry.getKey();
             String toRid = entry.getValue();
             String fromRid = CacheUtils.getApplyRid(applyNo);
+            if (StringUtils.isBlank(fromRid)) {
+                continue;
+            }
             createEdge(createApplyHasIp, selectApplyHasIp, fromRid, toRid);
 
             String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_APPLYRID_MEMBERID.get(fromRid));
@@ -47,6 +50,9 @@ public class HasIpIncrementConsumer extends SnsAbstractTxConsumer {
             String orderNo = entry.getKey();
             String toRid = entry.getValue();
             String fromRid = CacheUtils.getOrderRid(orderNo);
+            if (StringUtils.isBlank(fromRid)) {
+                continue;
+            }
             createEdge(createOrderHasIp, selectOrderHasIp, fromRid, toRid);
 
             String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_ORDERRID_MEMBERID.get(fromRid));
@@ -60,7 +66,6 @@ public class HasIpIncrementConsumer extends SnsAbstractTxConsumer {
                 String[] strArr = memberRidAndIpRid.split("\\|");
                 String memberRid = strArr[0];
                 String IpRid = strArr[1];
-                //Member-MemberHasIp->Ip
                 createEdge(createMemberHasIp, selectMemberHasIp, memberRid, IpRid);
             }
         }

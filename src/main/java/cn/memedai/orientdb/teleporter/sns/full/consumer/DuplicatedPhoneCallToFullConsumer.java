@@ -23,7 +23,7 @@ import java.util.*;
 /**
  * Created by kisho on 2017/4/6.
  */
-public class DuplicatedPhoneCallToConsumer extends BlockingQueueDataConsumer {
+public class DuplicatedPhoneCallToFullConsumer extends BlockingQueueDataConsumer {
 
     private static final String SQL_CALLTO = "select expand($c) from (select from V limit 1) let $a = (select expand(in_CallTo) from Phone where phone = ?), $b = (select expand(out_CallTo) from Phone where phone = ?), $c = unionall($a,$b)";
 

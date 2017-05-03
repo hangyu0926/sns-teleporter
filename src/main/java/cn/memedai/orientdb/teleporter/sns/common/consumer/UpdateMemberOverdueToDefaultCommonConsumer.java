@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
  * Created by kisho on 2017/4/6.
  */
 @Service
-public class UpdateMemberOverdueToDefaultConsumer extends AbstractTxConsumer {
+public class UpdateMemberOverdueToDefaultCommonConsumer extends AbstractTxConsumer {
 
     private static final String SQL_UPDATE_IS_OVERDUE = "update Member set isOverdue=false where isOverdue=true";
 

@@ -10,7 +10,7 @@
  * written permission of Shanghai Mi-Me Financial Information Service Co., Ltd.
  * -------------------------------------------------------------------------------------
  */
-package cn.memedai.orientdb.teleporter.sns.common.consumer;
+package cn.memedai.orientdb.teleporter.sns.common.producer;
 
 import cn.memedai.orientdb.teleporter.JdbcDataProducer;
 import cn.memedai.orientdb.teleporter.sns.common.SnsService;
@@ -27,7 +27,7 @@ import java.util.Properties;
  * Created by kisho on 2017/4/6.
  */
 @Resource
-public class PhoneWithCallTo2Producer extends JdbcDataProducer {
+public class PhoneWithCallTo2CommonProducer extends JdbcDataProducer {
 
     @Resource
     private Properties snsProp;
