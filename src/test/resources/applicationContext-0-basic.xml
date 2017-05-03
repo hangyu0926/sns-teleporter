@@ -12,24 +12,7 @@
 
     <import resource="applicationContext-sns-dataSource.xml"/>
     <import resource="applicationContext-sns-properties.xml"/>
-
-
-    <bean id="phoneWithCallToCacheBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
-        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
-    </bean>
-    <bean id="phoneWithCallToCacheProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
-          scope="prototype">
-        <property name="jdbcTemplate" ref="jdbcTemplate"/>
-        <property name="blockingQueue" ref="phoneWithCallToCacheBlockingQueue"/>
-        <property name="sql"
-                  value="SELECT b.REPORTNO,a.cellphone,a.apply_no FROM network.apply_info a LEFT JOIN mis_watson.D_JXL_PERSON b ON a.apply_no = b.APPL_NO  limit ?,?"/>
-    </bean>
-    <bean id="phoneWithCallToCacheConsumer"
-          class="cn.memedai.orientdb.teleporter.sns.full.consumer.PhoneWithCallToCacheConsumer"
-          scope="prototype">
-        <property name="blockingQueue" ref="phoneWithCallToCacheBlockingQueue"/>
-        <property name="documentTxFactory" ref="documentTxFactory"/>
-    </bean>
+    <import resource="applicationContext-sns-common.xml"/>
 
 
     <bean id="phoneWithCall1BlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
@@ -49,64 +32,21 @@
     </bean>
 
 
-    <bean id="phoneWithCall2BlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
-        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
-    </bean>
     <bean id="phoneWithCallTo2Producer"
           class="cn.memedai.orientdb.teleporter.sns.common.consumer.PhoneWithCallTo2Producer"
           scope="prototype">
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
         <property name="blockingQueue" ref="phoneWithCall2BlockingQueue"/>
         <property name="sql"
-                  value="select APPL_NO,PHONE_NO,CALL_CNT,CALL_LEN,CALL_IN_CNT,CALL_OUT_CNT,CREATE_TIME from network.ca_bur_operator_contact limit ?,?"/>
-    </bean>
-    <bean id="phoneWithCallTo2Consumer"
-          class="cn.memedai.orientdb.teleporter.sns.full.consumer.PhoneWithCallTo2Consumer"
-          scope="prototype">
-        <property name="blockingQueue" ref="phoneWithCall2BlockingQueue"/>
-        <property name="documentTxFactory" ref="documentTxFactory"/>
+                  value="#{snsSqlProp.phoneWithCallTo2} limit ?,?"/>
     </bean>
 
 
-    <bean id="deleteDuplicatedCallToBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
-        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
-    </bean>
-    <bean id="deleteDuplicatedCallToProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
+    <bean id="phoneWithPhoneMarkAndPhoneSourceProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
-        <property name="blockingQueue" ref="deleteDuplicatedCallToBlockingQueue"/>
+        <property name="blockingQueue" ref="phoneWithPhoneMarkAndPhoneSourceBlockingQueue"/>
         <property name="sql"
-                  value="select cellphone from network.apply_info group by cellphone HAVING count(1)>1 limit ?,?"/>
-    </bean>
-    <bean id="deleteDuplicatedCallToConsumer"
-          class="cn.memedai.orientdb.teleporter.sns.full.consumer.DuplicatedPhoneCallToConsumer"
-          scope="prototype">
-        <property name="documentTxFactory" ref="documentTxFactory"/>
-        <property name="blockingQueue" ref="deleteDuplicatedCallToBlockingQueue"/>
-    </bean>
-
-
-    <bean id="phoneWithPhoneMarkBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
-        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
-    </bean>
-    <bean id="phoneWithPhoneMarkProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
-        <property name="jdbcTemplate" ref="jdbcTemplate"/>
-        <property name="blockingQueue" ref="phoneWithPhoneMarkBlockingQueue"/>
-        <property name="sql"
-                  value="SELECT PHONE_NO, PHONE_TYPE  FROM network.ca_sys_phone_tag_merge  limit ?,?"/>
-    </bean>
-    <bean id="phoneWithPhoneMarkConsumer"
-          class="cn.memedai.orientdb.teleporter.sns.full.consumer.PhoneAndPhoneMarkConsumer"
-          scope="prototype">
-        <property name="documentTxFactory" ref="documentTxFactory"/>
-        <property name="blockingQueue" ref="phoneWithPhoneMarkBlockingQueue"/>
-        <property name="sql"
-                  value="update PhoneMark set mark=? upsert return after where mark=?"/>
-        <property name="sqlParameterNames">
-            <array>
-                <value>PHONE_TYPE</value>
-                <value>PHONE_TYPE</value>
-            </array>
-        </property>
+                  value="#{snsSqlProp.phoneWithPhoneMarkAndPhoneSource}  limit ?,?"/>
     </bean>
 
     <util:map id="teleporterMap" key-type="java.lang.Integer" value-type="java.util.List">
@@ -128,9 +68,9 @@
                 <ref bean="phoneWithCallTo2Consumer"/>
                 <ref bean="phoneWithCallTo2Consumer"/>
 
-                <ref bean="phoneWithPhoneMarkProducer"/>
-                <ref bean="phoneWithPhoneMarkConsumer"/>
-                <ref bean="phoneWithPhoneMarkConsumer"/>
+                <ref bean="phoneWithPhoneMarkAndPhoneSourceProducer"/>
+                <ref bean="phoneWithPhoneMarkAndPhoneSourceConsumer"/>
+                <ref bean="phoneWithPhoneMarkAndPhoneSourceConsumer"/>
             </list>
         </entry>
 

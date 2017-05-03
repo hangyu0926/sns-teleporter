@@ -14,8 +14,8 @@ package cn.memedai.orientdb.teleporter.sns.common;
 
 import cn.memedai.orientdb.teleporter.Caches;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
+import com.orientechnologies.common.concur.ONeedRetryException;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
-import com.orientechnologies.orient.core.exception.OConcurrentModificationException;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.query.OResultSet;
@@ -178,25 +178,21 @@ public class SnsService {
     }
 
     public <RET> RET execute(ODatabaseDocumentTx tx, String sql, Object... args) {
-        int i = 0;
-        while (i++ < 10) {
-            try {
-                return tx.command(new OCommandSQL(sql)).execute(args);
-            } catch (OConcurrentModificationException e) {
-                continue;
-            } catch (Exception e) {
-                LOG.error("{} @ {}", sql, e.getMessage());
-                LOG.error("", e);
-                if (args != null && args.length > 0) {
-                    StringBuilder builder = new StringBuilder();
-                    for (Object arg : args) {
-                        builder.append(arg).append(",");
-                    }
-                    sql += "|" + builder.toString().replaceAll(",$", "");
+        try {
+            return tx.command(new OCommandSQL(sql)).execute(args);
+        } catch (ONeedRetryException e) {
+            return execute(tx, sql, args);
+        } catch (Exception e) {
+            LOG.error("{} @ {}", sql, e.getMessage());
+            LOG.error("", e);
+            if (args != null && args.length > 0) {
+                StringBuilder builder = new StringBuilder();
+                for (Object arg : args) {
+                    builder.append(arg).append(",");
                 }
-                Caches.ERROR_SQL.add(sql);
-                break;
+                sql += "|" + builder.toString().replaceAll(",$", "");
             }
+            Caches.ERROR_SQL.add(sql);
         }
         return null;
     }

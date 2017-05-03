@@ -32,6 +32,8 @@ public final class CacheUtils {
     public static final Map<String, String> CACHE_REPORTERNO_PHONE = new ConcurrentHashMap(1500000);
     public static final Map<String, String> CACHE_APPLYNO_PHONE = new ConcurrentHashMap(15000);
 
+    public static final Map<String, String> CACHE_PHONE_SOURCERID = new ConcurrentHashMap();
+
 
     public static void setStoreRid(String key, String value) {
         CACHE_STORE_RID.put(key, value);
@@ -160,6 +162,14 @@ public final class CacheUtils {
 
     public static void setApplyNoPhone(String key, String value) {
         CACHE_APPLYNO_PHONE.put(key, value);
+    }
+
+    public static void setPhoneSourceRid(String key, String value) {
+        CACHE_PHONE_SOURCERID.put(key, value);
+    }
+
+    public static String getPhoneSourceRid(String key) {
+        return CACHE_PHONE_SOURCERID.get(key);
     }
 
 }

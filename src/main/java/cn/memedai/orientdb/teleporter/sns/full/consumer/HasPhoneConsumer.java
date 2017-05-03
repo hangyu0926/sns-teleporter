@@ -14,6 +14,7 @@ package cn.memedai.orientdb.teleporter.sns.full.consumer;
 
 import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsAbstractTxConsumer;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -31,10 +32,12 @@ public class HasPhoneConsumer extends SnsAbstractTxConsumer {
         for (Map.Entry<String, String> entry : CacheUtils.CACHE_MEMBER_PHONERIDS.entrySet()) {
             String memberId = entry.getKey();
             String memberRid = CacheUtils.getMemberRid(memberId);
-            String phoneRids = entry.getValue();
-            String[] phoneRidArr = phoneRids.split("\\|");
-            for (String phoneRid : phoneRidArr) {
-                execute(SQL_HASPHONE, memberRid, phoneRid);
+            if (StringUtils.isNotBlank(memberRid)) {
+                String phoneRids = entry.getValue();
+                String[] phoneRidArr = phoneRids.split("\\|");
+                for (String phoneRid : phoneRidArr) {
+                    execute(SQL_HASPHONE, memberRid, phoneRid);
+                }
             }
         }
     }

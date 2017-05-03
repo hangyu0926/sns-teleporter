@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <import resource="applicationContext-sns-dataSource.xml"/>
+    <import resource="applicationContext-sns-properties.xml"/>
+
+    <bean id="storeBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="5000"/>
+    </bean>
+    <bean id="storeProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="blockingQueue" ref="storeBlockingQueue"/>
+        <property name="sql"
+                  value="#{snsSqlProp.store}"/>
+    </bean>
+    <bean id="storeConsumer" class="cn.memedai.orientdb.teleporter.sns.common.consumer.StoreConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="storeBlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+        <property name="sql"
+                  value="#{snsOrientSqlProp.store}"/>
+        <property name="sqlParameterNames">
+            <array>
+                <value>STOREID</value>
+                <value>MERCHANTID</value>
+                <value>STORENAME</value>
+                <value>PROVINCE</value>
+                <value>CITY</value>
+                <value>CREDIT_LIMIT_TYPE</value>
+                <value>POLICY_BRACKET</value>
+                <value>BUSINESS_FIRST_TYPE</value>
+                <value>STOREID</value>
+            </array>
+        </property>
+    </bean>
+
+
+    <bean id="memberOverdueBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="memberOverdueProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
+          scope="prototype">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="blockingQueue" ref="memberOverdueBlockingQueue"/>
+        <property name="sql"
+                  value="#{snsSqlProp.memberOverdue}"/>
+    </bean>
+    <bean id="memberOverdueConsumer"
+          class="cn.memedai.orientdb.teleporter.BlockingQueueDataConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="memberOverdueBlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+        <property name="sql"
+                  value="#{snsOrientSqlProp.memberOverdue}"/>
+        <property name="sqlParameterNames">
+            <array>
+                <value>BORROWER_ID</value>
+            </array>
+        </property>
+    </bean>
+
+
+    <bean id="phoneWithCall2BlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="phoneWithCallTo2Consumer"
+          class="cn.memedai.orientdb.teleporter.sns.increment.consumer.PhoneWithCallTo2IncrementConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="phoneWithCall2BlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+    </bean>
+
+
+    <bean id="phoneWithPhoneMarkAndPhoneSourceBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="phoneWithPhoneMarkAndPhoneSourceConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.common.consumer.PhoneAndPhoneMarkAndPhoneSourceConsumer"
+          scope="prototype">
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+        <property name="blockingQueue" ref="phoneWithPhoneMarkAndPhoneSourceBlockingQueue"/>
+    </bean>
+
+    <bean id="deleteDuplicatedCallToBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="deleteDuplicatedCallToProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="blockingQueue" ref="deleteDuplicatedCallToBlockingQueue"/>
+        <property name="sql"
+                  value="select cellphone from network.apply_info group by cellphone HAVING count(1)>1 limit ?,?"/>
+    </bean>
+    <bean id="deleteDuplicatedCallToConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.full.consumer.DuplicatedPhoneCallToConsumer"
+          scope="prototype">
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+        <property name="blockingQueue" ref="deleteDuplicatedCallToBlockingQueue"/>
+    </bean>
+
+
+    <bean id="phoneWithCallToCacheBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="phoneWithCallToCacheProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
+          scope="prototype">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="blockingQueue" ref="phoneWithCallToCacheBlockingQueue"/>
+        <property name="sql"
+                  value="#{snsSqlProp.phoneWithCallToCache}"/>
+    </bean>
+    <bean id="phoneWithCallToCacheConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.full.consumer.PhoneWithCallToCacheConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="phoneWithCallToCacheBlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+    </bean>
+
+
+    <bean id="applyBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="applyConsumer" class="cn.memedai.orientdb.teleporter.sns.common.consumer.ApplyConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="applyBlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+        <property name="sql"
+                  value="#{snsOrientSqlProp.apply}"/>
+        <property name="sqlParameterNames">
+            <array>
+                <value>apply_no</value>
+                <value>status</value>
+                <value>original_status</value>
+                <value>created_datetime</value>
+                <value>apply_no</value>
+            </array>
+        </property>
+    </bean>
+
+
+    <bean id="orderBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="orderConsumer" class="cn.memedai.orientdb.teleporter.sns.common.consumer.OrderConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="orderBlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+        <property name="sql"
+                  value="#{snsOrientSqlProp.order}"/>
+        <property name="sqlParameterNames">
+            <array>
+                <value>order_no</value>
+                <value>status</value>
+                <value>original_status</value>
+                <value>pay_amount</value>
+                <value>created_datetime</value>
+                <value>order_no</value>
+            </array>
+        </property>
+    </bean>
+
+
+    <bean id="device2CaBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="device2CaConsumer" class="cn.memedai.orientdb.teleporter.sns.common.consumer.Device2CaConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="device2CaBlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+    </bean>
+
+
+    <bean id="ip2CaBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="ip2CaConsumer" class="cn.memedai.orientdb.teleporter.sns.common.consumer.Ip2CaConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="ip2CaBlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+    </bean>
+
+
+    <bean id="deviceAndIp2CtaBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="deviceAndIp2CtaConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.common.consumer.DeviceAndIp2CtaConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="deviceAndIp2CtaBlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+    </bean>
+
+</beans>

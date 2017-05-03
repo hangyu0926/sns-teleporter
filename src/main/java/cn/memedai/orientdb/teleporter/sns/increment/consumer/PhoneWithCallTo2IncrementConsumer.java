@@ -12,62 +12,64 @@
  */
 package cn.memedai.orientdb.teleporter.sns.increment.consumer;
 
-import cn.memedai.orientdb.teleporter.BlockingQueueDataConsumer;
+import cn.memedai.orientdb.teleporter.BlockingQueueDataBatchProcessConsumer;
+import cn.memedai.orientdb.teleporter.OrientSqlUtils;
 import cn.memedai.orientdb.teleporter.sns.common.SnsService;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.Resource;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Created by kisho on 2017/4/6.
  */
-public class PhoneWithCallTo2IncrementConsumer extends BlockingQueueDataConsumer {
+public class PhoneWithCallTo2IncrementConsumer extends BlockingQueueDataBatchProcessConsumer {
 
     @Resource
     private SnsService snsService;
 
-    private static final String CREATE_CALL_TO_SQL = "create edge CallTo from {0} to {1} set callCnt = ?,callLen=?,callInCnt=?,callOutCnt=?,reportTime=? retry 100";
-
-    private static final String SELECT_CALLTO_SQL = "select from (select expand(out_CallTo) from {0}) where in = {1}";
+    private static final String CREATE_CALL_TO_SQL = "create edge CallTo from {0} to {1} set callCnt = #callCnt,callLen=#callLen,callInCnt=#callInCnt,callOutCnt=#callOutCnt,reportTime=#reportTime";
 
     @Override
-    protected Object process(Object obj) {
-        Map<String, Object> dataMap = (Map<String, Object>) obj;
-        String applyNo = (String) dataMap.get("APPL_NO");
-        String toPhone = (String) dataMap.get("PHONE_NO");
-        if (StringUtils.isBlank(applyNo) || StringUtils.isBlank(toPhone)) {
+    protected Object process(List<Object> dataList) {
+        if (CollectionUtils.isEmpty(dataList)) {
             return null;
         }
+        List<String> orientSqls = new ArrayList(dataList.size());
+        for (Object obj : dataList) {
+            Map<String, Object> dataMap = (Map<String, Object>) obj;
+            String applyNo = (String) dataMap.get("APPL_NO");
+            String toPhone = (String) dataMap.get("PHONE_NO");
+            String createTime = dataMap.get("CREATE_TIME") == null ? null : dataMap.get("CREATE_TIME").toString();
+            if (StringUtils.isBlank(applyNo) || StringUtils.isBlank(toPhone) || createTime == null) {
+                continue;
+            }
 
-        String applyInfoRid = CacheUtils.getApplyRid(applyNo);
-        if (StringUtils.isBlank(applyInfoRid)) {
-            return null;
+            String applyInfoRid = CacheUtils.getApplyRid(applyNo);
+            if (StringUtils.isBlank(applyInfoRid)) {
+                continue;
+            }
+
+            String toPhoneRid = snsService.getPhoneRid(getODatabaseDocumentTx(), toPhone);
+            String fromPhoneRid = CacheUtils.getApplyRidPhoneRid(applyInfoRid);
+            if (StringUtils.isBlank(fromPhoneRid) || StringUtils.isBlank(toPhoneRid)) {
+                continue;
+            }
+
+            String templateSql = MessageFormat.format(CREATE_CALL_TO_SQL, fromPhoneRid, toPhoneRid);
+            String orientSql = templateSql.replace("#callCnt", getValue(dataMap.get("CALL_CNT"))).
+                    replace("#callLen", getValue(dataMap.get("CALL_LEN"))).
+                    replace("#callInCnt", getValue(dataMap.get("CALL_IN_CNT")))
+                    .replace("#callOutCnt", getValue(dataMap.get("CALL_OUT_CNT")))
+                    .replace("#reportTime", "'" + dataMap.get("CREATE_TIME").toString() + "'");
+            orientSqls.add(orientSql);
         }
-
-        String toPhoneRid = snsService.getPhoneRid(getODatabaseDocumentTx(), toPhone);
-        String fromPhoneRid = CacheUtils.getApplyRidPhoneRid(applyInfoRid);
-        if (StringUtils.isBlank(fromPhoneRid) || StringUtils.isBlank(toPhoneRid)) {
-            return null;
-        }
-
-//        OResultSet ocrs = execute(MessageFormat.format(SELECT_CALLTO_SQL, fromPhoneRid, toPhoneRid));
-//        if (ocrs == null || ocrs.isEmpty()) {
-//            execute(, fromRid, toRid);
-//        }
-
-        Object[] args = new Object[]{
-                getValue(dataMap.get("CALL_CNT")),
-                getValue(dataMap.get("CALL_LEN")),
-                getValue(dataMap.get("CALL_IN_CNT")),
-                getValue(dataMap.get("CALL_OUT_CNT")),
-                dataMap.get("CREATE_TIME") == null ? null : dataMap.get("CREATE_TIME"),
-        };
-
-        execute(MessageFormat.format(CREATE_CALL_TO_SQL, fromPhoneRid, toPhoneRid), args);
-        return null;
+        return OrientSqlUtils.executeBatch(getODatabaseDocumentTx(), orientSqls);
     }
 
     protected String getValue(Object value) {
