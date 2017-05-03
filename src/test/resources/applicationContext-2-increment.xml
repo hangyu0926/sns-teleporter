@@ -89,7 +89,7 @@
     </bean>
 
 
-    <bean id="phoneWithPhoneMarkAndPhoneSourceProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
+    <bean id="phoneWithPhoneMarkAndPhoneSourceIncrementProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
         <property name="blockingQueue" ref="phoneWithPhoneMarkAndPhoneSourceBlockingQueue"/>
         <property name="sql"
@@ -135,7 +135,7 @@
 
                 <ref bean="updateMemberOverdueToDefaultCommonConsumer"/>
 
-                <ref bean="phoneWithPhoneMarkAndPhoneSourceProducer"/>
+                <ref bean="phoneWithPhoneMarkAndPhoneSourceIncrementProducer"/>
                 <ref bean="phoneWithPhoneMarkAndPhoneSourceCommonConsumer"/>
             </list>
         </entry>

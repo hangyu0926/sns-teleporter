@@ -20,7 +20,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 
 import javax.annotation.Resource;
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,8 +31,6 @@ public class PhoneWithCallTo2IncrementConsumer extends BlockingQueueDataBatchPro
 
     @Resource
     private SnsService snsService;
-
-    private static final String CREATE_CALL_TO_SQL = "create edge CallTo from {0} to {1} set callCnt = #callCnt,callLen=#callLen,callInCnt=#callInCnt,callOutCnt=#callOutCnt,reportTime=#reportTime";
 
     @Override
     protected Object process(List<Object> dataList) {
@@ -61,19 +58,9 @@ public class PhoneWithCallTo2IncrementConsumer extends BlockingQueueDataBatchPro
                 continue;
             }
 
-            String templateSql = MessageFormat.format(CREATE_CALL_TO_SQL, fromPhoneRid, toPhoneRid);
-            String orientSql = templateSql.replace("#callCnt", getValue(dataMap.get("CALL_CNT"))).
-                    replace("#callLen", getValue(dataMap.get("CALL_LEN"))).
-                    replace("#callInCnt", getValue(dataMap.get("CALL_IN_CNT")))
-                    .replace("#callOutCnt", getValue(dataMap.get("CALL_OUT_CNT")))
-                    .replace("#reportTime", "'" + dataMap.get("CREATE_TIME").toString() + "'");
-            orientSqls.add(orientSql);
+            orientSqls.add(snsService.constructCallToSql(fromPhoneRid, toPhoneRid, dataMap));
         }
         return OrientSqlUtils.executeBatch(getODatabaseDocumentTx(), orientSqls);
-    }
-
-    protected String getValue(Object value) {
-        return value == null ? "0" : value.toString();
     }
 
 }

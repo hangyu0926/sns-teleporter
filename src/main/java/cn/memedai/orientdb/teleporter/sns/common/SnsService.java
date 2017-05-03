@@ -24,9 +24,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Map;
 
 /**
  * Created by kisho on 2017/4/27.
@@ -47,6 +49,8 @@ public class SnsService {
     private static final String SELECT_STORE_SQL = "select from Store where storeId=?";
 
     private static final String SELECT_MEMBER_SQL = "select from Member where memberId = ?";
+
+    private static final String CREATE_CALL_TO_SQL = "create edge CallTo from {0} to {1} set callCnt = #callCnt,callLen=#callLen,callInCnt=#callInCnt,callOutCnt=#callOutCnt,reportTime=#reportTime";
 
     public String processMemberAndPhone(ODatabaseDocumentTx tx,
                                         String memberId,
@@ -115,8 +119,6 @@ public class SnsService {
     public String getPhoneRid(ODatabaseDocumentTx tx, String phone) {
         String phoneRid = CacheUtils.getPhoneRid(phone);
         if (StringUtils.isBlank(phoneRid)) {
-//            phoneRid = getRid(execute(tx, SELECT_PHONE_SQL, phone, phone));
-//            if (StringUtils.isBlank(phone)) {
             phoneRid = getRid(execute(tx, UPDATE_PHONE_SQL, phone, phone));
 //            }
             if (StringUtils.isNotBlank(phoneRid)) {
@@ -149,18 +151,6 @@ public class SnsService {
         }
         return memberRid;
     }
-
-//    public ODocument getFirstODocumnet(Object obj) {
-//        if (obj instanceof OResultSet) {
-//            OResultSet ors = (OResultSet) obj;
-//            if (ors != null && !ors.isEmpty()) {
-//                return (ODocument) ors.get(0);
-//            }
-//        } else if (obj instanceof ODocument) {
-//            return (ODocument) obj;
-//        }
-//        return null;
-//    }
 
     protected String getRid(Object obj) {
         if (obj == null) {
@@ -204,6 +194,21 @@ public class SnsService {
             return sdf.format(date) + " 00:00:00";
         }
         return startDatetime;
+    }
+
+    public String constructCallToSql(String fromPhoneRid,
+                                     String toPhoneRid,
+                                     Map<String, Object> dataMap) {
+        String templateSql = MessageFormat.format(CREATE_CALL_TO_SQL, fromPhoneRid, toPhoneRid);
+        return templateSql.replace("#callCnt", getValue(dataMap.get("CALL_CNT"))).
+                replace("#callLen", getValue(dataMap.get("CALL_LEN"))).
+                replace("#callInCnt", getValue(dataMap.get("CALL_IN_CNT")))
+                .replace("#callOutCnt", getValue(dataMap.get("CALL_OUT_CNT")))
+                .replace("#reportTime", "'" + dataMap.get("CREATE_TIME").toString() + "'");
+    }
+
+    protected String getValue(Object value) {
+        return value == null ? "0" : value.toString();
     }
 
 }
