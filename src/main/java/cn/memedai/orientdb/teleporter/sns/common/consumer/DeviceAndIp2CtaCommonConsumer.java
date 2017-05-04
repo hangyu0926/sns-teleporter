@@ -13,7 +13,6 @@
 package cn.memedai.orientdb.teleporter.sns.common.consumer;
 
 import cn.memedai.orientdb.teleporter.BlockingQueueDataConsumer;
-import cn.memedai.orientdb.teleporter.OrientSqlUtils;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
 import org.apache.commons.lang.StringUtils;
 
@@ -49,7 +48,7 @@ public class DeviceAndIp2CtaCommonConsumer extends BlockingQueueDataConsumer {
         if (StringUtils.isNotBlank(ip)) {
             ipRid = CacheUtils.getIpRid(ip);
             if (StringUtils.isBlank(ipRid)) {
-                ipRid = getRid(OrientSqlUtils.execute(getODatabaseDocumentTx(), SQL_IP, ip, ipCity, ip));
+                ipRid = getRid(execute(SQL_IP, ip, ipCity, ip));
                 CacheUtils.setIpRid(ip, ipRid);
             }
             if (StringUtils.isNotBlank(orderNo)) {
@@ -65,7 +64,7 @@ public class DeviceAndIp2CtaCommonConsumer extends BlockingQueueDataConsumer {
         if (StringUtils.isNotBlank(deviceId)) {
             deviceRid = CacheUtils.getDeviceRid(deviceId);
             if (StringUtils.isBlank(deviceRid)) {
-                deviceRid = getRid(OrientSqlUtils.execute(getODatabaseDocumentTx(), SQL_DEVICE, deviceId, deviceId));
+                deviceRid = getRid(execute(SQL_DEVICE, deviceId, deviceId));
                 CacheUtils.setDeviceRid(deviceId, deviceRid);
             }
             if (StringUtils.isNotBlank(orderNo)) {
