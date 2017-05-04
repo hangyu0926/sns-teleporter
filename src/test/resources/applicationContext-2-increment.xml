@@ -13,6 +13,7 @@
     <import resource="applicationContext-sns-dataSource.xml"/>
     <import resource="applicationContext-sns-properties.xml"/>
     <import resource="applicationContext-sns-common.xml"/>
+    <import resource="applicationContext-sns-sql.xml"/>
 
     <bean id="memberBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
         <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>

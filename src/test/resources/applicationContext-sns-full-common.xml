@@ -10,7 +10,7 @@
         <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
     </bean>
     <bean id="phoneWithCallTo2FullConsumer"
-          class="cn.memedai.orientdb.teleporter.sns.full.consumer.PhoneWithCallTo2Consumer"
+          class="cn.memedai.orientdb.teleporter.sns.full.consumer.PhoneWithCallTo2FullConsumer"
           scope="prototype">
         <property name="blockingQueue" ref="phoneWithCall2BlockingQueue"/>
         <property name="documentTxFactory" ref="documentTxFactory"/>

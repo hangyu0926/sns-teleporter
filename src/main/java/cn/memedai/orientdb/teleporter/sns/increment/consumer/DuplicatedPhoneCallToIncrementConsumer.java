@@ -12,7 +12,6 @@
  */
 package cn.memedai.orientdb.teleporter.sns.increment.consumer;
 
-import cn.memedai.orientdb.teleporter.OrientSqlUtils;
 import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsCommonAbstractTxConsumer;
 import cn.memedai.orientdb.teleporter.sns.common.model.CallTo;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
@@ -31,15 +30,11 @@ public class DuplicatedPhoneCallToIncrementConsumer extends SnsCommonAbstractTxC
 
     private static final String SQL_CALLTO = "select expand($c) from (select from V limit 1) let $a = (select expand(in_CallTo) from {0}), $b = (select expand(out_CallTo) from {1}), $c = unionall($a,$b)";
 
-    private List<String> deleteSqls = new ArrayList<>(20000);
-
     protected void process() {
         Collection<String> collection = CacheUtils.CACHE_APPLYRID_PHONERID.values();
         if (!collection.isEmpty()) {
-
-            Set<String> phoneRids = new HashSet<>();
+            Set<String> phoneRids = new HashSet<String>();
             phoneRids.addAll(collection);
-            log.info("need to check duplicate phone size : " + phoneRids.size());
             for (String phoneRid : phoneRids) {
                 OResultSet ocrs = execute(SQL_CALLTO, phoneRid, phoneRid);
                 if (ocrs != null && !ocrs.isEmpty()) {
@@ -61,30 +56,15 @@ public class DuplicatedPhoneCallToIncrementConsumer extends SnsCommonAbstractTxC
                             Collections.sort(callTos);
                             callTos.remove(0);
                             for (CallTo callTo : callTos) {
-                                executeBatch(" delete edge " + callTo.getRid());
+                                execute(" delete edge " + callTo.getRid());
                             }
                         }
                     }
                 }
             }
-            executeBatch();
+
         }
 
-    }
-
-    private void executeBatch(String sql) {
-        deleteSqls.add(sql);
-        if (deleteSqls.size() == 20000) {
-            executeBatch();
-        }
-    }
-
-    private void executeBatch() {
-        if (deleteSqls.isEmpty()) {
-            return;
-        }
-        OrientSqlUtils.executeBatch(getODatabaseDocumentTx(), deleteSqls);
-        deleteSqls.clear();
     }
 
     private CallTo createCallTo(ODocument doc) {

@@ -7,9 +7,7 @@
 
     <util:properties id="snsProp">
         <prop key="defaultBlockingQueueSize">40000</prop>
-        <prop key="callToLastReadRecordPath">
-            \home\orientdb\migration_script\v2\callTo_lastReadRecord.properties
-        </prop>
+        <prop key="callToLastReadRecordPath">/home/orientdb/migration_script/v2/callTo_lastReadRecord.properties</prop>
         <prop key="skipCount">0</prop>
         <prop key="phoneWithCallTo1FilePath">C:\Users\kisho\Desktop\OrientDb\migration_script\D_JXL_CONTACTLIST.csv
         </prop>
@@ -32,74 +30,5 @@
         <prop key="userName"></prop>
         <prop key="password"></prop>
     </util:properties>
-
-    <util:properties id="snsSqlProp">
-        <prop key="memberOverdue">
-            <![CDATA[SELECT BORROWER_ID FROM memedai.LOANS WHERE CREDIT_DATE IS NOT NULL GROUP BY BORROWER_ID HAVING max(OVERDUE_DAYS) > 3 limit ?,?]]>
-        </prop>
-        <prop key="member">
-            <![CDATA[SELECT a.MEMBER_ID,a.MOBILE_NO,b.`NAME`,b.ID_NO,c.PROVINCE,c.CITY FROM memedai.MEMBER a LEFT JOIN memedai.ID_CARD b ON a.MEMBER_ID = b.MEMBER_ID LEFT JOIN credit_audit.ca_sys_value_id_area c ON left(b.id_no,6) = c.id_prefix WHERE 	a.MOBILE_NO IS NOT NULL limit ?,?]]>
-        </prop>
-
-        <prop key="store">
-            <![CDATA[SELECT a.STOREID,a.MERCHANTID,a.STORENAME,a.PROVINCE,a.CITY,a.CREDIT_LIMIT_TYPE,b.POLICY_BRACKET,b.BUSINESS_FIRST_TYPE FROM MERCHANTAUDIT.ma_store_baseinfo AS a LEFT JOIN MERCHANTAUDIT.ma_execution_strategy AS b ON a.storeid = b.storeid limit ?,?]]>
-        </prop>
-
-        <prop key="apply">
-            <![CDATA[SELECT cellphone,member_id,apply_no,created_datetime,apply_status as original_status,case when apply_status=4000 then 1 when left(apply_status,2)=30 then 0 else null end as status,store_id,order_no FROM network.apply_info]]>
-        </prop>
-
-        <prop key="order">
-            <![CDATA[SELECT mobile,member_id,order_no,created_datetime, case when status in ('1051','1081','1085')  then 1 WHEN status in ('1011','1012') then null else 0 end as status,status as original_status,store_id,pay_amount/100 as pay_amount from network.money_box_order]]>
-        </prop>
-
-        <prop key="device2Ca">
-            <![CDATA[SELECT APPL_NO,DEVICE_ID FROM network.ca_appl_member_device where DEVICE_ID is not null]]>
-        </prop>
-
-        <prop key="ip2Ca">
-            <![CDATA[SELECT APPL_NO,IP,IP_CITY  FROM network.ca_appl_member_device where IP is not null]]>
-        </prop>
-
-        <prop key="deviceAndIp2Cta">
-            <![CDATA[SELECT ORDER_ID,DEVICE_ID,IP,IP_CITY from network.cta_order_deviceinfo where ip is not null  or device_id is not null]]>
-        </prop>
-
-        <prop key="phoneWithPhoneMarkAndPhoneSource">
-            <![CDATA[SELECT PHONE_NO, PHONE_TYPE,SOURCE  FROM network.ca_sys_phone_tag_merge where PHONE_NO is not null]]>
-        </prop>
-
-        <prop key="phoneWithCallTo2">
-            <![CDATA[select APPL_NO,PHONE_NO,CALL_CNT,CALL_LEN,CALL_IN_CNT,CALL_OUT_CNT,CREATE_TIME from network.ca_bur_operator_contact]]>
-        </prop>
-
-        <prop key="phoneWithCallToCache">
-            <![CDATA[SELECT b.REPORTNO,a.cellphone,a.apply_no FROM network.apply_info a LEFT JOIN mis_watson.D_JXL_PERSON b ON a.apply_no = b.APPL_NO  limit ?,?]]>
-        </prop>
-
-    </util:properties>
-
-    <util:properties id="snsOrientSqlProp">
-        <prop key="memberOverdue">
-            <![CDATA[update Member set isOverdue=true where memberId=?]]>
-        </prop>
-        <prop key="member">
-            <![CDATA[update Member set memberId=?,name=?,idNo=?,province=?,city=?,isBlack=false,isOverdue=false upsert return after where memberId=?]]>
-        </prop>
-
-        <prop key="store">
-            <![CDATA[update Store set storeId=?,merchantId=?,storeName=?,province=?,city=?,creditLimitType=?,policyBracket=?,businessFirstType=? upsert return after where storeId = ?]]>
-        </prop>
-
-        <prop key="apply">
-            <![CDATA[update Apply set applyNo=?,status=?,originalStatus=?,createdDatetime=? upsert return after where applyNo=?]]>
-        </prop>
-
-        <prop key="order">
-            <![CDATA[update Order set orderNo=?,status=?,originalStatus=?,amount=?,createdDatetime=? upsert return after where orderNo=?]]>
-        </prop>
-
-    </util:properties>
-
 
 </beans>
