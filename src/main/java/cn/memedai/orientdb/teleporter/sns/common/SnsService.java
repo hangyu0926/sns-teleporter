@@ -12,12 +12,10 @@
  */
 package cn.memedai.orientdb.teleporter.sns.common;
 
-import cn.memedai.orientdb.teleporter.Caches;
+import cn.memedai.orientdb.teleporter.OrientSqlUtils;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
-import com.orientechnologies.common.concur.ONeedRetryException;
 import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
-import com.orientechnologies.orient.core.sql.OCommandSQL;
 import com.orientechnologies.orient.core.sql.query.OResultSet;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -29,6 +27,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Map;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by kisho on 2017/4/27.
@@ -51,6 +51,8 @@ public class SnsService {
     private static final String SELECT_MEMBER_SQL = "select from Member where memberId = ?";
 
     private static final String CREATE_CALL_TO_SQL = "create edge CallTo from {0} to {1} set callCnt = #callCnt,callLen=#callLen,callInCnt=#callInCnt,callOutCnt=#callOutCnt,reportTime=#reportTime";
+
+    private Lock phoneLock = new ReentrantLock();
 
     public String processMemberAndPhone(ODatabaseDocumentTx tx,
                                         String memberId,
@@ -119,10 +121,14 @@ public class SnsService {
     public String getPhoneRid(ODatabaseDocumentTx tx, String phone) {
         String phoneRid = CacheUtils.getPhoneRid(phone);
         if (StringUtils.isBlank(phoneRid)) {
-            phoneRid = getRid(execute(tx, UPDATE_PHONE_SQL, phone, phone));
-//            }
-            if (StringUtils.isNotBlank(phoneRid)) {
-                CacheUtils.setPhoneRid(phone, phoneRid);
+            phoneLock.lock();
+            try {
+                phoneRid = getRid(execute(tx, UPDATE_PHONE_SQL, phone, phone));
+                if (StringUtils.isNotBlank(phoneRid)) {
+                    CacheUtils.setPhoneRid(phone, phoneRid);
+                }
+            } finally {
+                phoneLock.unlock();
             }
         }
         return phoneRid;
@@ -168,23 +174,7 @@ public class SnsService {
     }
 
     public <RET> RET execute(ODatabaseDocumentTx tx, String sql, Object... args) {
-        try {
-            return tx.command(new OCommandSQL(sql)).execute(args);
-        } catch (ONeedRetryException e) {
-            return execute(tx, sql, args);
-        } catch (Exception e) {
-            LOG.error("{} @ {}", sql, e.getMessage());
-            LOG.error("", e);
-            if (args != null && args.length > 0) {
-                StringBuilder builder = new StringBuilder();
-                for (Object arg : args) {
-                    builder.append(arg).append(",");
-                }
-                sql += "|" + builder.toString().replaceAll(",$", "");
-            }
-            Caches.ERROR_SQL.add(sql);
-        }
-        return null;
+        return OrientSqlUtils.execute(tx, sql, args);
     }
 
     public String getStartDatetime(String startDatetime, int i) {
