@@ -90,7 +90,8 @@
     </bean>
 
 
-    <bean id="phoneWithPhoneMarkAndPhoneSourceIncrementProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
+    <bean id="phoneWithPhoneMarkAndPhoneSourceIncrementProducer"
+          class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
         <property name="blockingQueue" ref="phoneWithPhoneMarkAndPhoneSourceBlockingQueue"/>
         <property name="sql"
@@ -172,12 +173,6 @@
             <list>
                 <ref bean="phoneWithCallTo2IncrementProducer"/>
                 <ref bean="phoneWithCallTo2IncrementConsumer"/>
-            </list>
-        </entry>
-
-        <entry key="50">
-            <list>
-                <ref bean="duplicatedPhoneCallToIncrementConsumer"/>
             </list>
         </entry>
 
