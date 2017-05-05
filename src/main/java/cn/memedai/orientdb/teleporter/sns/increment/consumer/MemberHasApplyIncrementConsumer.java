@@ -10,38 +10,42 @@
  * written permission of Shanghai Mi-Me Financial Information Service Co., Ltd.
  * -------------------------------------------------------------------------------------
  */
-package cn.memedai.orientdb.teleporter.sns.full.consumer;
+package cn.memedai.orientdb.teleporter.sns.increment.consumer;
 
+import cn.memedai.orientdb.teleporter.sns.common.SnsService;
 import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsCommonAbstractTxConsumer;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Map;
 
 /**
  * Created by kisho on 2017/4/7.
  */
 @Service
-public class HasPhoneFullConsumer extends SnsCommonAbstractTxConsumer {
+public class MemberHasApplyIncrementConsumer extends SnsCommonAbstractTxConsumer {
 
-    @Value("#{snsOrientSqlProp.createHasPhone}")
-    private String createHasPhone;
+    @Value("#{snsOrientSqlProp.createMemberHasApply}")
+    private String createMemberHasApply;
+
+    @Resource
+    private SnsService snsService;
 
     @Override
     protected void process() {
-        for (Map.Entry<String, String> entry : CacheUtils.CACHE_MEMBER_PHONERIDS.entrySet()) {
-            String memberId = entry.getKey();
-            String memberRid = CacheUtils.getMemberRid(memberId);
-            if (StringUtils.isNotBlank(memberRid)) {
-                String phoneRids = entry.getValue();
-                String[] phoneRidArr = phoneRids.split("\\|");
-                for (String phoneRid : phoneRidArr) {
-                    execute(createHasPhone, createHasPhone, new Object[]{memberRid, phoneRid});
-                }
+        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYRID_MEMBERID.entrySet()) {
+            String memberId = entry.getValue();
+            String fromRid = snsService.getMemberRid(getODatabaseDocumentTx(), memberId);
+            if (StringUtils.isBlank(fromRid)) {
+                continue;
             }
+            String toRid = entry.getKey();
+            createEdge(createMemberHasApply, "MemberHasApply", fromRid, toRid);
         }
+
     }
 
 }

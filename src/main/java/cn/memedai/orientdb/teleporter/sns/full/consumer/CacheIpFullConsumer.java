@@ -16,6 +16,7 @@ import cn.memedai.orientdb.teleporter.AbstractDataConsumer;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OResultSet;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -24,9 +25,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class CacheIpFullConsumer extends AbstractDataConsumer {
 
+    @Value("#{snsOrientSqlProp.selectAllIp}")
+    private String selectAllIp;
+
     public void run() {
         long startTime = System.currentTimeMillis();
-        OResultSet ocrs = execute("select from Ip");
+        OResultSet ocrs = execute(selectAllIp, selectAllIp, null);
         if (ocrs != null && !ocrs.isEmpty()) {
             for (int i = 0; i < ocrs.size(); i++) {
                 ODocument doc = (ODocument) ocrs.get(i);

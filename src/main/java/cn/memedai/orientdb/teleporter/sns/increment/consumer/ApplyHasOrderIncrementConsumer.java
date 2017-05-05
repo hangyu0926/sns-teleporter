@@ -10,7 +10,7 @@
  * written permission of Shanghai Mi-Me Financial Information Service Co., Ltd.
  * -------------------------------------------------------------------------------------
  */
-package cn.memedai.orientdb.teleporter.sns.full.consumer;
+package cn.memedai.orientdb.teleporter.sns.increment.consumer;
 
 import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsCommonAbstractTxConsumer;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
@@ -24,22 +24,20 @@ import java.util.Map;
  * Created by kisho on 2017/4/7.
  */
 @Service
-public class HasPhoneFullConsumer extends SnsCommonAbstractTxConsumer {
+public class ApplyHasOrderIncrementConsumer extends SnsCommonAbstractTxConsumer {
 
-    @Value("#{snsOrientSqlProp.createHasPhone}")
-    private String createHasPhone;
+    @Value("#{snsOrientSqlProp.createApplyHasOrder}")
+    private String createApplyHasOrder;
 
     @Override
     protected void process() {
-        for (Map.Entry<String, String> entry : CacheUtils.CACHE_MEMBER_PHONERIDS.entrySet()) {
-            String memberId = entry.getKey();
-            String memberRid = CacheUtils.getMemberRid(memberId);
-            if (StringUtils.isNotBlank(memberRid)) {
-                String phoneRids = entry.getValue();
-                String[] phoneRidArr = phoneRids.split("\\|");
-                for (String phoneRid : phoneRidArr) {
-                    execute(createHasPhone, createHasPhone, new Object[]{memberRid, phoneRid});
-                }
+
+        for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERNO_APPLYINFORID.entrySet()) {
+            String fromRid = entry.getValue();
+            String orderNo = entry.getKey();
+            String toRid = CacheUtils.getOrderRid(orderNo);
+            if (StringUtils.isNotBlank(toRid)) {
+                createEdge(createApplyHasOrder, "ApplyHasOrder", fromRid, toRid);
             }
         }
     }

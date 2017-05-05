@@ -16,6 +16,7 @@ import cn.memedai.orientdb.teleporter.sns.common.SnsService;
 import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsCommonAbstractTxConsumer;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -29,9 +30,14 @@ import java.util.Set;
 @Service
 public class HasIpFullConsumer extends SnsCommonAbstractTxConsumer {
 
-    private String createApplyHasIp = "create edge ApplyHasIp from {0} to {1} retry 100";
-    private String createOrderHasIp = "create edge OrderHasIp from {0} to {1} retry 100";
-    private String createMemberHasIp = "create edge MemberHasIp from {0} to {1} retry 100";
+    @Value("#{snsOrientSqlProp.createApplyHasIp}")
+    private String createApplyHasIp;
+
+    @Value("#{snsOrientSqlProp.createOrderHasIp}")
+    private String createOrderHasIp;
+
+    @Value("#{snsOrientSqlProp.createMemberHasIp}")
+    private String createMemberHasIp;
 
     @Resource
     private SnsService snsService;
@@ -44,7 +50,7 @@ public class HasIpFullConsumer extends SnsCommonAbstractTxConsumer {
             String toRid = entry.getValue();
             String fromRid = CacheUtils.getApplyRid(applyNo);
             if (StringUtils.isNotBlank(fromRid)) {
-                execute(createApplyHasIp, fromRid, toRid);
+                execute(createApplyHasIp, createApplyHasIp, new Object[]{fromRid, toRid});
                 String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_APPLYRID_MEMBERID.get(fromRid));
                 if (StringUtils.isNotBlank(memberRid)) {
                     memberRidAndIpRidSet.add(memberRid + "|" + toRid);
@@ -57,7 +63,7 @@ public class HasIpFullConsumer extends SnsCommonAbstractTxConsumer {
             String toRid = entry.getValue();
             String fromRid = CacheUtils.getOrderRid(orderNo);
             if (StringUtils.isNotBlank(fromRid)) {
-                execute(createOrderHasIp, fromRid, toRid);
+                execute(createOrderHasIp, createOrderHasIp, new Object[]{fromRid, toRid});
                 String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_ORDERRID_MEMBERID.get(fromRid));
                 if (StringUtils.isNotBlank(memberRid)) {
                     memberRidAndIpRidSet.add(memberRid + "|" + toRid);
@@ -71,7 +77,7 @@ public class HasIpFullConsumer extends SnsCommonAbstractTxConsumer {
                 String memberRid = strArr[0];
                 String IpRid = strArr[1];
                 //Member-MemberHasIp->Ip
-                execute(createMemberHasIp, memberRid, IpRid);
+                execute(createMemberHasIp, createMemberHasIp, new Object[]{memberRid, IpRid});
             }
         }
     }

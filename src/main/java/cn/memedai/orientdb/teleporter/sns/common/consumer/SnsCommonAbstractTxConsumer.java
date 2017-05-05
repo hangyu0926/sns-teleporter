@@ -13,7 +13,7 @@
 package cn.memedai.orientdb.teleporter.sns.common.consumer;
 
 import cn.memedai.orientdb.teleporter.AbstractTxConsumer;
-import com.orientechnologies.orient.core.sql.query.OResultSet;
+import cn.memedai.orientdb.teleporter.OrientSqlUtils;
 import org.apache.commons.lang.StringUtils;
 
 import java.text.MessageFormat;
@@ -24,18 +24,17 @@ import java.text.MessageFormat;
 public abstract class SnsCommonAbstractTxConsumer extends AbstractTxConsumer {
 
     @Override
-    protected <RET> RET execute(String sql, Object... args) {
+    protected <RET> RET execute(String templateSql, String sql, Object[] args) {
         sql = MessageFormat.format(sql, args);
-        return super.execute(sql);
+        return super.execute(templateSql, sql, null);
     }
 
-    protected void createEdge(String createSql, String selectSql, String fromRid, String toRid) {
+    protected void createEdge(String createSql, String edgeName, String fromRid, String toRid) {
         if (StringUtils.isBlank(fromRid) || StringUtils.isBlank(toRid)) {
             return;
         }
-        OResultSet ocrs = execute(selectSql, fromRid, toRid);
-        if (ocrs == null || ocrs.isEmpty()) {
-            execute(createSql, fromRid, toRid);
+        if (!OrientSqlUtils.checkEdgeIfExists(getODatabaseDocumentTx(), edgeName, fromRid, toRid)) {
+            execute(createSql, createSql, new Object[]{fromRid, toRid});
         }
     }
 

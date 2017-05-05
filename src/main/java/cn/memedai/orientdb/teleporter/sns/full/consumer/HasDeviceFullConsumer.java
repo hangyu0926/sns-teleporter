@@ -16,6 +16,7 @@ import cn.memedai.orientdb.teleporter.sns.common.SnsService;
 import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsCommonAbstractTxConsumer;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -29,9 +30,14 @@ import java.util.Set;
 @Service
 public class HasDeviceFullConsumer extends SnsCommonAbstractTxConsumer {
 
-    private String SQL_APPLYHASDEVICE = "create edge ApplyHasDevice from {0} to {1} retry 100";
-    private String SQL_ORDERHASDEVICE = "create edge OrderHasDevice from {0} to {1} retry 100";
-    private String SQL_MEMBERHASDEVICE = "create edge MemberHasDevice from {0} to {1} retry 100";
+    @Value("#{snsOrientSqlProp.createApplyHasDevice}")
+    private String createApplyHasDevice;
+
+    @Value("#{snsOrientSqlProp.createOrderHasDevice}")
+    private String createOrderHasDevice;
+
+    @Value("#{snsOrientSqlProp.createMemberHasDevice}")
+    private String createMemberHasDevice;
 
     @Resource
     private SnsService snsService;
@@ -45,7 +51,7 @@ public class HasDeviceFullConsumer extends SnsCommonAbstractTxConsumer {
             String fromRid = CacheUtils.getApplyRid(applyNo);
             if (StringUtils.isNotBlank(fromRid)) {
                 //Apply-ApplyHasDevice->Device
-                execute(SQL_APPLYHASDEVICE, fromRid, toRid);
+                execute(createApplyHasDevice, createApplyHasDevice, new Object[]{fromRid, toRid});
                 String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_APPLYRID_MEMBERID.get(fromRid));
                 if (StringUtils.isNotBlank(memberRid)) {
                     memberRidAndDeviceRidSet.add(memberRid + "|" + toRid);
@@ -60,7 +66,7 @@ public class HasDeviceFullConsumer extends SnsCommonAbstractTxConsumer {
             String fromRid = CacheUtils.getOrderRid(orderNo);
             if (StringUtils.isNotBlank(fromRid)) {
                 //Order-OrderHasDevice->Device
-                execute(SQL_ORDERHASDEVICE, fromRid, toRid);
+                execute(createOrderHasDevice, createOrderHasDevice, new Object[]{fromRid, toRid});
                 String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_ORDERRID_MEMBERID.get(fromRid));
                 if (StringUtils.isNotBlank(memberRid)) {
                     memberRidAndDeviceRidSet.add(memberRid + "|" + toRid);
@@ -75,7 +81,7 @@ public class HasDeviceFullConsumer extends SnsCommonAbstractTxConsumer {
                 String memberRid = strArr[0];
                 String deviceRid = strArr[1];
                 //Member-MemberHasDevice->Device
-                execute(SQL_MEMBERHASDEVICE, memberRid, deviceRid);
+                execute(createMemberHasDevice, createMemberHasDevice, new Object[]{memberRid, deviceRid});
             }
         }
     }

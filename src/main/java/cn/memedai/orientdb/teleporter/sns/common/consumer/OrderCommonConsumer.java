@@ -33,12 +33,12 @@ public class OrderCommonConsumer extends BlockingQueueDataConsumer {
         Object docObj = super.process(obj);
         Map<String, Object> dataMap = (Map<String, Object>) obj;
         String orderNo = (String) dataMap.get("order_no");
-        String orderInfoRid = getRid(docObj);
-        CacheUtils.setOrderRid(orderNo, orderInfoRid);
+        String orderRid = getRid(docObj);
+        CacheUtils.setOrderRid(orderNo, orderRid);
 
         String storeId = (String) dataMap.get("store_id");
         if (StringUtils.isNotBlank(storeId)) {
-            CacheUtils.setOrderRidStoreId(orderInfoRid, storeId);
+            CacheUtils.setOrderRidStoreId(orderRid, storeId);
         }
 
         String memberId = dataMap.get("member_id").toString();
@@ -46,11 +46,11 @@ public class OrderCommonConsumer extends BlockingQueueDataConsumer {
         if (StringUtils.isNotBlank(phone)) {
             String phoneRid = snsService.processMemberAndPhone(getODatabaseDocumentTx(), memberId, phone);
             if (StringUtils.isNotBlank(phoneRid)) {
-                CacheUtils.setOrderRidPhoneRid(orderInfoRid, phoneRid);
+                CacheUtils.setOrderRidPhoneRid(orderRid, phoneRid);
             }
         }
 
-        CacheUtils.setOrderRidMemberId(orderInfoRid, memberId);
+        CacheUtils.setOrderRidMemberId(orderRid, memberId);
 
         return getFirstODocumnet(docObj);
     }

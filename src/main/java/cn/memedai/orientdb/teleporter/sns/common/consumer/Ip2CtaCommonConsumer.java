@@ -22,10 +22,7 @@ import java.util.Map;
 /**
  * Created by kisho on 2017/4/6.
  */
-public class DeviceAndIp2CtaCommonConsumer extends BlockingQueueDataConsumer {
-
-    @Value("#{snsOrientSqlProp.updateDevice}")
-    private String updateDevice;
+public class Ip2CtaCommonConsumer extends BlockingQueueDataConsumer {
 
     @Value("#{snsOrientSqlProp.updateIp}")
     private String updateIp;
@@ -39,8 +36,6 @@ public class DeviceAndIp2CtaCommonConsumer extends BlockingQueueDataConsumer {
         String ipCity = (String) dataMap.get("IP_CITY");
         processOrderAndIp(orderNo, ip, ipCity);
 
-        String deviceId = (String) dataMap.get("DEVICE_ID");
-        processOrderAndDevice(orderNo, deviceId);
         return null;
     }
 
@@ -59,22 +54,6 @@ public class DeviceAndIp2CtaCommonConsumer extends BlockingQueueDataConsumer {
             }
         }
         return ipRid;
-    }
-
-    protected String processOrderAndDevice(String orderNo,
-                                           String deviceId) {
-        String deviceRid = null;
-        if (StringUtils.isNotBlank(deviceId)) {
-            deviceRid = CacheUtils.getDeviceRid(deviceId);
-            if (StringUtils.isBlank(deviceRid)) {
-                deviceRid = getRid(execute(updateDevice, updateDevice, new Object[]{deviceId, deviceId}));
-                CacheUtils.setDeviceRid(deviceId, deviceRid);
-            }
-            if (StringUtils.isNotBlank(orderNo)) {
-                CacheUtils.setOrderNoDeviceRid(orderNo, deviceRid);
-            }
-        }
-        return deviceRid;
     }
 
 }

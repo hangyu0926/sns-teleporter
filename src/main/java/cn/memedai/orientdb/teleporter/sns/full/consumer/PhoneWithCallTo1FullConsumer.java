@@ -18,6 +18,7 @@ import cn.memedai.orientdb.teleporter.sns.common.SnsService;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -33,6 +34,10 @@ public class PhoneWithCallTo1FullConsumer extends BlockingQueueDataBatchProcessC
 
     @Resource
     private SnsService snsService;
+
+    @Value("#{snsOrientSqlProp.createCallTo2}")
+    private String createCallTo2;
+
 
     @Override
     protected Object process(List<Object> dataList) {
@@ -65,7 +70,7 @@ public class PhoneWithCallTo1FullConsumer extends BlockingQueueDataBatchProcessC
             orientSqls.add(snsService.constructCallToSql(fromPhoneRid, toPhoneRid, dataMap));
         }
 
-        return OrientSqlUtils.executeBatch(getODatabaseDocumentTx(), orientSqls);
+        return OrientSqlUtils.executeBatch(getODatabaseDocumentTx(), createCallTo2, orientSqls);
     }
 
 }

@@ -81,12 +81,20 @@
     </bean>
 
 
-    <bean id="deviceAndIp2CtaIncrementProducer"
-          class="cn.memedai.orientdb.teleporter.sns.increment.producer.DeviceAndIp2CtaIncrementProducer">
+    <bean id="device2CtaIncrementProducer"
+          class="cn.memedai.orientdb.teleporter.sns.increment.producer.DeviceOrIp2CtaIncrementProducer">
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
-        <property name="blockingQueue" ref="deviceAndIp2CtaBlockingQueue"/>
+        <property name="blockingQueue" ref="device2CtaBlockingQueue"/>
         <property name="sql"
-                  value="#{snsSqlProp.deviceAndIp2Cta} AND ORDER_ID IN (#inDataList)"/>
+                  value="#{snsSqlProp.device2Cta} AND ORDER_ID IN (#inDataList)"/>
+    </bean>
+
+    <bean id="ip2CtaIncrementProducer"
+          class="cn.memedai.orientdb.teleporter.sns.increment.producer.DeviceOrIp2CtaIncrementProducer">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="blockingQueue" ref="ip2CtaBlockingQueue"/>
+        <property name="sql"
+                  value="#{snsSqlProp.ip2Cta} AND ORDER_ID IN (#inDataList)"/>
     </bean>
 
 
@@ -153,19 +161,55 @@
                 <ref bean="ip2CaIncrementProducer"/>
                 <ref bean="ip2CaCommonConsumer"/>
 
-                <ref bean="deviceAndIp2CtaIncrementProducer"/>
-                <ref bean="deviceAndIp2CtaCommonConsumer"/>
+                <ref bean="device2CtaIncrementProducer"/>
+                <ref bean="device2CtaCommonConsumer"/>
+
+                <ref bean="ip2CtaIncrementProducer"/>
+                <ref bean="ip2CtaCommonConsumer"/>
             </list>
         </entry>
 
         <entry key="30">
             <list>
-                <ref bean="hasApplyIncrementConsumer"/>
-                <ref bean="hasDeviceIncrementConsumer"/>
-                <ref bean="hasIpIncrementConsumer"/>
-                <ref bean="hasOrderIncrementConsumer"/>
+                <ref bean="memberHasApplyIncrementConsumer"/>
+                <ref bean="orderHasDeviceIncrementConsumer"/>
+                <ref bean="applyHasIpIncrementConsumer"/>
+            </list>
+        </entry>
+
+        <entry key="31">
+            <list>
+                <ref bean="memberHasDeviceIncrementConsumer"/>
+                <ref bean="orderHasIpIncrementConsumer"/>
+                <ref bean="applyHasStoreIncrementConsumer"/>
+            </list>
+        </entry>
+
+        <entry key="32">
+            <list>
+                <ref bean="memberHasIpIncrementConsumer"/>
+                <ref bean="orderHasStoreIncrementConsumer"/>
+                <ref bean="applyHasDeviceIncrementConsumer"/>
+            </list>
+        </entry>
+
+        <entry key="33">
+            <list>
+                <ref bean="memberHasOrderIncrementConsumer"/>
+                <ref bean="phoneHasApplyIncrementConsumer"/>
+            </list>
+        </entry>
+
+        <entry key="34">
+            <list>
+                <ref bean="applyHasOrderIncrementConsumer"/>
                 <ref bean="hasPhoneIncrementConsumer"/>
-                <ref bean="hasStoreIncrementConsumer"/>
+            </list>
+        </entry>
+
+        <entry key="34">
+            <list>
+                <ref bean="phoneHasOrderIncrementConsumer"/>
             </list>
         </entry>
 

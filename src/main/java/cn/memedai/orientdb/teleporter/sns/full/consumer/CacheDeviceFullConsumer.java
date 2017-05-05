@@ -16,14 +16,18 @@ import cn.memedai.orientdb.teleporter.AbstractDataConsumer;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OResultSet;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CacheDeviceFullConsumer extends AbstractDataConsumer {
 
+    @Value("#{snsOrientSqlProp.selectAllDevice}")
+    private String selectAllDevice;
+
     public void run() {
         long startTime = System.currentTimeMillis();
-        OResultSet ocrs = execute("select from Device");
+        OResultSet ocrs = execute(selectAllDevice, selectAllDevice, null);
         if (ocrs != null && !ocrs.isEmpty()) {
             for (int i = 0; i < ocrs.size(); i++) {
                 ODocument doc = (ODocument) ocrs.get(i);

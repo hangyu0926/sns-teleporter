@@ -18,7 +18,7 @@ import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
 /**
  * Created by kisho on 2017/4/6.
  */
-public class DeviceAndIp2CtaIncrementProducer extends SnsCommonJdbcDataProducer {
+public class DeviceOrIp2CtaIncrementProducer extends SnsCommonJdbcDataProducer {
 
     @Override
     protected void onStart() {

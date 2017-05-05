@@ -10,11 +10,10 @@
  * written permission of Shanghai Mi-Me Financial Information Service Co., Ltd.
  * -------------------------------------------------------------------------------------
  */
-package cn.memedai.orientdb.teleporter.sns.full.consumer;
+package cn.memedai.orientdb.teleporter.sns.increment.consumer;
 
 import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsCommonAbstractTxConsumer;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -24,23 +23,17 @@ import java.util.Map;
  * Created by kisho on 2017/4/7.
  */
 @Service
-public class HasPhoneFullConsumer extends SnsCommonAbstractTxConsumer {
+public class ApplyHasDeviceIncrementConsumer extends SnsCommonAbstractTxConsumer {
 
-    @Value("#{snsOrientSqlProp.createHasPhone}")
-    private String createHasPhone;
+    @Value("#{snsOrientSqlProp.createApplyHasDevice}")
+    private String createApplyHasDevice;
 
-    @Override
     protected void process() {
-        for (Map.Entry<String, String> entry : CacheUtils.CACHE_MEMBER_PHONERIDS.entrySet()) {
-            String memberId = entry.getKey();
-            String memberRid = CacheUtils.getMemberRid(memberId);
-            if (StringUtils.isNotBlank(memberRid)) {
-                String phoneRids = entry.getValue();
-                String[] phoneRidArr = phoneRids.split("\\|");
-                for (String phoneRid : phoneRidArr) {
-                    execute(createHasPhone, createHasPhone, new Object[]{memberRid, phoneRid});
-                }
-            }
+        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYNO_DEVICERID.entrySet()) {
+            String applyNo = entry.getKey();
+            String toRid = entry.getValue();
+            String fromRid = CacheUtils.getApplyRid(applyNo);
+            createEdge(createApplyHasDevice, "ApplyHasDevice", fromRid, toRid);
         }
     }
 

@@ -66,15 +66,15 @@ public class PhoneWithCallTo2IncrementConsumer extends BlockingQueueDataConsumer
                 dataMap.get("CREATE_TIME") == null ? null : dataMap.get("CREATE_TIME"),
         };
 
-        OResultSet ocrs = execute(MessageFormat.format(SELECT_CALL_TO_SQL, fromPhoneRid, toPhoneRid));
+        OResultSet ocrs = execute(SELECT_CALL_TO_SQL, MessageFormat.format(SELECT_CALL_TO_SQL, fromPhoneRid, toPhoneRid), null);
         if (ocrs != null && !ocrs.isEmpty()) {
             //更新
             ODocument doc = (ODocument) ocrs.get(0);
             ORecordId oRecordId = doc.field("@rid");
-            execute(MessageFormat.format(UPDATE_CALL_TO_SQL, oRecordId.getIdentity().toString()), args);
+            execute(UPDATE_CALL_TO_SQL, MessageFormat.format(UPDATE_CALL_TO_SQL, oRecordId.getIdentity().toString()), args);
         } else {
             //新增
-            execute(MessageFormat.format(CREATE_CALL_TO_SQL, fromPhoneRid, toPhoneRid), args);
+            execute(CREATE_CALL_TO_SQL, MessageFormat.format(CREATE_CALL_TO_SQL, fromPhoneRid, toPhoneRid), args);
         }
         return null;
     }

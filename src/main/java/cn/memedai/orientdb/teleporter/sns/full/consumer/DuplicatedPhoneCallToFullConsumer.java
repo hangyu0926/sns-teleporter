@@ -17,7 +17,9 @@ import cn.memedai.orientdb.teleporter.sns.common.model.CallTo;
 import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OResultSet;
+import org.springframework.beans.factory.annotation.Value;
 
+import java.text.MessageFormat;
 import java.util.*;
 
 /**
@@ -25,13 +27,18 @@ import java.util.*;
  */
 public class DuplicatedPhoneCallToFullConsumer extends BlockingQueueDataConsumer {
 
-    private static final String SQL_CALLTO = "select expand($c) from (select from V limit 1) let $a = (select expand(in_CallTo) from Phone where phone = ?), $b = (select expand(out_CallTo) from Phone where phone = ?), $c = unionall($a,$b)";
+
+    @Value("#{snsOrientSqlProp.deleteEdge}")
+    private String deleteEdge;
+
+    @Value("#{snsOrientSsqlProp.selectDuplicatedCallTo}")
+    private String selectDuplicatedCallTo;
 
     @Override
     protected Object process(Object obj) {
         Map<String, String> dataMap = (Map<String, String>) obj;
         String phone = dataMap.get("cellphone");
-        OResultSet ocrs = execute(SQL_CALLTO, phone, phone);
+        OResultSet ocrs = execute(selectDuplicatedCallTo, selectDuplicatedCallTo, new Object[]{phone, phone});
 
         if (ocrs != null && !ocrs.isEmpty()) {
             Map<String, List<CallTo>> allCallTos = new HashMap<String, List<CallTo>>(ocrs.size());
@@ -52,7 +59,7 @@ public class DuplicatedPhoneCallToFullConsumer extends BlockingQueueDataConsumer
                     Collections.sort(callTos);
                     callTos.remove(0);
                     for (CallTo callTo : callTos) {
-                        execute(" delete edge " + callTo.getRid());
+                        execute(deleteEdge, MessageFormat.format(deleteEdge, callTo.getRid()), null);
                     }
                 }
             }

@@ -12,11 +12,12 @@
  */
 package cn.memedai.orientdb.teleporter.sns.increment.consumer;
 
+import cn.memedai.orientdb.teleporter.OrientSqlUtils;
 import cn.memedai.orientdb.teleporter.sns.common.SnsService;
 import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsCommonAbstractTxConsumer;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
-import com.orientechnologies.orient.core.sql.query.OResultSet;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -28,8 +29,8 @@ import java.util.Map;
 @Service
 public class HasPhoneIncrementConsumer extends SnsCommonAbstractTxConsumer {
 
-    private static final String CREATE_HASPHONE_SQL = "create edge HasPhone from {0} to {1} retry 100";
-    private static final String SELECT_HASPHONE_SQL = "select from (select expand(out_HasPhone) from {0}) where in = {1}";
+    @Value("#{snsOrientSqlProp.createHasPhone}")
+    private String createHasPhone;
 
     @Resource
     private SnsService snsService;
@@ -40,13 +41,11 @@ public class HasPhoneIncrementConsumer extends SnsCommonAbstractTxConsumer {
             String memberId = entry.getKey();
             String fromRid = snsService.getMemberRid(getODatabaseDocumentTx(), memberId);
             String phoneRids = entry.getValue();
-            //Member-HasPhone->Phone
             String[] phoneRidArr = phoneRids.split("\\|");
             for (String toRid : phoneRidArr) {
                 if (StringUtils.isNotBlank(fromRid)) {
-                    OResultSet ocrs = execute(SELECT_HASPHONE_SQL, fromRid, toRid);
-                    if (ocrs == null || ocrs.isEmpty()) {
-                        execute(CREATE_HASPHONE_SQL, fromRid, toRid);
+                    if (!OrientSqlUtils.checkEdgeIfExists(getODatabaseDocumentTx(), "HasPhone", fromRid, toRid)) {
+                        execute(createHasPhone, createHasPhone, new Object[]{fromRid, toRid});
                     }
                 }
             }

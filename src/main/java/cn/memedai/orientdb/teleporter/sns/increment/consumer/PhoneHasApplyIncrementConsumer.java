@@ -10,25 +10,31 @@
  * written permission of Shanghai Mi-Me Financial Information Service Co., Ltd.
  * -------------------------------------------------------------------------------------
  */
-package cn.memedai.orientdb.teleporter.sns.common.consumer;
+package cn.memedai.orientdb.teleporter.sns.increment.consumer;
 
-import cn.memedai.orientdb.teleporter.AbstractTxConsumer;
+import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsCommonAbstractTxConsumer;
+import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
+
 /**
- * Created by kisho on 2017/4/6.
+ * Created by kisho on 2017/4/7.
  */
 @Service
-public class UpdateMemberOverdueToDefaultCommonConsumer extends AbstractTxConsumer {
+public class PhoneHasApplyIncrementConsumer extends SnsCommonAbstractTxConsumer {
 
-    @Value("#{snsOrientSqlProp.updateMemberOverdueToFalse}")
-    private String updateMemberOverdueToFalse;
+    @Value("#{snsOrientSqlProp.createPhoneHasApply}")
+    private String createPhoneHasApply;
 
     @Override
     protected void process() {
-        execute(updateMemberOverdueToFalse, updateMemberOverdueToFalse, null);
+        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYRID_PHONERID.entrySet()) {
+            String fromRid = entry.getValue();
+            String toRid = entry.getKey();
+            createEdge(createPhoneHasApply, "PhoneHasApply", fromRid, toRid);
+        }
     }
-
 
 }

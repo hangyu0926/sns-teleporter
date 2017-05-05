@@ -18,8 +18,7 @@ import com.orientechnologies.orient.core.db.document.ODatabaseDocumentTx;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OResultSet;
 import org.apache.commons.lang.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
@@ -36,21 +35,23 @@ import java.util.concurrent.locks.ReentrantLock;
 @Service
 public class SnsService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SnsService.class);
+    @Value("#{snsOrientSqlProp.updateDevice}")
+    private String updateDevice;
 
-    private static final String SQL_DEVICE = "update Device set deviceId=? upsert return after where deviceId=?";
+    @Value("#{snsOrientSqlProp.updateIp}")
+    private String updateIp;
 
-    private static final String SQL_IP = "update Ip set ip=?,ipCity=? upsert return after where ip=?";
+    @Value("#{snsOrientSqlProp.updatePhone}")
+    private String updatePhone;
 
-    private static final String UPDATE_PHONE_SQL = "update Phone set phone=? upsert return after where phone=?";
+    @Value("#{snsOrientSqlProp.selectStore}")
+    private String selectStore;
 
-    private static final String SELECT_PHONE_SQL = "select from Phone where phone=?";
+    @Value("#{snsOrientSqlProp.selectMember}")
+    private String selectMember;
 
-    private static final String SELECT_STORE_SQL = "select from Store where storeId=?";
-
-    private static final String SELECT_MEMBER_SQL = "select from Member where memberId = ?";
-
-    private static final String CREATE_CALL_TO_SQL = "create edge CallTo from {0} to {1} set callCnt = #callCnt,callLen=#callLen,callInCnt=#callInCnt,callOutCnt=#callOutCnt,reportTime=#reportTime";
+    @Value("#{snsOrientSqlProp.createCallTo2}")
+    private String createCallTo2;
 
     private Lock phoneLock = new ReentrantLock();
 
@@ -86,7 +87,7 @@ public class SnsService {
         if (StringUtils.isNotBlank(ip)) {
             ipRid = CacheUtils.getIpRid(ip);
             if (StringUtils.isBlank(ipRid)) {
-                ipRid = getRid(execute(tx, SQL_IP, ip, ipCity, ip));
+                ipRid = getRid(execute(tx, updateIp, updateIp, new Object[]{ip, ipCity, ip}));
                 if (StringUtils.isNotBlank(ipRid)) {
                     CacheUtils.setIpRid(ip, ipRid);
                 }
@@ -105,7 +106,7 @@ public class SnsService {
         if (StringUtils.isNotBlank(deviceId)) {
             deviceRid = CacheUtils.getDeviceRid(deviceId);
             if (StringUtils.isBlank(deviceRid)) {
-                deviceRid = getRid(execute(tx, SQL_DEVICE, deviceId, deviceId));
+                deviceRid = getRid(execute(tx, updateDevice, updateDevice, new Object[]{deviceId, deviceId}));
                 if (StringUtils.isNotBlank(deviceRid)) {
                     CacheUtils.setDeviceRid(deviceId, deviceRid);
                 }
@@ -123,7 +124,7 @@ public class SnsService {
         if (StringUtils.isBlank(phoneRid)) {
             phoneLock.lock();
             try {
-                phoneRid = getRid(execute(tx, UPDATE_PHONE_SQL, phone, phone));
+                phoneRid = getRid(execute(tx, updatePhone, updatePhone, new Object[]{phone, phone}));
                 if (StringUtils.isNotBlank(phoneRid)) {
                     CacheUtils.setPhoneRid(phone, phoneRid);
                 }
@@ -137,7 +138,7 @@ public class SnsService {
     public String getStoreRid(ODatabaseDocumentTx tx, String storeId) {
         String storeRid = CacheUtils.getStoreRid(storeId);
         if (StringUtils.isBlank(storeRid)) {
-            storeRid = getRid(execute(tx, SELECT_STORE_SQL, storeId));
+            storeRid = getRid(execute(tx, selectStore, selectStore, new Object[]{storeId}));
             if (StringUtils.isNotBlank(storeRid)) {
                 CacheUtils.setStoreRid(storeId, storeRid);
             }
@@ -152,7 +153,7 @@ public class SnsService {
         }
         String memberRid = CacheUtils.getMemberRid(memberId);
         if (StringUtils.isBlank(memberRid)) {
-            memberRid = getRid(execute(tx, SELECT_MEMBER_SQL, memberId));
+            memberRid = getRid(execute(tx, selectMember, selectMember, new Object[]{memberId}));
             CacheUtils.setMemberRid(memberId, memberRid);
         }
         return memberRid;
@@ -173,8 +174,8 @@ public class SnsService {
         return null;
     }
 
-    public <RET> RET execute(ODatabaseDocumentTx tx, String sql, Object... args) {
-        return OrientSqlUtils.execute(tx, sql, args);
+    public <RET> RET execute(ODatabaseDocumentTx tx, String templateSql, String sql, Object[] args) {
+        return OrientSqlUtils.execute(tx, templateSql, sql, args);
     }
 
     public String getStartDatetime(String startDatetime, int i) {
@@ -189,7 +190,7 @@ public class SnsService {
     public String constructCallToSql(String fromPhoneRid,
                                      String toPhoneRid,
                                      Map<String, Object> dataMap) {
-        String templateSql = MessageFormat.format(CREATE_CALL_TO_SQL, fromPhoneRid, toPhoneRid);
+        String templateSql = MessageFormat.format(createCallTo2, fromPhoneRid, toPhoneRid);
         return templateSql.replace("#callCnt", getValue(dataMap.get("CALL_CNT"))).
                 replace("#callLen", getValue(dataMap.get("CALL_LEN"))).
                 replace("#callInCnt", getValue(dataMap.get("CALL_IN_CNT")))
@@ -197,7 +198,7 @@ public class SnsService {
                 .replace("#reportTime", "'" + dataMap.get("CREATE_TIME").toString() + "'");
     }
 
-    protected String getValue(Object value) {
+    private String getValue(Object value) {
         return value == null ? "0" : value.toString();
     }
 

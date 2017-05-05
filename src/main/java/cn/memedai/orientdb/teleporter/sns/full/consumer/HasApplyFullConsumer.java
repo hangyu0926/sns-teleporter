@@ -15,6 +15,7 @@ package cn.memedai.orientdb.teleporter.sns.full.consumer;
 import cn.memedai.orientdb.teleporter.sns.common.consumer.SnsCommonAbstractTxConsumer;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
@@ -25,8 +26,12 @@ import java.util.Map;
 @Service
 public class HasApplyFullConsumer extends SnsCommonAbstractTxConsumer {
 
-    private String createMemberHasApply = "create edge MemberHasApply from {0} to {1} retry 100";
-    private String createPhoneHasApply = "create edge PhoneHasApply from {0} to {1} retry 100";
+
+    @Value("#{snsOrientSqlProp.createMemberHasApply}")
+    private String createMemberHasApply;
+
+    @Value("#{snsOrientSqlProp.createPhoneHasApply}")
+    private String createPhoneHasApply;
 
     @Override
     protected void process() {
@@ -37,7 +42,7 @@ public class HasApplyFullConsumer extends SnsCommonAbstractTxConsumer {
             String toRid = entry.getKey();
             if (StringUtils.isNotBlank(fromRid)) {
                 //Member-MemberHasApply->ApplyInfo
-                execute(createMemberHasApply, fromRid, toRid);
+                execute(createMemberHasApply, createMemberHasApply, new Object[]{fromRid, toRid});
             }
         }
 
@@ -45,7 +50,7 @@ public class HasApplyFullConsumer extends SnsCommonAbstractTxConsumer {
             String fromRid = entry.getValue();
             String toRid = entry.getKey();
             //Phone-PhoneHasApply->ApplyInfo
-            execute(createPhoneHasApply, fromRid, toRid);
+            execute(createPhoneHasApply, createPhoneHasApply, new Object[]{fromRid, toRid});
         }
     }
 

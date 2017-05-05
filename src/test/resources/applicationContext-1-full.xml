@@ -112,12 +112,20 @@
     </bean>
 
 
-    <bean id="deviceAndIp2CtaFullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
+    <bean id="device2CtaFullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
           scope="prototype">
         <property name="jdbcTemplate" ref="jdbcTemplate"/>
-        <property name="blockingQueue" ref="deviceAndIp2CtaBlockingQueue"/>
+        <property name="blockingQueue" ref="device2CtaBlockingQueue"/>
         <property name="sql"
-                  value="#{snsSqlProp.deviceAndIp2Cta} limit ?,?"/>
+                  value="#{snsSqlProp.device2Cta} limit ?,?"/>
+    </bean>
+
+    <bean id="ip2CtaFullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
+          scope="prototype">
+        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="blockingQueue" ref="ip2CtaBlockingQueue"/>
+        <property name="sql"
+                  value="#{snsSqlProp.ip2Cta} limit ?,?"/>
     </bean>
 
 
@@ -182,8 +190,11 @@
                 <ref bean="deviceAndIp1FullProducer"/>
                 <ref bean="deviceAndIp1FullConsumer"/>
 
-                <ref bean="deviceAndIp2CtaFullProducer"/>
-                <ref bean="deviceAndIp2CtaCommonConsumer"/>
+                <ref bean="device2CtaFullProducer"/>
+                <ref bean="device2CtaCommonConsumer"/>
+
+                <ref bean="ip2CtaFullProducer"/>
+                <ref bean="ip2CtaCommonConsumer"/>
             </list>
         </entry>
 

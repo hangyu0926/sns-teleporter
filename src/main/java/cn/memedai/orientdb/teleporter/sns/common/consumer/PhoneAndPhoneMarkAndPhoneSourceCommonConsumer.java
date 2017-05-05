@@ -17,6 +17,7 @@ import cn.memedai.orientdb.teleporter.OrientSqlUtils;
 import cn.memedai.orientdb.teleporter.sns.common.SnsService;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.Resource;
 import java.text.MessageFormat;
@@ -28,11 +29,18 @@ import java.util.Map;
 
 public class PhoneAndPhoneMarkAndPhoneSourceCommonConsumer extends BlockingQueueDataConsumer {
 
-    private static final String UPDATE_PHONE_MARK = "update PhoneMark set mark=? upsert return after where mark=?";
-    private static final String CREATE_HASPHONEMARK = "create edge HasPhoneMark from {0} to {1}";
 
-    private static final String UPDATE_PHONE_SOURCE = "update PhoneSource set source=? upsert return after where source=?";
-    private static final String CREATE_HASPHONESOURCE = "create edge HasPhoneSource from {0} to {1}";
+    @Value("#{snsOrientSqlProp.updatePhoneMark}")
+    private String updatePhoneMark;
+
+    @Value("#{snsOrientSqlProp.updatePhoneSource}")
+    private String updatePhoneSource;
+
+    @Value("#{snsOrientSqlProp.createHasPhoneMark}")
+    private String createHasPhoneMark;
+
+    @Value("#{snsOrientSqlProp.createHasPhoneSource}")
+    private String createHasPhoneSource;
 
     @Resource
     private SnsService snsService;
@@ -55,13 +63,13 @@ public class PhoneAndPhoneMarkAndPhoneSourceCommonConsumer extends BlockingQueue
         if (StringUtils.isNotBlank(mark)) {
             String markRid = CacheUtils.getPhoneMarkRid(mark);
             if (StringUtils.isBlank(markRid)) {
-                markRid = getRid(execute(UPDATE_PHONE_MARK, mark, mark));
+                markRid = getRid(execute(updatePhoneMark, updatePhoneMark, new Object[]{mark, mark}));
                 if (StringUtils.isNotBlank(markRid)) {
                     CacheUtils.setPhoneMarkRid(mark, markRid);
                 }
             }
             if (!OrientSqlUtils.checkEdgeIfExists(getODatabaseDocumentTx(), "HasPhoneMark", phoneRid, markRid)) {
-                execute(MessageFormat.format(CREATE_HASPHONEMARK, phoneRid, markRid));
+                execute(createHasPhoneMark, MessageFormat.format(createHasPhoneMark, phoneRid, markRid), null);
             }
         }
 
@@ -69,13 +77,13 @@ public class PhoneAndPhoneMarkAndPhoneSourceCommonConsumer extends BlockingQueue
         if (StringUtils.isNotBlank(source)) {
             String sourceRid = CacheUtils.getPhoneSourceRid(source);
             if (StringUtils.isBlank(sourceRid)) {
-                sourceRid = getRid(execute(UPDATE_PHONE_SOURCE, source, source));
+                sourceRid = getRid(execute(updatePhoneSource, updatePhoneSource, new Object[]{source, source}));
                 if (StringUtils.isNotBlank(sourceRid)) {
                     CacheUtils.setPhoneSourceRid(source, sourceRid);
                 }
             }
             if (!OrientSqlUtils.checkEdgeIfExists(getODatabaseDocumentTx(), "HasPhoneSource", phoneRid, sourceRid)) {
-                execute(MessageFormat.format(CREATE_HASPHONESOURCE, phoneRid, sourceRid));
+                execute(createHasPhoneSource, MessageFormat.format(createHasPhoneSource, phoneRid, sourceRid), null);
             }
         }
 

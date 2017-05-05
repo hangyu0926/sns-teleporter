@@ -33,8 +33,12 @@
             <![CDATA[SELECT APPL_NO,IP,IP_CITY  FROM network.ca_appl_member_device where IP is not null]]>
         </prop>
 
-        <prop key="deviceAndIp2Cta">
-            <![CDATA[SELECT ORDER_ID,DEVICE_ID,IP,IP_CITY from network.cta_order_deviceinfo where ip is not null  or device_id is not null]]>
+        <prop key="device2Cta">
+            <![CDATA[SELECT ORDER_ID,DEVICE_ID,IP,IP_CITY from network.cta_order_deviceinfo where device_id is not null]]>
+        </prop>
+
+        <prop key="ip2Cta">
+            <![CDATA[SELECT ORDER_ID,DEVICE_ID,IP,IP_CITY from network.cta_order_deviceinfo where ip is not null]]>
         </prop>
 
         <prop key="phoneWithPhoneMarkAndPhoneSource">
@@ -52,9 +56,14 @@
     </util:properties>
 
     <util:properties id="snsOrientSqlProp">
-        <prop key="memberOverdue">
+        <prop key="updateMemberOverdueToTrue">
             <![CDATA[update Member set isOverdue=true where memberId=?]]>
         </prop>
+
+        <prop key="updateMemberOverdueToFalse">
+            <![CDATA[update Member set isOverdue=false where isOverdue=true]]>
+        </prop>
+
         <prop key="member">
             <![CDATA[update Member set memberId=?,name=?,idNo=?,province=?,city=?,isBlack=false,isOverdue=false upsert return after where memberId=?]]>
         </prop>
@@ -69,6 +78,126 @@
 
         <prop key="order">
             <![CDATA[update Order set orderNo=?,status=?,originalStatus=?,amount=?,createdDatetime=? upsert return after where orderNo=?]]>
+        </prop>
+
+        <prop key="deleteEdge">
+            <![CDATA[delete edge {0}]]>
+        </prop>
+
+        <prop key="selectDuplicatedCallTo">
+            <![CDATA[select expand($c) from (select from V limit 1) let $a = (select expand(in_CallTo) from Phone where phone = ?), $b = (select expand(out_CallTo) from Phone where phone = ?), $c = unionall($a,$b)]]>
+        </prop>
+
+        <prop key="updateDevice">
+            <![CDATA[update Device set deviceId=? upsert return after where deviceId=?]]>
+        </prop>
+
+        <prop key="updateIp">
+            <![CDATA[update Ip set ip=?,ipCity=? upsert return after where ip=?]]>
+        </prop>
+
+        <prop key="updatePhone">
+            <![CDATA[update Phone set phone=? upsert return after where phone=?]]>
+        </prop>
+
+        <prop key="selectStore">
+            <![CDATA[select from Store where storeId=?]]>
+        </prop>
+
+        <prop key="selectMember">
+            <![CDATA[select from Member where memberId = ?]]>
+        </prop>
+
+        <prop key="updatePhoneMark">
+            <![CDATA[update PhoneMark set mark=? upsert return after where mark=?]]>
+        </prop>
+
+        <prop key="createHasPhoneMark">
+            <![CDATA[create edge HasPhoneMark from {0} to {1}]]>
+        </prop>
+
+        <prop key="updatePhoneSource">
+            <![CDATA[update PhoneSource set source=? upsert return after where source=?]]>
+        </prop>
+
+        <prop key="createHasPhoneSource">
+            <![CDATA[create edge HasPhoneSource from {0} to {1}]]>
+        </prop>
+
+        <prop key="selectAllDevice">
+            <![CDATA[select from Device]]>
+        </prop>
+
+        <prop key="selectAllIp">
+            <![CDATA[select from Ip]]>
+        </prop>
+
+        <prop key="createMemberHasApply">
+            <![CDATA[create edge MemberHasApply from {0} to {1} retry 100]]>
+        </prop>
+
+        <prop key="createPhoneHasApply">
+            <![CDATA[create edge PhoneHasApply from {0} to {1} retry 100]]>
+        </prop>
+
+        <prop key="createApplyHasDevice">
+            <![CDATA[create edge ApplyHasDevice from {0} to {1} retry 100]]>
+        </prop>
+
+        <prop key="createOrderHasDevice">
+            <![CDATA[create edge OrderHasDevice from {0} to {1} retry 100]]>
+        </prop>
+
+        <prop key="createMemberHasDevice">
+            <![CDATA[create edge MemberHasDevice from {0} to {1} retry 100]]>
+        </prop>
+
+        <prop key="createApplyHasIp">
+            <![CDATA[create edge ApplyHasIp from {0} to {1} retry 100]]>
+        </prop>
+
+        <prop key="createOrderHasIp">
+            <![CDATA[create edge OrderHasIp from {0} to {1} retry 100]]>
+        </prop>
+
+        <prop key="createMemberHasIp">
+            <![CDATA[create edge MemberHasIp from {0} to {1} retry 100]]>
+        </prop>
+
+        <prop key="createApplyHasOrder">
+            <![CDATA[create edge ApplyHasOrder from {0} to {1} retry 100]]>
+        </prop>
+
+        <prop key="createPhoneHasOrder">
+            <![CDATA[create edge PhoneHasOrder from {0} to {1} retry 100]]>
+        </prop>
+
+        <prop key="createMemberHasOrder">
+            <![CDATA[create edge MemberHasOrder from {0} to {1} retry 100]]>
+        </prop>
+
+        <prop key="createHasPhone">
+            <![CDATA[create edge HasPhone from {0} to {1} retry 100]]>
+        </prop>
+
+        <prop key="createApplyHasStore">
+            <![CDATA[create edge ApplyHasStore from {0} to {1} retry 100]]>
+        </prop>
+
+        <prop key="createOrderHasStore">
+            <![CDATA[create edge OrderHasStore from {0} to {1} retry 100]]>
+        </prop>
+
+        <prop key="createCallTo">
+            <![CDATA[create edge CallTo from {0} to {1} set callCnt = ?,callLen=?,callInCnt=?,callOutCnt=?,reportTime=? retry 100]]>
+        </prop>
+
+        <prop key="createCallTo2">
+            <![CDATA[create edge CallTo from {0} to {1} set callCnt = #callCnt,callLen=#callLen,callInCnt=#callInCnt,callOutCnt=#callOutCnt,reportTime=#reportTime]]>
+        </prop>
+
+        <prop key="createHasPhone">
+            <![CDATA[create edge HasPhone from {0} to {1} retry 100]]>
         </prop>
 
     </util:properties>

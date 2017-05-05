@@ -16,6 +16,7 @@ import cn.memedai.orientdb.teleporter.BlockingQueueDataConsumer;
 import cn.memedai.orientdb.teleporter.sns.common.SnsService;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -31,7 +32,8 @@ public class PhoneWithCallTo2FullConsumer extends BlockingQueueDataConsumer {
     @Resource
     private SnsService snsService;
 
-    private static final String CREATE_CALL_TO_SQL = "create edge CallTo from {0} to {1} set callCnt = ?,callLen=?,callInCnt=?,callOutCnt=?,reportTime=? retry 100";
+    @Value("#{snsOrientSqlProp.createCallTo}")
+    private String createCallTo;
 
     @Override
     protected Object process(Object obj) {
@@ -57,7 +59,7 @@ public class PhoneWithCallTo2FullConsumer extends BlockingQueueDataConsumer {
                 dataMap.get("CREATE_TIME") == null ? null : dataMap.get("CREATE_TIME"),
         };
 
-        execute(MessageFormat.format(CREATE_CALL_TO_SQL, fromPhoneRid, toPhoneRid), args);
+        execute(createCallTo, MessageFormat.format(createCallTo, fromPhoneRid, toPhoneRid), args);
         return null;
     }
 

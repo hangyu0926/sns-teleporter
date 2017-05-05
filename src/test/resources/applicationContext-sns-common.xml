@@ -53,7 +53,7 @@
         <property name="blockingQueue" ref="memberOverdueBlockingQueue"/>
         <property name="documentTxFactory" ref="documentTxFactory"/>
         <property name="sql"
-                  value="#{snsOrientSqlProp.memberOverdue}"/>
+                  value="#{snsOrientSqlProp.updateMemberOverdueToTrue}"/>
         <property name="sqlParameterNames">
             <array>
                 <value>BORROWER_ID</value>
@@ -119,7 +119,8 @@
     <bean id="device2CaBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
         <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
     </bean>
-    <bean id="device2CaCommonConsumer" class="cn.memedai.orientdb.teleporter.sns.common.consumer.Device2CaCommonConsumer"
+    <bean id="device2CaCommonConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.common.consumer.Device2CaCommonConsumer"
           scope="prototype">
         <property name="blockingQueue" ref="device2CaBlockingQueue"/>
         <property name="documentTxFactory" ref="documentTxFactory"/>
@@ -135,14 +136,23 @@
         <property name="documentTxFactory" ref="documentTxFactory"/>
     </bean>
 
-
-    <bean id="deviceAndIp2CtaBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+    <bean id="device2CtaBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
         <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
     </bean>
-    <bean id="deviceAndIp2CtaCommonConsumer"
-          class="cn.memedai.orientdb.teleporter.sns.common.consumer.DeviceAndIp2CtaCommonConsumer"
+    <bean id="device2CtaCommonConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.common.consumer.Device2CtaCommonConsumer"
           scope="prototype">
-        <property name="blockingQueue" ref="deviceAndIp2CtaBlockingQueue"/>
+        <property name="blockingQueue" ref="device2CtaBlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+    </bean>
+
+    <bean id="ip2CtaBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="ip2CtaCommonConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.common.consumer.Ip2CtaCommonConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="ip2CtaBlockingQueue"/>
         <property name="documentTxFactory" ref="documentTxFactory"/>
     </bean>
 
