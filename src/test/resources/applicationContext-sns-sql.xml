@@ -34,11 +34,11 @@
         </prop>
 
         <prop key="device2Cta">
-            <![CDATA[SELECT ORDER_ID,DEVICE_ID,IP,IP_CITY from network.cta_order_deviceinfo where device_id is not null]]>
+            <![CDATA[SELECT ORDER_ID,DEVICE_ID from network.cta_order_deviceinfo where device_id is not null]]>
         </prop>
 
         <prop key="ip2Cta">
-            <![CDATA[SELECT ORDER_ID,DEVICE_ID,IP,IP_CITY from network.cta_order_deviceinfo where ip is not null]]>
+            <![CDATA[SELECT ORDER_ID,IP,IP_CITY from network.cta_order_deviceinfo where ip is not null]]>
         </prop>
 
         <prop key="phoneWithPhoneMarkAndPhoneSource">
