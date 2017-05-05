@@ -18,7 +18,9 @@ import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
 import com.orientechnologies.orient.core.id.ORecordId;
 import com.orientechnologies.orient.core.record.impl.ODocument;
 import com.orientechnologies.orient.core.sql.query.OResultSet;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.Resource;
 import java.text.MessageFormat;
@@ -32,11 +34,15 @@ public class PhoneWithCallTo2IncrementConsumer extends BlockingQueueDataConsumer
     @Resource
     private SnsService snsService;
 
-    private static final String CREATE_CALL_TO_SQL = "create edge CallTo from {0} to {1} set callCnt = ?,callLen=?,callInCnt=?,callOutCnt=?,reportTime=? retry 100";
+    @Value("#{snsOrientSqlProp.createCallTo}")
+    private String createCallTo;
 
-    private static final String UPDATE_CALL_TO_SQL = "update edge {0} set callCnt = ?,callLen=?,callInCnt=?,callOutCnt=?,reportTime=?";
+    @Value("#{snsOrientSqlProp.updateCallTo}")
+    private String updateCallTo;
 
-    private static final String SELECT_CALL_TO_SQL = "select from (select expand(out_CallTo) from {0}) where in = {1}";
+    @Value("#{snsOrientSqlProp.selectCallTo}")
+    private String selectCallTo;
+
 
     @Override
     protected Object process(Object obj) {
@@ -66,15 +72,13 @@ public class PhoneWithCallTo2IncrementConsumer extends BlockingQueueDataConsumer
                 dataMap.get("CREATE_TIME") == null ? null : dataMap.get("CREATE_TIME"),
         };
 
-        OResultSet ocrs = execute(SELECT_CALL_TO_SQL, MessageFormat.format(SELECT_CALL_TO_SQL, fromPhoneRid, toPhoneRid), null);
-        if (ocrs != null && !ocrs.isEmpty()) {
-            //更新
+        OResultSet ocrs = execute(selectCallTo, MessageFormat.format(selectCallTo, fromPhoneRid, toPhoneRid), null);
+        if (CollectionUtils.isEmpty(ocrs)) {
+            execute(createCallTo, MessageFormat.format(createCallTo, fromPhoneRid, toPhoneRid), args);
+        } else {
             ODocument doc = (ODocument) ocrs.get(0);
             ORecordId oRecordId = doc.field("@rid");
-            execute(UPDATE_CALL_TO_SQL, MessageFormat.format(UPDATE_CALL_TO_SQL, oRecordId.getIdentity().toString()), args);
-        } else {
-            //新增
-            execute(CREATE_CALL_TO_SQL, MessageFormat.format(CREATE_CALL_TO_SQL, fromPhoneRid, toPhoneRid), args);
+            execute(updateCallTo, MessageFormat.format(updateCallTo, oRecordId.getIdentity().toString()), args);
         }
         return null;
     }

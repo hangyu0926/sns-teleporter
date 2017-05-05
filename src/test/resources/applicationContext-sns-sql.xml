@@ -196,6 +196,14 @@
             <![CDATA[create edge CallTo from {0} to {1} set callCnt = #callCnt,callLen=#callLen,callInCnt=#callInCnt,callOutCnt=#callOutCnt,reportTime=#reportTime]]>
         </prop>
 
+        <prop key="updateCallTo">
+            <![CDATA[update edge {0} set callCnt = ?,callLen=?,callInCnt=?,callOutCnt=?,reportTime=?]]>
+        </prop>
+
+        <prop key="selectCallTo">
+            <![CDATA[select from (select expand(out_CallTo) from {0}) where in = {1}]]>
+        </prop>
+
         <prop key="createHasPhone">
             <![CDATA[create edge HasPhone from {0} to {1} retry 100]]>
         </prop>
