@@ -9,7 +9,7 @@
         <prop key="defaultBlockingQueueSize">40000</prop>
         <prop key="callToLastReadRecordPath">/home/orientdb/migration_script/v2/callTo_lastReadRecord.properties</prop>
         <prop key="skipCount">0</prop>
-        <prop key="phoneWithCallTo1FilePath">C:\Users\kisho\Desktop\OrientDb\migration_script\D_JXL_CONTACTLIST.csv
+        <prop key="phoneWithCallTo1FilePath">/home/orientdb/migration_data/D_JXL_CONTACTLIST.csv
         </prop>
     </util:properties>
 
@@ -38,9 +38,9 @@
 
         <prop key="mail.from.user">mime15821180279@163.com</prop>
         <prop key="mail.from.password">ComM3416225611</prop>
-        <prop key="mail.from.displayName">mime</prop>
+        <prop key="mail.from.displayName">Mime OrientDB Teleporter</prop>
 
-        <prop key="mail.subject">sns orientdb teleporter performance</prop>
+        <prop key="mail.subject">OrientDB Teleporter Performance</prop>
         <prop key="mail.to.user">kisho.dai@mi-me.com</prop>
     </util:properties>
 

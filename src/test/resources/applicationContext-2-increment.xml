@@ -143,10 +143,14 @@
                 <ref bean="orderIncrementProducer"/>
                 <ref bean="orderCommonConsumer"/>
 
-                <ref bean="updateMemberOverdueToDefaultCommonConsumer"/>
-
                 <ref bean="phoneWithPhoneMarkAndPhoneSourceIncrementProducer"/>
                 <ref bean="phoneWithPhoneMarkAndPhoneSourceCommonConsumer"/>
+            </list>
+        </entry>
+
+        <entry key="11">
+            <list>
+                <ref bean="updateMemberOverdueToDefaultCommonConsumer"/>
             </list>
         </entry>
 

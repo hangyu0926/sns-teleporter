@@ -189,7 +189,7 @@
         </prop>
 
         <prop key="createCallTo">
-            <![CDATA[create edge CallTo from {0} to {1} set callCnt = ?,callLen=?,callInCnt=?,callOutCnt=?,reportTime=? retry 100]]>
+            <![CDATA[create edge CallTo from {0} to {1} set callCnt = ?,callLen=?,callInCnt=?,callOutCnt=?,reportTime=?]]>
         </prop>
 
         <prop key="createCallTo2">
