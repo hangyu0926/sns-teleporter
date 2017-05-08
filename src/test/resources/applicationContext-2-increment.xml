@@ -129,32 +129,39 @@
         <!-- key的大小决定着优先执行顺序, 同一个key的producer和consumer会并发执行-->
         <entry key="10">
             <list>
+                <ref bean="applyIncrementProducer"/>
+                <ref bean="applyCommonConsumer"/>
+
+                <ref bean="updateMemberOverdueToDefaultCommonConsumer"/>
+            </list>
+        </entry>
+
+        <entry key="20">
+            <list>
                 <ref bean="storeCommonProducer"/>
                 <ref bean="storeCommonConsumer"/>
+
+
+                <ref bean="orderIncrementProducer"/>
+                <ref bean="orderCommonConsumer"/>
+
+
+                <ref bean="phoneWithPhoneMarkAndPhoneSourceIncrementProducer"/>
+                <ref bean="phoneWithPhoneMarkAndPhoneSourceCommonConsumer"/>
+
 
                 <ref bean="memberIncrementProducer"/>
                 <ref bean="memberIncrementConsumer"/>
                 <ref bean="memberIncrementConsumer"/>
                 <ref bean="memberIncrementConsumer"/>
 
-                <ref bean="applyIncrementProducer"/>
-                <ref bean="applyCommonConsumer"/>
 
-                <ref bean="orderIncrementProducer"/>
-                <ref bean="orderCommonConsumer"/>
-
-                <ref bean="phoneWithPhoneMarkAndPhoneSourceIncrementProducer"/>
-                <ref bean="phoneWithPhoneMarkAndPhoneSourceCommonConsumer"/>
+                <ref bean="phoneWithCallTo2IncrementProducer"/>
+                <ref bean="phoneWithCallTo2IncrementConsumer"/>
             </list>
         </entry>
 
-        <entry key="11">
-            <list>
-                <ref bean="updateMemberOverdueToDefaultCommonConsumer"/>
-            </list>
-        </entry>
-
-        <entry key="20">
+        <entry key="30">
             <list>
                 <ref bean="memberOverdueCommonProducer"/>
                 <ref bean="memberOverdueCommonConsumer"/>
@@ -173,7 +180,7 @@
             </list>
         </entry>
 
-        <entry key="30">
+        <entry key="40">
             <list>
                 <ref bean="memberHasApplyIncrementConsumer"/>
                 <ref bean="orderHasDeviceIncrementConsumer"/>
@@ -181,7 +188,7 @@
             </list>
         </entry>
 
-        <entry key="31">
+        <entry key="41">
             <list>
                 <ref bean="memberHasDeviceIncrementConsumer"/>
                 <ref bean="orderHasIpIncrementConsumer"/>
@@ -189,7 +196,7 @@
             </list>
         </entry>
 
-        <entry key="32">
+        <entry key="42">
             <list>
                 <ref bean="memberHasIpIncrementConsumer"/>
                 <ref bean="orderHasStoreIncrementConsumer"/>
@@ -197,30 +204,23 @@
             </list>
         </entry>
 
-        <entry key="33">
+        <entry key="43">
             <list>
                 <ref bean="memberHasOrderIncrementConsumer"/>
                 <ref bean="phoneHasApplyIncrementConsumer"/>
             </list>
         </entry>
 
-        <entry key="34">
+        <entry key="44">
             <list>
                 <ref bean="applyHasOrderIncrementConsumer"/>
                 <ref bean="hasPhoneIncrementConsumer"/>
             </list>
         </entry>
 
-        <entry key="34">
+        <entry key="45">
             <list>
                 <ref bean="phoneHasOrderIncrementConsumer"/>
-            </list>
-        </entry>
-
-        <entry key="40">
-            <list>
-                <ref bean="phoneWithCallTo2IncrementProducer"/>
-                <ref bean="phoneWithCallTo2IncrementConsumer"/>
             </list>
         </entry>
 
