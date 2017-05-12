@@ -39,6 +39,7 @@
                 <value>ID_NO</value>
                 <value>PROVINCE</value>
                 <value>CITY</value>
+                <value>MOBILE_NO</value>
                 <value>MEMBER_ID</value>
             </array>
         </property>

@@ -2,7 +2,6 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-
                 http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 
     <util:properties id="snsSqlProp">
@@ -65,7 +64,7 @@
         </prop>
 
         <prop key="member">
-            <![CDATA[update Member set memberId=?,name=?,idNo=?,province=?,city=?,isBlack=false,isOverdue=false upsert return after where memberId=?]]>
+            <![CDATA[update Member set memberId=?,name=?,idNo=?,province=?,city=?,phone=?,isBlack=false,isOverdue=false upsert return after where memberId=?]]>
         </prop>
 
         <prop key="store">
@@ -133,59 +132,59 @@
         </prop>
 
         <prop key="createMemberHasApply">
-            <![CDATA[create edge MemberHasApply from {0} to {1} retry 100]]>
+            <![CDATA[create edge MemberHasApply from {0} to {1}]]>
         </prop>
 
         <prop key="createPhoneHasApply">
-            <![CDATA[create edge PhoneHasApply from {0} to {1} retry 100]]>
+            <![CDATA[create edge PhoneHasApply from {0} to {1}]]>
         </prop>
 
         <prop key="createApplyHasDevice">
-            <![CDATA[create edge ApplyHasDevice from {0} to {1} retry 100]]>
+            <![CDATA[create edge ApplyHasDevice from {0} to {1}]]>
         </prop>
 
         <prop key="createOrderHasDevice">
-            <![CDATA[create edge OrderHasDevice from {0} to {1} retry 100]]>
+            <![CDATA[create edge OrderHasDevice from {0} to {1}]]>
         </prop>
 
         <prop key="createMemberHasDevice">
-            <![CDATA[create edge MemberHasDevice from {0} to {1} retry 100]]>
+            <![CDATA[create edge MemberHasDevice from {0} to {1}]]>
         </prop>
 
         <prop key="createApplyHasIp">
-            <![CDATA[create edge ApplyHasIp from {0} to {1} retry 100]]>
+            <![CDATA[create edge ApplyHasIp from {0} to {1}]]>
         </prop>
 
         <prop key="createOrderHasIp">
-            <![CDATA[create edge OrderHasIp from {0} to {1} retry 100]]>
+            <![CDATA[create edge OrderHasIp from {0} to {1}]]>
         </prop>
 
         <prop key="createMemberHasIp">
-            <![CDATA[create edge MemberHasIp from {0} to {1} retry 100]]>
+            <![CDATA[create edge MemberHasIp from {0} to {1}]]>
         </prop>
 
         <prop key="createApplyHasOrder">
-            <![CDATA[create edge ApplyHasOrder from {0} to {1} retry 100]]>
+            <![CDATA[create edge ApplyHasOrder from {0} to {1}]]>
         </prop>
 
         <prop key="createPhoneHasOrder">
-            <![CDATA[create edge PhoneHasOrder from {0} to {1} retry 100]]>
+            <![CDATA[create edge PhoneHasOrder from {0} to {1}]]>
         </prop>
 
         <prop key="createMemberHasOrder">
-            <![CDATA[create edge MemberHasOrder from {0} to {1} retry 100]]>
+            <![CDATA[create edge MemberHasOrder from {0} to {1}]]>
         </prop>
 
         <prop key="createHasPhone">
-            <![CDATA[create edge HasPhone from {0} to {1} retry 100]]>
+            <![CDATA[create edge HasPhone from {0} to {1}]]>
         </prop>
 
         <prop key="createApplyHasStore">
-            <![CDATA[create edge ApplyHasStore from {0} to {1} retry 100]]>
+            <![CDATA[create edge ApplyHasStore from {0} to {1}]]>
         </prop>
 
         <prop key="createOrderHasStore">
-            <![CDATA[create edge OrderHasStore from {0} to {1} retry 100]]>
+            <![CDATA[create edge OrderHasStore from {0} to {1}]]>
         </prop>
 
         <prop key="createCallTo">
@@ -205,7 +204,7 @@
         </prop>
 
         <prop key="createHasPhone">
-            <![CDATA[create edge HasPhone from {0} to {1} retry 100]]>
+            <![CDATA[create edge HasPhone from {0} to {1}]]>
         </prop>
 
     </util:properties>
