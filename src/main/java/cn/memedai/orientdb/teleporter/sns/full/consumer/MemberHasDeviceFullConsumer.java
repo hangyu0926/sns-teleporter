@@ -28,13 +28,7 @@ import java.util.Set;
  * Created by kisho on 2017/4/7.
  */
 @Service
-public class HasDeviceFullConsumer extends SnsCommonAbstractTxConsumer {
-
-    @Value("#{snsOrientSqlProp.createApplyHasDevice}")
-    private String createApplyHasDevice;
-
-    @Value("#{snsOrientSqlProp.createOrderHasDevice}")
-    private String createOrderHasDevice;
+public class MemberHasDeviceFullConsumer extends SnsCommonAbstractTxConsumer {
 
     @Value("#{snsOrientSqlProp.createMemberHasDevice}")
     private String createMemberHasDevice;
@@ -50,14 +44,11 @@ public class HasDeviceFullConsumer extends SnsCommonAbstractTxConsumer {
             String toRid = entry.getValue();
             String fromRid = CacheUtils.getApplyRid(applyNo);
             if (StringUtils.isNotBlank(fromRid)) {
-                //Apply-ApplyHasDevice->Device
-                execute(createApplyHasDevice, createApplyHasDevice, new Object[]{fromRid, toRid});
                 String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_APPLYRID_MEMBERID.get(fromRid));
                 if (StringUtils.isNotBlank(memberRid)) {
                     memberRidAndDeviceRidSet.add(memberRid + "|" + toRid);
                 }
             }
-
         }
 
         for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERNO_DEVICERID.entrySet()) {
@@ -65,14 +56,11 @@ public class HasDeviceFullConsumer extends SnsCommonAbstractTxConsumer {
             String toRid = entry.getValue();
             String fromRid = CacheUtils.getOrderRid(orderNo);
             if (StringUtils.isNotBlank(fromRid)) {
-                //Order-OrderHasDevice->Device
-                execute(createOrderHasDevice, createOrderHasDevice, new Object[]{fromRid, toRid});
                 String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_ORDERRID_MEMBERID.get(fromRid));
                 if (StringUtils.isNotBlank(memberRid)) {
                     memberRidAndDeviceRidSet.add(memberRid + "|" + toRid);
                 }
             }
-
         }
 
         if (!memberRidAndDeviceRidSet.isEmpty()) {

@@ -31,7 +31,7 @@ public class DuplicatedPhoneCallToFullConsumer extends BlockingQueueDataConsumer
     @Value("#{snsOrientSqlProp.deleteEdge}")
     private String deleteEdge;
 
-    @Value("#{snsOrientSsqlProp.selectDuplicatedCallTo}")
+    @Value("#{snsOrientSqlProp.selectDuplicatedCallTo}")
     private String selectDuplicatedCallTo;
 
     @Override

@@ -24,34 +24,20 @@ import java.util.Map;
  * Created by kisho on 2017/4/7.
  */
 @Service
-public class HasApplyFullConsumer extends SnsCommonAbstractTxConsumer {
+public class ApplyHasDeviceFullConsumer extends SnsCommonAbstractTxConsumer {
 
-
-    @Value("#{snsOrientSqlProp.createMemberHasApply}")
-    private String createMemberHasApply;
-
-    @Value("#{snsOrientSqlProp.createPhoneHasApply}")
-    private String createPhoneHasApply;
+    @Value("#{snsOrientSqlProp.createApplyHasDevice}")
+    private String createApplyHasDevice;
 
     @Override
     protected void process() {
-
-        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYRID_MEMBERID.entrySet()) {
-            String memberId = entry.getValue();
-            String fromRid = CacheUtils.getMemberRid(memberId);
-            String toRid = entry.getKey();
+        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYNO_DEVICERID.entrySet()) {
+            String applyNo = entry.getKey();
+            String toRid = entry.getValue();
+            String fromRid = CacheUtils.getApplyRid(applyNo);
             if (StringUtils.isNotBlank(fromRid)) {
-                //Member-MemberHasApply->ApplyInfo
-                execute(createMemberHasApply, createMemberHasApply, new Object[]{fromRid, toRid});
+                execute(createApplyHasDevice, createApplyHasDevice, new Object[]{fromRid, toRid});
             }
         }
-
-        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYRID_PHONERID.entrySet()) {
-            String fromRid = entry.getValue();
-            String toRid = entry.getKey();
-            //Phone-PhoneHasApply->ApplyInfo
-            execute(createPhoneHasApply, createPhoneHasApply, new Object[]{fromRid, toRid});
-        }
     }
-
 }

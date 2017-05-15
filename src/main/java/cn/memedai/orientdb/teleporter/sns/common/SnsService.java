@@ -191,11 +191,18 @@ public class SnsService {
                                      String toPhoneRid,
                                      Map<String, Object> dataMap) {
         String templateSql = MessageFormat.format(createCallTo2, fromPhoneRid, toPhoneRid);
+        String reportTime = null;
+        if (dataMap.containsKey("REPORTTIME")) {
+            reportTime = dataMap.get("REPORTTIME").toString();
+        } else {
+            reportTime = dataMap.get("CREATE_TIME").toString();
+        }
+
         return templateSql.replace("#callCnt", getValue(dataMap.get("CALL_CNT"))).
                 replace("#callLen", getValue(dataMap.get("CALL_LEN"))).
                 replace("#callInCnt", getValue(dataMap.get("CALL_IN_CNT")))
                 .replace("#callOutCnt", getValue(dataMap.get("CALL_OUT_CNT")))
-                .replace("#reportTime", "'" + dataMap.get("CREATE_TIME").toString() + "'");
+                .replace("#reportTime", "'" + reportTime + "'");
     }
 
     private String getValue(Object value) {

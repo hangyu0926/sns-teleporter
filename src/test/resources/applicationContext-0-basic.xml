@@ -67,14 +67,11 @@
             <list>
                 <ref bean="phoneWithCallTo1FullProducer"/>
                 <ref bean="phoneWithCallTo1FullConsumer"/>
-                <ref bean="phoneWithCallTo1FullConsumer"/>
 
                 <ref bean="phoneWithCallTo2FullProducer"/>
                 <ref bean="phoneWithCallTo2FullConsumer"/>
-                <ref bean="phoneWithCallTo2FullConsumer"/>
 
                 <ref bean="phoneWithPhoneMarkAndPhoneSourceFullProducer"/>
-                <ref bean="phoneWithPhoneMarkAndPhoneSourceCommonConsumer"/>
                 <ref bean="phoneWithPhoneMarkAndPhoneSourceCommonConsumer"/>
             </list>
         </entry>

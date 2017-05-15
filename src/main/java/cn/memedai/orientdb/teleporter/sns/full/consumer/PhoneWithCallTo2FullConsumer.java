@@ -12,55 +12,65 @@
  */
 package cn.memedai.orientdb.teleporter.sns.full.consumer;
 
-import cn.memedai.orientdb.teleporter.BlockingQueueDataConsumer;
+import cn.memedai.orientdb.teleporter.BlockingQueueDataBatchProcessConsumer;
+import cn.memedai.orientdb.teleporter.OrientSqlUtils;
 import cn.memedai.orientdb.teleporter.sns.common.SnsService;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Created by kisho on 2017/4/6.
  */
 @Service
-public class PhoneWithCallTo2FullConsumer extends BlockingQueueDataConsumer {
+public class PhoneWithCallTo2FullConsumer extends BlockingQueueDataBatchProcessConsumer {
 
     @Resource
     private SnsService snsService;
 
-    @Value("#{snsOrientSqlProp.createCallTo}")
-    private String createCallTo;
+    @Value("#{snsOrientSqlProp.createCallTo2}")
+    private String createCallTo2;
 
     @Override
-    protected Object process(Object obj) {
-        Map<String, Object> dataMap = (Map<String, Object>) obj;
-        String applyNo = (String) dataMap.get("APPL_NO");
-        String toPhone = (String) dataMap.get("PHONE_NO");
-        if (StringUtils.isBlank(applyNo) || StringUtils.isBlank(toPhone)) {
+    protected Object process(List<Object> dataList) {
+        if (CollectionUtils.isEmpty(dataList)) {
             return null;
         }
+        List<String> orientSqls = new ArrayList(dataList.size());
+        for (Object dataObj : dataList) {
+            Map<String, Object> dataMap = (Map<String, Object>) dataObj;
+            String applyNo = (String) dataMap.get("APPL_NO");
+            String toPhone = (String) dataMap.get("PHONE_NO");
+            if (StringUtils.isBlank(applyNo) || StringUtils.isBlank(toPhone)) {
+                return null;
+            }
 
-        String fromPhone = CacheUtils.CACHE_APPLYNO_PHONE.get(applyNo);
-        if (StringUtils.isBlank(fromPhone)) {
-            return null;
+            String fromPhone = CacheUtils.CACHE_APPLYNO_PHONE.get(applyNo);
+            if (StringUtils.isBlank(fromPhone)) {
+                return null;
+            }
+
+            String fromPhoneRid = snsService.getPhoneRid(getODatabaseDocumentTx(), fromPhone);
+            String toPhoneRid = snsService.getPhoneRid(getODatabaseDocumentTx(), toPhone);
+            if (StringUtils.isBlank(fromPhoneRid)
+                    || StringUtils.isBlank(toPhoneRid)) {
+                continue;
+            }
+            if (dataMap.get("CREATE_TIME") == null) {
+                continue;
+            }
+
+            orientSqls.add(snsService.constructCallToSql(fromPhoneRid, toPhoneRid, dataMap));
         }
 
-        String fromPhoneRid = snsService.getPhoneRid(getODatabaseDocumentTx(), fromPhone);
-        String toPhoneRid = snsService.getPhoneRid(getODatabaseDocumentTx(), toPhone);
-        Object[] args = new Object[]{
-                getValue(dataMap.get("CALL_CNT")),
-                getValue(dataMap.get("CALL_LEN")),
-                getValue(dataMap.get("CALL_IN_CNT")),
-                getValue(dataMap.get("CALL_OUT_CNT")),
-                dataMap.get("CREATE_TIME") == null ? null : dataMap.get("CREATE_TIME"),
-        };
-
-        execute(createCallTo, MessageFormat.format(createCallTo, fromPhoneRid, toPhoneRid), args);
-        return null;
+        return OrientSqlUtils.executeBatch(getODatabaseDocumentTx(), createCallTo2, orientSqls);
     }
 
     protected String getValue(Object value) {

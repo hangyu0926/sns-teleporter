@@ -38,15 +38,17 @@ public class PhoneWithCallTo1FullConsumer extends BlockingQueueDataBatchProcessC
     @Value("#{snsOrientSqlProp.createCallTo2}")
     private String createCallTo2;
 
-
     @Override
     protected Object process(List<Object> dataList) {
         if (CollectionUtils.isEmpty(dataList)) {
             return null;
         }
+
         List<String> orientSqls = new ArrayList(dataList.size());
+
         for (Object dataObj : dataList) {
             Map<String, Object> dataMap = (Map<String, Object>) dataObj;
+            //check data
             String reportno = (String) dataMap.get("REPORTNO");
             String toPhone = (String) dataMap.get("PHONE_NUM");
             String reportTime = (String) dataMap.get("REPORTTIME");
@@ -72,5 +74,6 @@ public class PhoneWithCallTo1FullConsumer extends BlockingQueueDataBatchProcessC
 
         return OrientSqlUtils.executeBatch(getODatabaseDocumentTx(), createCallTo2, orientSqls);
     }
+
 
 }

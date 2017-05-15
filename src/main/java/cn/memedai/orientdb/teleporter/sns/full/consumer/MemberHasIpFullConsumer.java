@@ -28,13 +28,7 @@ import java.util.Set;
  * Created by kisho on 2017/4/7.
  */
 @Service
-public class HasIpFullConsumer extends SnsCommonAbstractTxConsumer {
-
-    @Value("#{snsOrientSqlProp.createApplyHasIp}")
-    private String createApplyHasIp;
-
-    @Value("#{snsOrientSqlProp.createOrderHasIp}")
-    private String createOrderHasIp;
+public class MemberHasIpFullConsumer extends SnsCommonAbstractTxConsumer {
 
     @Value("#{snsOrientSqlProp.createMemberHasIp}")
     private String createMemberHasIp;
@@ -50,7 +44,6 @@ public class HasIpFullConsumer extends SnsCommonAbstractTxConsumer {
             String toRid = entry.getValue();
             String fromRid = CacheUtils.getApplyRid(applyNo);
             if (StringUtils.isNotBlank(fromRid)) {
-                execute(createApplyHasIp, createApplyHasIp, new Object[]{fromRid, toRid});
                 String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_APPLYRID_MEMBERID.get(fromRid));
                 if (StringUtils.isNotBlank(memberRid)) {
                     memberRidAndIpRidSet.add(memberRid + "|" + toRid);
@@ -63,7 +56,6 @@ public class HasIpFullConsumer extends SnsCommonAbstractTxConsumer {
             String toRid = entry.getValue();
             String fromRid = CacheUtils.getOrderRid(orderNo);
             if (StringUtils.isNotBlank(fromRid)) {
-                execute(createOrderHasIp, createOrderHasIp, new Object[]{fromRid, toRid});
                 String memberRid = snsService.getMemberRid(getODatabaseDocumentTx(), CacheUtils.CACHE_ORDERRID_MEMBERID.get(fromRid));
                 if (StringUtils.isNotBlank(memberRid)) {
                     memberRidAndIpRidSet.add(memberRid + "|" + toRid);

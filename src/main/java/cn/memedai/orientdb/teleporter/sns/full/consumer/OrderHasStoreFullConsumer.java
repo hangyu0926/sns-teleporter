@@ -24,27 +24,13 @@ import java.util.Map;
  * Created by kisho on 2017/4/7.
  */
 @Service
-public class HasStoreFullConsumer extends SnsCommonAbstractTxConsumer {
-
-    @Value("#{snsOrientSqlProp.createApplyHasStore}")
-    private String createApplyHasStore;
+public class OrderHasStoreFullConsumer extends SnsCommonAbstractTxConsumer {
 
     @Value("#{snsOrientSqlProp.createOrderHasStore}")
     private String createOrderHasStore;
 
     @Override
     protected void process() {
-        for (Map.Entry<String, String> entry : CacheUtils.CACHE_APPLYRID_STOREID.entrySet()) {
-            String fromRid = entry.getKey();
-            String storeId = entry.getValue();
-            //ApplyInfo-HasStore->StoreInfo
-            String toRid = CacheUtils.getStoreRid(storeId);
-            if (StringUtils.isBlank(toRid)) {
-                log.info("storeId : " + storeId + " does not exist!");
-            } else {
-                execute(createApplyHasStore, createApplyHasStore, new Object[]{fromRid, toRid});
-            }
-        }
 
         for (Map.Entry<String, String> entry : CacheUtils.CACHE_ORDERRID_STOREID.entrySet()) {
             String fromRid = entry.getKey();

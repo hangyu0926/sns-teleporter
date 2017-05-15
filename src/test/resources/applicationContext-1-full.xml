@@ -201,12 +201,25 @@
 
         <entry key="50">
             <list>
-                <ref bean="hasStoreFullConsumer"/>
-                <ref bean="hasOrderFullConsumer"/>
-                <ref bean="hasIpFullConsumer"/>
-                <ref bean="hasDeviceFullConsumer"/>
-                <ref bean="hasApplyFullConsumer"/>
+                <ref bean="memberHasApplyFullConsumer"/>
+                <ref bean="orderHasDeviceFullConsumer"/>
+                <ref bean="applyHasIpFullConsumer"/>
+
+                <ref bean="memberHasDeviceFullConsumer"/>
+                <ref bean="orderHasIpFullConsumer"/>
+                <ref bean="applyHasStoreFullConsumer"/>
+
+                <ref bean="memberHasIpFullConsumer"/>
+                <ref bean="orderHasStoreFullConsumer"/>
+                <ref bean="applyHasDeviceFullConsumer"/>
+
+                <ref bean="memberHasOrderFullConsumer"/>
+                <ref bean="phoneHasApplyFullConsumer"/>
+
+                <ref bean="applyHasOrderFullConsumer"/>
                 <ref bean="hasPhoneFullConsumer"/>
+
+                <ref bean="phoneHasOrderFullConsumer"/>
             </list>
         </entry>
 
