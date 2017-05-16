@@ -50,7 +50,7 @@
         <prop key="mail.from.displayName">Mime OrientDB Teleporter</prop>
 
         <prop key="mail.subject">OrientDB Teleporter Performance</prop>
-        <prop key="mail.to.user">kisho.dai@mi-me.com</prop>
+        <prop key="mail.to.user">kisho.dai@mi-me.com,yu.hang@nan-mi.cn,ti.zhou@mi-me.com</prop>
     </util:properties>
 
 
