@@ -1,5 +1,6 @@
 package cn.memedai.orientdb.teleporter.sns.utils;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -34,6 +35,7 @@ public final class CacheUtils {
 
     public static final Map<String, String> CACHE_PHONE_SOURCERID = new ConcurrentHashMap();
 
+    public static final Map<String, Map<String, String>> ID_ADDRESS = new HashMap<>();
 
     public static void setStoreRid(String key, String value) {
         CACHE_STORE_RID.put(key, value);

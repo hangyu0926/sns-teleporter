@@ -6,60 +6,63 @@
 
     <util:properties id="snsSqlProp">
         <prop key="memberOverdue">
-            <![CDATA[SELECT BORROWER_ID FROM memedai.LOANS WHERE CREDIT_DATE IS NOT NULL GROUP BY BORROWER_ID HAVING max(OVERDUE_DAYS) > 3 limit ?,?]]>
+            <!--SqlServer-->
+            <![CDATA[SELECT a.BORROWER_ID FROM (SELECT row_number () OVER (ORDER BY BORROWER_ID) rownumber,BORROWER_ID FROM memedaidb.FSS.LOANS WHERE CREDIT_DATE IS NOT NULL GROUP BY BORROWER_ID HAVING	MAX (OVERDUE_DAYS) > 3 ) a WHERE rownumber BETWEEN ? AND ?]]>
         </prop>
+
         <prop key="member">
-            <![CDATA[SELECT a.MEMBER_ID,a.MOBILE_NO,b.`NAME`,b.ID_NO,c.PROVINCE,c.CITY FROM memedai.MEMBER a LEFT JOIN memedai.ID_CARD b ON a.MEMBER_ID = b.MEMBER_ID LEFT JOIN credit_audit.ca_sys_value_id_area c ON left(b.id_no,6) = c.id_prefix WHERE 	a.MOBILE_NO IS NOT NULL limit ?,?]]>
+            <!--SqlServer-->
+            <![CDATA[select * from (SELECT row_number () OVER (ORDER BY a.MEMBER_ID) as rownum, a.MEMBER_ID,a.MOBILE_NO,b.NAME,b.ID_NO FROM memedaidb.CRM.MEMBER a LEFT JOIN memedaidb.CRM.ID_CARD b ON a.MEMBER_ID = b.MEMBER_ID WHERE a.MOBILE_NO IS NOT NULL) a where a.rownum BETWEEN ? and ?]]>
         </prop>
 
         <prop key="store">
-            <![CDATA[SELECT a.STOREID,a.MERCHANTID,a.STORENAME,a.PROVINCE,a.CITY,a.CREDIT_LIMIT_TYPE,b.POLICY_BRACKET,b.BUSINESS_FIRST_TYPE FROM MERCHANTAUDIT.ma_store_baseinfo AS a LEFT JOIN MERCHANTAUDIT.ma_execution_strategy AS b ON a.storeid = b.storeid limit ?,?]]>
+            <!--SqlServer-->
+            <![CDATA[select * from (SELECT row_number () OVER (ORDER BY a.STOREID) as rownum,a.STOREID,a.MERCHANTID,a.STORENAME,a.PROVINCE,a.CITY,a.CREDIT_LIMIT_TYPE,b.POLICY_BRACKET,b.BUSINESS_FIRST_TYPE FROM MERCHANTAUDIT.mas.ma_store_baseinfo AS a LEFT JOIN MERCHANTAUDIT.mas.ma_execution_strategy AS b ON a.storeid = b.storeid) a where a.rownum between ? and ?]]>
         </prop>
 
         <prop key="apply">
-            <![CDATA[SELECT cellphone,member_id,apply_no,created_datetime,apply_status as original_status,case when apply_status=4000 then 1 when left(apply_status,2)=30 then 0 else null end as status,store_id,order_no FROM network.apply_info]]>
+            <![CDATA[SELECT cellphone,member_id,apply_no,created_datetime,apply_status as original_status,case when apply_status=4000 then 1 when left(apply_status,2)=30 then 0 else null end as status,store_id,order_no FROM wallet.apply_info]]>
         </prop>
 
         <prop key="order">
-            <![CDATA[SELECT mobile,member_id,order_no,created_datetime, case when status in ('1051','1081','1085')  then 1 WHEN status in ('1011','1012') then null else 0 end as status,status as original_status,store_id,pay_amount/100 as pay_amount from network.money_box_order]]>
+            <![CDATA[SELECT mobile,member_id,order_no,created_datetime, case when status in ('1051','1081','1085')  then 1 WHEN status in ('1011','1012') then null else 0 end as status,status as original_status,store_id,pay_amount/100 as pay_amount from wallet.money_box_order]]>
         </prop>
 
         <prop key="deviceAndIp1">
-            <![CDATA[SELECT APPL_NO,DEVICE_ID,IP,IP_CITY FROM memedai.A_APPL where device_id is not null or ip is not null  limit ?,?]]>
+            <![CDATA[SELECT APPL_NO,DEVICE_ID,IP,IP_CITY FROM memedaidb.APPL.A_APPL where device_id is not null or ip is not null  limit ?,?]]>
         </prop>
 
         <prop key="device2Ca">
-            <![CDATA[SELECT APPL_NO,DEVICE_ID FROM network.ca_appl_member_device where DEVICE_ID is not null]]>
+            <![CDATA[SELECT APPL_NO,DEVICE_ID FROM credit_trade_audit.ca_appl_member_device where DEVICE_ID is not null]]>
         </prop>
 
         <prop key="ip2Ca">
-            <![CDATA[SELECT APPL_NO,IP,IP_CITY  FROM network.ca_appl_member_device where IP is not null]]>
+            <![CDATA[SELECT APPL_NO,IP,IP_CITY  FROM credit_trade_audit.ca_appl_member_device where IP is not null]]>
         </prop>
 
         <prop key="device2Cta">
-            <![CDATA[SELECT ORDER_ID,DEVICE_ID from network.cta_order_deviceinfo where device_id is not null]]>
+            <![CDATA[SELECT ORDER_ID,DEVICE_ID from credit_trade_audit.cta_order_deviceinfo where device_id is not null]]>
         </prop>
 
         <prop key="ip2Cta">
-            <![CDATA[SELECT ORDER_ID,IP,IP_CITY from network.cta_order_deviceinfo where ip is not null]]>
+            <![CDATA[SELECT ORDER_ID,IP,IP_CITY from credit_trade_audit.cta_order_deviceinfo where ip is not null]]>
         </prop>
 
         <prop key="phoneWithPhoneMarkAndPhoneSource">
-            <![CDATA[SELECT PHONE_NO, PHONE_TYPE,SOURCE  FROM network.ca_sys_phone_tag_merge where PHONE_NO is not null]]>
+            <![CDATA[SELECT PHONE_NO, PHONE_TYPE,SOURCE  FROM credit_audit.ca_sys_phone_tag_merge where PHONE_NO is not null]]>
         </prop>
 
         <prop key="phoneWithCallTo2">
-            <![CDATA[select APPL_NO,PHONE_NO,CALL_CNT,CALL_LEN,CALL_IN_CNT,CALL_OUT_CNT,CREATE_TIME from network.ca_bur_operator_contact]]>
+            <![CDATA[select APPL_NO,PHONE_NO,CALL_CNT,CALL_LEN,CALL_IN_CNT,CALL_OUT_CNT,CREATE_TIME from credit_audit.ca_bur_operator_contact]]>
         </prop>
 
         <prop key="phoneWithCallToCache01">
-            <![CDATA[SELECT cellphone,apply_no FROM network.apply_info limit ?,?]]>
+            <![CDATA[SELECT cellphone,apply_no FROM wallet.apply_info limit ?,?]]>
         </prop>
 
         <prop key="phoneWithCallToCache02">
-            <![CDATA[SELECT REPORTNO, APPL_NO FROM mis_watson.D_JXL_PERSON limit ?,?]]>
+            <![CDATA[select * from (SELECT row_number () OVER (ORDER BY REPORTNO) as rownum,REPORTNO, APPL_NO FROM watson.WTS.D_JXL_PERSON) a where a.rownum BETWEEN ? and ?]]>
         </prop>
-
     </util:properties>
 
     <util:properties id="snsOrientSqlProp">

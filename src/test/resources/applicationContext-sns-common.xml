@@ -10,7 +10,7 @@
         <constructor-arg index="0" value="5000"/>
     </bean>
     <bean id="storeCommonProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
-        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="jdbcTemplate" ref="caJdbcTemplate"/>
         <property name="blockingQueue" ref="storeBlockingQueue"/>
         <property name="sql"
                   value="#{snsSqlProp.store}"/>
@@ -42,7 +42,7 @@
     </bean>
     <bean id="memberOverdueCommonProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
           scope="prototype">
-        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="jdbcTemplate" ref="caJdbcTemplate"/>
         <property name="blockingQueue" ref="memberOverdueBlockingQueue"/>
         <property name="sql"
                   value="#{snsSqlProp.memberOverdue}"/>

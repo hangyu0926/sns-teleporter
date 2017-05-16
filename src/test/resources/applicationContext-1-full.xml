@@ -38,7 +38,7 @@
     </bean>
     <bean id="memberFullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
           scope="prototype">
-        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="jdbcTemplate" ref="sqlserverJdbcTemplate"/>
         <property name="blockingQueue" ref="memberBlockingQueue"/>
         <property name="sql"
                   value="#{snsSqlProp.member}"/>
@@ -64,7 +64,7 @@
 
     <bean id="applyFullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
           scope="prototype">
-        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="jdbcTemplate" ref="walletAndSnsJdbcTemplate"/>
         <property name="blockingQueue" ref="applyBlockingQueue"/>
         <property name="sql"
                   value="#{snsSqlProp.apply} limit ?,?"/>
@@ -72,7 +72,7 @@
 
 
     <bean id="orderFullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
-        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="jdbcTemplate" ref="walletAndSnsJdbcTemplate"/>
         <property name="blockingQueue" ref="orderBlockingQueue"/>
         <property name="sql"
                   value="#{snsSqlProp.order}  limit ?,?"/>
@@ -83,10 +83,10 @@
         <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
     </bean>
     <bean id="deviceAndIp1FullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
-        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="jdbcTemplate" ref="sqlserverJdbcTemplate"/>
         <property name="blockingQueue" ref="deviceAndIp1BlockingQueue"/>
         <property name="sql"
-                  value="SELECT APPL_NO,DEVICE_ID,IP,IP_CITY FROM memedai.A_APPL where device_id is not null or ip is not null  limit ?,?"/>
+                  value="#{snsSqlProp.deviceAndIp1}"/>
     </bean>
     <bean id="deviceAndIp1FullConsumer"
           class="cn.memedai.orientdb.teleporter.sns.full.consumer.DeviceAndIp1FullConsumer"
@@ -97,7 +97,7 @@
 
 
     <bean id="device2CaFullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
-        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="jdbcTemplate" ref="caJdbcTemplate"/>
         <property name="blockingQueue" ref="device2CaBlockingQueue"/>
         <property name="sql"
                   value="#{snsSqlProp.device2Ca}  limit ?,?"/>
@@ -106,7 +106,7 @@
 
     <bean id="ip2CaFullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
           scope="prototype">
-        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="jdbcTemplate" ref="caJdbcTemplate"/>
         <property name="blockingQueue" ref="ip2CaBlockingQueue"/>
         <property name="sql"
                   value="#{snsSqlProp.ip2Ca}  limit ?,?"/>
@@ -115,7 +115,7 @@
 
     <bean id="device2CtaFullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
           scope="prototype">
-        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="jdbcTemplate" ref="ctaJdbcTemplate"/>
         <property name="blockingQueue" ref="device2CtaBlockingQueue"/>
         <property name="sql"
                   value="#{snsSqlProp.device2Cta} limit ?,?"/>
@@ -123,7 +123,7 @@
 
     <bean id="ip2CtaFullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
           scope="prototype">
-        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="jdbcTemplate" ref="ctaJdbcTemplate"/>
         <property name="blockingQueue" ref="ip2CtaBlockingQueue"/>
         <property name="sql"
                   value="#{snsSqlProp.ip2Cta} limit ?,?"/>
@@ -131,7 +131,7 @@
 
 
     <bean id="phoneWithPhoneMarkAndPhoneSourceFullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
-        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="jdbcTemplate" ref="caJdbcTemplate"/>
         <property name="blockingQueue" ref="phoneWithPhoneMarkAndPhoneSourceBlockingQueue"/>
         <property name="sql"
                   value="#{snsSqlProp.phoneWithPhoneMarkAndPhoneSource} limit ?,?"/>
@@ -143,6 +143,7 @@
         <entry key="10">
             <list>
                 <ref bean="deleteEdgesFullConsumer"/>
+                <ref bean="idAddressCommonProducer"/>
             </list>
         </entry>
 

@@ -21,21 +21,19 @@ import java.util.Map;
 /**
  * Created by kisho on 2017/4/6.
  */
-public class PhoneWithCallToCacheFullConsumer extends BlockingQueueDataConsumer {
+public class PhoneWithCallToCache02FullConsumer extends BlockingQueueDataConsumer {
 
     @Override
     protected Object process(Object obj) {
         Map<String, String> dataMap = (Map<String, String>) obj;
         String reportno = dataMap.get("REPORTNO");
-        String applyNo = dataMap.get("apply_no");
-        String phone = dataMap.get("cellphone");
-        if (StringUtils.isBlank(phone)) {
-            return null;
+        String applyNo = dataMap.get("APPL_NO");
+        if (StringUtils.isNotBlank(reportno) && StringUtils.isNotBlank(applyNo)) {
+            String phone = CacheUtils.CACHE_APPLYNO_PHONE.get(applyNo);
+            if (StringUtils.isNotBlank(phone)) {
+                CacheUtils.setReporternoPhone(reportno, phone);
+            }
         }
-        if (StringUtils.isNotBlank(reportno)) {
-            CacheUtils.setReporternoPhone(reportno, phone);
-        }
-        CacheUtils.setApplyNoPhone(applyNo, phone);
 
         return null;
     }

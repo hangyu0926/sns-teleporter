@@ -10,28 +10,31 @@
  * written permission of Shanghai Mi-Me Financial Information Service Co., Ltd.
  * -------------------------------------------------------------------------------------
  */
-package cn.memedai.orientdb.teleporter.sns.increment.consumer;
+package cn.memedai.orientdb.teleporter.sns.full.consumer;
 
 import cn.memedai.orientdb.teleporter.BlockingQueueDataConsumer;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.Map;
 
-public class MemberIncrementConsumer extends BlockingQueueDataConsumer {
+/**
+ * Created by kisho on 2017/4/6.
+ */
+public class PhoneWithCallToCache01FullConsumer extends BlockingQueueDataConsumer {
 
     @Override
     protected Object process(Object obj) {
-        Map<String, Object> dataMap = (Map<String, Object>) obj;
-        String idNo = (String) dataMap.get("ID_NO");
-        if (idNo != null) {
-            dataMap.putAll(CacheUtils.ID_ADDRESS.get(idNo.substring(0, 6)));
+        Map<String, String> dataMap = (Map<String, String>) obj;
+        String applyNo = dataMap.get("apply_no");
+        String phone = dataMap.get("cellphone");
+        if (StringUtils.isBlank(phone)) {
+            return null;
         }
+        CacheUtils.setApplyNoPhone(applyNo, phone);
 
-        Object docObj = super.process(obj);
-        String memberId = dataMap.get("MEMBER_ID").toString();
-
-        CacheUtils.setMemberRid(memberId, getRid(docObj));
-        return getFirstODocumnet(docObj);
+        return null;
     }
+
 
 }

@@ -17,20 +17,37 @@
     </bean>
 
 
-    <bean id="phoneWithCallToCacheBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+    <bean id="phoneWithCallToCache01BlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
         <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
     </bean>
-    <bean id="phoneWithCallToCacheProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
+    <bean id="phoneWithCallToCache01Producer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
           scope="prototype">
-        <property name="jdbcTemplate" ref="jdbcTemplate"/>
-        <property name="blockingQueue" ref="phoneWithCallToCacheBlockingQueue"/>
+        <property name="jdbcTemplate" ref="walletAndSnsJdbcTemplate"/>
+        <property name="blockingQueue" ref="phoneWithCallToCache01BlockingQueue"/>
         <property name="sql"
-                  value="#{snsSqlProp.phoneWithCallToCache}"/>
+                  value="#{snsSqlProp.phoneWithCallToCache01}"/>
     </bean>
-    <bean id="phoneWithCallToCacheConsumer"
-          class="cn.memedai.orientdb.teleporter.sns.full.consumer.PhoneWithCallToCacheFullConsumer"
+    <bean id="phoneWithCallToCache01Consumer"
+          class="cn.memedai.orientdb.teleporter.sns.full.consumer.PhoneWithCallToCache02FullConsumer"
           scope="prototype">
-        <property name="blockingQueue" ref="phoneWithCallToCacheBlockingQueue"/>
+        <property name="blockingQueue" ref="phoneWithCallToCache01BlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+    </bean>
+
+    <bean id="phoneWithCallToCache02BlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="phoneWithCallToCache02Producer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
+          scope="prototype">
+        <property name="jdbcTemplate" ref="sqlserverJdbcTemplate"/>
+        <property name="blockingQueue" ref="phoneWithCallToCache02BlockingQueue"/>
+        <property name="sql"
+                  value="#{snsSqlProp.phoneWithCallToCache02}"/>
+    </bean>
+    <bean id="phoneWithCallToCache02Consumer"
+          class="cn.memedai.orientdb.teleporter.sns.full.consumer.PhoneWithCallToCache02FullConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="phoneWithCallToCache02BlockingQueue"/>
         <property name="documentTxFactory" ref="documentTxFactory"/>
     </bean>
 
@@ -39,7 +56,7 @@
         <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
     </bean>
     <bean id="deleteDuplicatedCallToProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
-        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="jdbcTemplate" ref="caJdbcTemplate"/>
         <property name="blockingQueue" ref="deleteDuplicatedCallToBlockingQueue"/>
         <property name="sql"
                   value="select cellphone from network.apply_info group by cellphone HAVING count(1)>1 limit ?,?"/>

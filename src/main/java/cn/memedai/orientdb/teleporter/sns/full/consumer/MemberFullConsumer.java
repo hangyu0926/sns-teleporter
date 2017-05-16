@@ -29,8 +29,13 @@ public class MemberFullConsumer extends BlockingQueueDataConsumer {
 
     @Override
     protected Object process(Object obj) {
-        Object docObj = super.process(obj);
         Map<String, Object> dataMap = (Map<String, Object>) obj;
+        String idNo = (String) dataMap.get("ID_NO");
+        if (idNo != null) {
+            dataMap.putAll(CacheUtils.ID_ADDRESS.get(idNo.substring(0, 6)));
+        }
+
+        Object docObj = super.process(dataMap);
         String memberId = dataMap.get("MEMBER_ID").toString();
 
         String memberRid = getRid(docObj);
@@ -43,5 +48,8 @@ public class MemberFullConsumer extends BlockingQueueDataConsumer {
         return null;
     }
 
+    public static void main(String[] args) {
+        System.out.println("12345678".substring(0, 6));
+    }
 
 }

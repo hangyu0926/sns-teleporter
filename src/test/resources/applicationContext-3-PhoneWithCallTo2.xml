@@ -18,7 +18,7 @@
     <bean id="phoneWithCallTo2Producer"
           class="cn.memedai.orientdb.teleporter.sns.common.producer.PhoneWithCallTo2CommonProducer"
           scope="prototype">
-        <property name="jdbcTemplate" ref="jdbcTemplate"/>
+        <property name="jdbcTemplate" ref="caJdbcTemplate"/>
         <property name="blockingQueue" ref="phoneWithCall2BlockingQueue"/>
         <property name="sql"
                   value="#{snsSqlProp.phoneWithCallTo2} where #subSql limit ?,?"/>
@@ -28,8 +28,14 @@
         <!-- key的大小决定着优先执行顺序, 同一个key的producer和consumer会并发执行-->
         <entry key="10">
             <list>
-                <ref bean="phoneWithCallToCacheProducer"/>
-                <ref bean="phoneWithCallToCacheConsumer"/>
+                <ref bean="phoneWithCallToCache01Producer"/>
+                <ref bean="phoneWithCallToCache01Consumer"/>
+            </list>
+        </entry>
+        <entry key="11">
+            <list>
+                <ref bean="phoneWithCallToCache02Producer"/>
+                <ref bean="phoneWithCallToCache02Consumer"/>
             </list>
         </entry>
 
