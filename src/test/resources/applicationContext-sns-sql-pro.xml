@@ -12,7 +12,7 @@
 
         <prop key="member">
             <!--SqlServer-->
-            <![CDATA[select * from (SELECT row_number () OVER (ORDER BY a.MEMBER_ID) as rownum, a.MEMBER_ID,a.MOBILE_NO,b.NAME,b.ID_NO FROM memedaidb.CRM.MEMBER a LEFT JOIN memedaidb.CRM.ID_CARD b ON a.MEMBER_ID = b.MEMBER_ID WHERE a.MOBILE_NO IS NOT NULL) a where a.rownum BETWEEN ? and ?]]>
+            <![CDATA[select * from (SELECT row_number () OVER (ORDER BY a.MEMBER_ID) as rownum, a.MEMBER_ID,a.MOBILE_NO,b.NAME,b.ID_NO,b.ID_PROVINCE as PROVINCE,b.ID_CITY as CITY FROM memedaidb.CRM.MEMBER a LEFT JOIN memedaidb.CRM.ID_CARD b ON a.MEMBER_ID = b.MEMBER_ID WHERE a.MOBILE_NO IS NOT NULL) a where a.rownum BETWEEN ? and ?]]>
         </prop>
 
         <prop key="store">

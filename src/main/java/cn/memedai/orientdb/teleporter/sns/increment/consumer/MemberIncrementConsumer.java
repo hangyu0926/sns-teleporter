@@ -24,7 +24,10 @@ public class MemberIncrementConsumer extends BlockingQueueDataConsumer {
         Map<String, Object> dataMap = (Map<String, Object>) obj;
         String idNo = (String) dataMap.get("ID_NO");
         if (idNo != null) {
-            dataMap.putAll(CacheUtils.ID_ADDRESS.get(idNo.substring(0, 6)));
+            Map<String, String> idAddress = CacheUtils.ID_ADDRESS.get(idNo.substring(0, 6));
+            if (idAddress != null) {
+                dataMap.putAll(idAddress);
+            }
         }
 
         Object docObj = super.process(obj);

@@ -15,6 +15,8 @@ package cn.memedai.orientdb.teleporter.sns.common.producer;
 import cn.memedai.orientdb.teleporter.sns.utils.CacheUtils;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +30,8 @@ import java.util.Map;
 @Service
 public class IdAddressCommonProducer implements Runnable {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(IdAddressCommonProducer.class);
+
     @Value("#{idAddressProp.idAddress}")
     private String idAddress;
 
@@ -39,6 +43,7 @@ public class IdAddressCommonProducer implements Runnable {
             for (Map<String, String> idArress : idArressList) {
                 CacheUtils.ID_ADDRESS.put(idArress.get("ID_PREFIX"), idArress);
             }
+            LOGGER.debug("id_address size : " + CacheUtils.ID_ADDRESS.size());
         } catch (IOException e) {
             e.printStackTrace();
         }
