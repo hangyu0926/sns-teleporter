@@ -10,11 +10,8 @@
     <context:annotation-config/>
     <context:component-scan base-package="cn.memedai.orientdb.teleporter"/>
 
-    <import resource="applicationContext-sns-dataSource.xml"/>
-    <import resource="applicationContext-sns-properties.xml"/>
     <import resource="applicationContext-sns-common.xml"/>
     <import resource="applicationContext-sns-full-common.xml"/>
-    <import resource="applicationContext-sns-sql.xml"/>
 
     <bean id="deleteEdgesFullConsumer" class="cn.memedai.orientdb.teleporter.sns.full.consumer.DeleteEdgeFullConsumer"
           scope="prototype">
@@ -26,8 +23,8 @@
                 <value>HasStore</value>
                 <value>HasApply</value>
                 <value>HasOrder</value>
-                <value>HasPhoneSource</value>
-                <value>HasPhoneMark</value>
+                <!--<value>HasPhoneSource</value>-->
+                <!--<value>HasPhoneMark</value>-->
             </array>
         </property>
         <property name="documentTxFactory" ref="documentTxFactory"/>
@@ -172,9 +169,9 @@
 
                 <ref bean="updateMemberOverdueToDefaultCommonConsumer"/>
 
-                <ref bean="phoneWithPhoneMarkAndPhoneSourceFullProducer"/>
-                <ref bean="phoneWithPhoneMarkAndPhoneSourceCommonConsumer"/>
-                <ref bean="phoneWithPhoneMarkAndPhoneSourceCommonConsumer"/>
+                <!--<ref bean="phoneWithPhoneMarkAndPhoneSourceFullProducer"/>-->
+                <!--<ref bean="phoneWithPhoneMarkAndPhoneSourceCommonConsumer"/>-->
+                <!--<ref bean="phoneWithPhoneMarkAndPhoneSourceCommonConsumer"/>-->
             </list>
         </entry>
 

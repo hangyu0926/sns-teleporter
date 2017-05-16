@@ -4,7 +4,11 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <import resource="applicationContext-sns-dataSource.xml"/>
+    <import resource="applicationContext-sns-idAddress.xml"/>
+
+    <!--生产环境配置不同-->
     <import resource="applicationContext-sns-properties.xml"/>
+    <import resource="applicationContext-sns-sql.xml"/>
 
     <bean id="storeBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
         <constructor-arg index="0" value="5000"/>

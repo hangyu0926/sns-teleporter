@@ -14,7 +14,7 @@
     <bean id="caJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
         <property name="dataSource">
             <bean class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
-                <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+                <property name="driverClassName" value="#{caDbProp.driver}"/>
                 <property name="url" value="#{caDbProp.url}"/>
                 <property name="username" value="#{caDbProp.userName}"/>
                 <property name="password" value="#{caDbProp.password}"/>
@@ -32,7 +32,7 @@
     <bean id="ctaJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
         <property name="dataSource">
             <bean class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
-                <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+                <property name="driverClassName" value="#{ctaDbProp.driver}"/>
                 <property name="url" value="#{ctaDbProp.url}"/>
                 <property name="username" value="#{ctaDbProp.userName}"/>
                 <property name="password" value="#{ctaDbProp.password}"/>
@@ -50,7 +50,7 @@
     <bean id="walletAndSnsJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
         <property name="dataSource">
             <bean class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
-                <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+                <property name="driverClassName" value="#{walletAndSnsDbProp.driver}"/>
                 <property name="url" value="#{walletAndSnsDbProp.url}"/>
                 <property name="username" value="#{walletAndSnsDbProp.userName}"/>
                 <property name="password" value="#{walletAndSnsDbProp.password}"/>
@@ -68,7 +68,7 @@
     <bean id="sqlserverJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
         <property name="dataSource">
             <bean class="org.apache.commons.dbcp2.BasicDataSource" destroy-method="close">
-                <property name="driverClassName" value="com.mysql.jdbc.Driver"/>
+                <property name="driverClassName" value="#{sqlserverDbProp.driver}"/>
                 <property name="url" value="#{sqlserverDbProp.url}"/>
                 <property name="username" value="#{sqlserverDbProp.userName}"/>
                 <property name="password" value="#{sqlserverDbProp.password}"/>

@@ -3,9 +3,6 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-    <import resource="applicationContext-sns-dataSource.xml"/>
-    <import resource="applicationContext-sns-properties.xml"/>
-
     <bean id="phoneWithCall2BlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
         <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
     </bean>
@@ -28,7 +25,7 @@
                   value="#{snsSqlProp.phoneWithCallToCache01}"/>
     </bean>
     <bean id="phoneWithCallToCache01Consumer"
-          class="cn.memedai.orientdb.teleporter.sns.full.consumer.PhoneWithCallToCache02FullConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.full.consumer.PhoneWithCallToCache01FullConsumer"
           scope="prototype">
         <property name="blockingQueue" ref="phoneWithCallToCache01BlockingQueue"/>
         <property name="documentTxFactory" ref="documentTxFactory"/>

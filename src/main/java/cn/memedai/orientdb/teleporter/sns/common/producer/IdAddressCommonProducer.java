@@ -28,7 +28,7 @@ import java.util.Map;
 @Service
 public class IdAddressCommonProducer implements Runnable {
 
-    @Value("#{snsProp.idAddress}")
+    @Value("#{idAddressProp.idAddress}")
     private String idAddress;
 
     public void run() {
