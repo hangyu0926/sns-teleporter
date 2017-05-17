@@ -19,7 +19,7 @@
         <property name="jdbcTemplate" ref="caJdbcTemplate"/>
         <property name="blockingQueue" ref="phoneWithCall2BlockingQueue"/>
         <property name="sql"
-                  value="#{snsSqlProp.phoneWithCallTo2} where #subSql limit ?,?"/>
+                  value="#{snsSqlProp.phoneWithCallTo2} where #subSql and PHONE_NO is not null limit ?,?"/>
     </bean>
 
     <util:map id="teleporterMap" key-type="java.lang.Integer" value-type="java.util.List">
@@ -30,12 +30,12 @@
                 <ref bean="phoneWithCallToCache01Consumer"/>
             </list>
         </entry>
-        <entry key="11">
-            <list>
-                <ref bean="phoneWithCallToCache02Producer"/>
-                <ref bean="phoneWithCallToCache02Consumer"/>
-            </list>
-        </entry>
+        <!--<entry key="11">-->
+            <!--<list>-->
+                <!--<ref bean="phoneWithCallToCache02Producer"/>-->
+                <!--<ref bean="phoneWithCallToCache02Consumer"/>-->
+            <!--</list>-->
+        <!--</entry>-->
 
         <entry key="20">
             <list>
