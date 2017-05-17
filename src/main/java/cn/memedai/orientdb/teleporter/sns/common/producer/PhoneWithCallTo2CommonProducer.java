@@ -26,7 +26,6 @@ import java.util.Properties;
 /**
  * Created by kisho on 2017/4/6.
  */
-@Resource
 public class PhoneWithCallTo2CommonProducer extends JdbcDataProducer {
 
     @Resource
