@@ -33,11 +33,11 @@
         </prop>
 
         <prop key="device2Ca">
-            <![CDATA[SELECT APPL_NO,DEVICE_ID FROM credit_trade_audit.ca_appl_member_device where DEVICE_ID is not null]]>
+            <![CDATA[SELECT APPL_NO,DEVICE_ID FROM credit_audit.ca_appl_member_device where DEVICE_ID is not null]]>
         </prop>
 
         <prop key="ip2Ca">
-            <![CDATA[SELECT APPL_NO,IP,IP_CITY  FROM credit_trade_audit.ca_appl_member_device where IP is not null]]>
+            <![CDATA[SELECT APPL_NO,IP,IP_CITY  FROM credit_audit.ca_appl_member_device where IP is not null]]>
         </prop>
 
         <prop key="device2Cta">
