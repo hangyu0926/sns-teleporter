@@ -60,6 +60,10 @@
             <![CDATA[SELECT REPORTNO, APPL_NO FROM mis_watson.D_JXL_PERSON limit ?,?]]>
         </prop>
 
+        <prop key="phonesWithMoreCellphones">
+            <![CDATA[select cellphone from network.apply_info group by cellphone HAVING count(1)>1 limit ?,?]]>
+        </prop>
+
     </util:properties>
 
     <util:properties id="snsOrientSqlProp">

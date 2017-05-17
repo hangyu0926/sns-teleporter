@@ -12,7 +12,7 @@
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${USER_HOME}/sns-teleporter.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${USER_HOME}/sys_%d{yyyy-MM-dd}.log
+            <fileNamePattern>${USER_HOME}/sns-teleporter_%d{yyyy-MM-dd}.log
             </fileNamePattern>
             <timeBaseFileNamingAndTriggeringPolicy
                     class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">

@@ -63,6 +63,10 @@
         <prop key="phoneWithCallToCache02">
             <![CDATA[select * from (SELECT row_number () OVER (ORDER BY REPORTNO) as rownum,REPORTNO, APPL_NO FROM watson.WTS.D_JXL_PERSON) a where a.rownum BETWEEN ? and ?]]>
         </prop>
+
+        <prop key="phonesWithMoreCellphones">
+            <![CDATA[select cellphone from wallet.apply_info group by cellphone HAVING count(1)>1 limit ?,?]]>
+        </prop>
     </util:properties>
 
     <util:properties id="snsOrientSqlProp">
