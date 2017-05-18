@@ -10,6 +10,12 @@
         <property name="password" value="#{orientdbProp.password}"/>
     </bean>
 
+    <bean id="performanceDocumentTxFactory" class="cn.memedai.orientdb.teleporter.ODatabaseDocumentTxFactory">
+        <property name="url" value="#{orientdbSqlperformanceProp.url}"/>
+        <property name="userName" value="#{orientdbSqlperformanceProp.userName}"/>
+        <property name="password" value="#{orientdbSqlperformanceProp.password}"/>
+    </bean>
+
     <!--JDBC数据源 配置-->
     <bean id="caJdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
         <property name="dataSource">

@@ -11,6 +11,12 @@
         <prop key="password">admin</prop>
     </util:properties>
 
+    <util:properties id="orientdbSqlperformanceProp">
+        <prop key="url">remote:localhost/performance</prop>
+        <prop key="userName">admin</prop>
+        <prop key="password">admin</prop>
+    </util:properties>
+
     <util:properties id="caDbProp">
         <prop key="driver">com.mysql.jdbc.Driver</prop>
         <prop key="url">jdbc:mysql://115.29.177.124:3306/MERCHANTAUDIT</prop>

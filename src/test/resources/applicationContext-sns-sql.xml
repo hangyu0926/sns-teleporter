@@ -49,7 +49,7 @@
         </prop>
 
         <prop key="phoneWithCallTo2">
-            <![CDATA[select APPL_NO,PHONE_NO,CALL_CNT,CALL_LEN,CALL_IN_CNT,CALL_OUT_CNT,CREATE_TIME from network.ca_bur_operator_contact where PHONE_NO is not nul l]]>
+            <![CDATA[select APPL_NO,PHONE_NO,CALL_CNT,CALL_LEN,CALL_IN_CNT,CALL_OUT_CNT,CREATE_TIME from network.ca_bur_operator_contact where PHONE_NO is not null ]]>
         </prop>
 
         <prop key="phoneWithCallToCache01">
