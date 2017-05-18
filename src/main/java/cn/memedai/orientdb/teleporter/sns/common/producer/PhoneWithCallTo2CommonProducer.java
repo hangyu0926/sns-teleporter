@@ -15,6 +15,7 @@ package cn.memedai.orientdb.teleporter.sns.common.producer;
 import cn.memedai.orientdb.teleporter.JdbcDataProducer;
 import cn.memedai.orientdb.teleporter.sns.common.SnsService;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.annotation.Resource;
 import java.io.*;
@@ -36,6 +37,16 @@ public class PhoneWithCallTo2CommonProducer extends JdbcDataProducer {
 
     private int lastMaxId;
 
+    @Value("#{snsSqlProp.maxIdForCallTo2}")
+    private String maxIdForCallTo2;
+
+    @Value("#{snsProp.assignedStartDatetime}")
+    private String assignedStartDatetime;
+
+    @Value("#{snsProp.assignedEndDatetime}")
+    private String assignedEndDatetime;
+
+
     @Override
     protected void onStart() {
         String filePath = snsProp.getProperty("callToLastReadRecordPath");
@@ -51,17 +62,22 @@ public class PhoneWithCallTo2CommonProducer extends JdbcDataProducer {
         }
         log.debug("lastMaxId = " + lastMax);
         String subSql = null;
-        if (lastMaxId > 0) {
-            subSql = " ID>" + lastMaxId;
+        if (StringUtils.isNotBlank(assignedStartDatetime) && StringUtils.isNotBlank(assignedEndDatetime)) {
+            subSql = "CREATE_TIME between '" + assignedStartDatetime + "' and '" + assignedEndDatetime + "' ";
         } else {
-            subSql = " CREATE_TIME>='" + snsService.getStartDatetime(null, 1) + "'";
+            if (lastMaxId > 0) {
+                subSql = " ID>" + lastMaxId;
+            } else {
+                subSql = " CREATE_TIME>='" + snsService.getStartDatetime(null, -1) + "'";
+            }
         }
         setSql(getSql().replaceAll("#subSql", subSql));
+        log.debug("sql : " + getSql());
     }
 
     @Override
     protected void onEnd() {
-        int currentMaxId = getJdbcTemplate().queryForObject("select max(ID) from network.ca_bur_operator_contact", Integer.class);
+        int currentMaxId = getJdbcTemplate().queryForObject(maxIdForCallTo2, Integer.class);
         log.debug("currentMaxId : " + currentMaxId);
         String filePath = snsProp.getProperty("callToLastReadRecordPath");
         try {

@@ -47,7 +47,7 @@
         <property name="jdbcTemplate" ref="walletAndSnsJdbcTemplate"/>
         <property name="blockingQueue" ref="applyBlockingQueue"/>
         <property name="sql"
-                  value="#{snsSqlProp.apply} where created_datetime >='#{snsService.getStartDatetime('',1)}' or modified_datetime >='#{snsService.getStartDatetime('',1)}'  limit ?,?"/>
+                  value="#{snsSqlProp.apply} where created_datetime between '#{snsService.getStartDatetime('',-1)}' and '#{snsService.getEndDatetime('',-1)}' or modified_datetime between '#{snsService.getStartDatetime('',-1)}' and '#{snsService.getEndDatetime('',-1)}'  limit ?,?"/>
     </bean>
 
 
@@ -55,7 +55,7 @@
         <property name="jdbcTemplate" ref="walletAndSnsJdbcTemplate"/>
         <property name="blockingQueue" ref="orderBlockingQueue"/>
         <property name="sql"
-                  value="#{snsSqlProp.order} where created_datetime >='#{snsService.getStartDatetime('',1)}' or modified_datetime >='#{snsService.getStartDatetime('',1)}'  limit ?,?"/>
+                  value="#{snsSqlProp.order} where created_datetime between '#{snsService.getStartDatetime('',-1)}' and '#{snsService.getEndDatetime('',-1)}' or modified_datetime between '#{snsService.getStartDatetime('',-1)}' and '#{snsService.getEndDatetime('',-1)}'  limit ?,?"/>
     </bean>
 
 
@@ -101,7 +101,7 @@
         <property name="jdbcTemplate" ref="caJdbcTemplate"/>
         <property name="blockingQueue" ref="phoneWithPhoneMarkAndPhoneSourceBlockingQueue"/>
         <property name="sql"
-                  value="#{snsSqlProp.phoneWithPhoneMarkAndPhoneSource} and UP_DATE>='#{snsService.getStartDatetime('',1)}'  limit ?,?"/>
+                  value="#{snsSqlProp.phoneWithPhoneMarkAndPhoneSource} and UP_DATE between '#{snsService.getStartDatetime('',-1)}' and '#{snsService.getEndDatetime('',-1)}'  limit ?,?"/>
     </bean>
 
 
@@ -114,7 +114,7 @@
         <property name="jdbcTemplate" ref="caJdbcTemplate"/>
         <property name="blockingQueue" ref="phoneWithCall2BlockingQueue"/>
         <property name="sql"
-                  value="#{snsSqlProp.phoneWithCallTo2} where #subSql limit ?,?"/>
+                  value="#{snsSqlProp.phoneWithCallTo2} and #subSql limit ?,?"/>
     </bean>
     <bean id="phoneWithCallTo2IncrementConsumer"
           class="cn.memedai.orientdb.teleporter.sns.increment.consumer.PhoneWithCallTo2IncrementConsumer"

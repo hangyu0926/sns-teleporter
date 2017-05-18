@@ -53,7 +53,7 @@
         </prop>
 
         <prop key="phoneWithCallTo2">
-            <![CDATA[select APPL_NO,PHONE_NO,CALL_CNT,CALL_LEN,CALL_IN_CNT,CALL_OUT_CNT,CREATE_TIME from credit_audit.ca_bur_operator_contact]]>
+            <![CDATA[select APPL_NO,PHONE_NO,CALL_CNT,CALL_LEN,CALL_IN_CNT,CALL_OUT_CNT,CREATE_TIME from credit_audit.ca_bur_operator_contact where PHONE_NO is not null]]>
         </prop>
 
         <prop key="phoneWithCallToCache01">
@@ -67,6 +67,11 @@
         <prop key="phonesWithMoreCellphones">
             <![CDATA[select cellphone from wallet.apply_info group by cellphone HAVING count(1)>1 limit ?,?]]>
         </prop>
+
+        <prop key="maxIdForCallTo2">
+            <![CDATA[select max(ID) from credit_audit.ca_bur_operator_contact]]>
+        </prop>
+
     </util:properties>
 
     <util:properties id="snsOrientSqlProp">

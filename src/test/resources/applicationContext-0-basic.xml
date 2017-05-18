@@ -39,7 +39,7 @@
         <property name="jdbcTemplate" ref="caJdbcTemplate"/>
         <property name="blockingQueue" ref="phoneWithCall2BlockingQueue"/>
         <property name="sql"
-                  value="#{snsSqlProp.phoneWithCallTo2} limit ?,?"/>
+                  value="#{snsSqlProp.phoneWithCallTo2} where PHONE_NO is not null limit ?,?"/>
     </bean>
 
 

@@ -49,21 +49,25 @@ public class PhoneWithCallTo2FullConsumer extends BlockingQueueDataBatchProcessC
             String applyNo = (String) dataMap.get("APPL_NO");
             String toPhone = (String) dataMap.get("PHONE_NO");
             if (StringUtils.isBlank(applyNo) || StringUtils.isBlank(toPhone)) {
-                return null;
+//                log.debug("applyNo:{},toPhone:{}", applyNo, toPhone);
+                continue;
             }
 
             String fromPhone = CacheUtils.CACHE_APPLYNO_PHONE.get(applyNo);
             if (StringUtils.isBlank(fromPhone)) {
-                return null;
+//                log.debug("fromPhone is null");
+                continue;
             }
 
             String fromPhoneRid = snsService.getPhoneRid(getODatabaseDocumentTx(), fromPhone);
             String toPhoneRid = snsService.getPhoneRid(getODatabaseDocumentTx(), toPhone);
             if (StringUtils.isBlank(fromPhoneRid)
                     || StringUtils.isBlank(toPhoneRid)) {
+//                log.debug("fromPhone:{},toPhone:", fromPhone, toPhone);
                 continue;
             }
             if (dataMap.get("CREATE_TIME") == null) {
+//                log.debug("CREATE_TIME is null");
                 continue;
             }
 

@@ -59,6 +59,8 @@
         <prop key="callToLastReadRecordPath">/home/orientdb/migration_script/v2/callTo_lastReadRecord.properties</prop>
         <prop key="skipCount">0</prop>
         <prop key="phoneWithCallTo1FilePath">D:\D_JXL_CONTACTLIST.csv</prop>
+        <prop key="assignedStartDatetime"></prop>
+        <prop key="assignedEndDatetime"></prop>
     </util:properties>
 
 </beans>

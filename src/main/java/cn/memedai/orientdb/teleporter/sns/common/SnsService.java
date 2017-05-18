@@ -53,6 +53,12 @@ public class SnsService {
     @Value("#{snsOrientSqlProp.createCallTo2}")
     private String createCallTo2;
 
+    @Value("#{snsProp.assignedStartDatetime}")
+    private String assignedStartDatetime;
+
+    @Value("#{snsProp.assignedEndDatetime}")
+    private String assignedEndDatetime;
+
     private Lock phoneLock = new ReentrantLock();
 
     public String processMemberAndPhone(ODatabaseDocumentTx tx,
@@ -179,12 +185,27 @@ public class SnsService {
     }
 
     public String getStartDatetime(String startDatetime, int i) {
+        if (StringUtils.isNotBlank(assignedStartDatetime) && StringUtils.isNotBlank(assignedEndDatetime)) {
+            return assignedStartDatetime;
+        }
         if (StringUtils.isBlank(startDatetime)) {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            Date date = new Date(Calendar.getInstance().getTimeInMillis() - i * 3600 * 24 * 1000);
+            Date date = new Date(Calendar.getInstance().getTimeInMillis() + i * 3600 * 24 * 1000);
             return sdf.format(date) + " 00:00:00";
         }
         return startDatetime;
+    }
+
+    public String getEndDatetime(String endDatetime, int i) {
+        if (StringUtils.isNotBlank(assignedStartDatetime) && StringUtils.isNotBlank(assignedEndDatetime)) {
+            return assignedEndDatetime;
+        }
+        if (StringUtils.isBlank(endDatetime)) {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date date = new Date(Calendar.getInstance().getTimeInMillis() + i * 3600 * 24 * 1000);
+            return sdf.format(date) + " 23:59:59";
+        }
+        return endDatetime;
     }
 
     public String constructCallToSql(String fromPhoneRid,
