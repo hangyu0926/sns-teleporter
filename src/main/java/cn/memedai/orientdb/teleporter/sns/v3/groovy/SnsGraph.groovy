@@ -16,7 +16,7 @@ phone0 = '13826006620'
 startTime = System.currentTimeMillis()
 def myPrintln = {
     message ->
-        println(new Date().toLocaleString() + "(" + Thread.currentThread().getId() + "): " + message)
+        println("${new Date().toLocaleString()}(${Thread.currentThread().getId()}): ${message}")
 }
 /**
  * 定义返回结果数据模型
@@ -31,7 +31,7 @@ try {
 /**
  * 检查入参
  **/
-    if (phone0 == null || "".equals(phone0.trim()) || phone0.trim().length() < 11) {
+    if (phone0 == null || "" == phone0.trim() || phone0.trim().length() < 11) {
         errors.add("手机号不能为空且手机号的长度不能小于11位!")
         return result
     }
@@ -83,7 +83,7 @@ try {
         phone ->
             matchResult = phone.length() < 10 || phone.matches('^(00|10|400|800|100)|13800138000')
             if (matchResult) {
-                myPrintln 'filter phone->' + phone
+                myPrintln "filter phone->${phone}"
             }
             return matchResult
     }
@@ -107,7 +107,7 @@ try {
 
             orderNo = orderRecord.field("orderNo")
             amount = orderRecord.field("amount")
-            status = orderRecord.field('status');
+            status = orderRecord.field('status')
             //订单门店信息
             storeInfo = getStoreInfo(orderRecord.field('out_OrderHasStore'))
             nodeMap = ['id': id, 'name': orderNo + "|" + storeInfo.storeName + "|" + storeInfo.businessFirstType + "|" + amount, 'attributes': 'Order' + status]
@@ -376,7 +376,7 @@ try {
                     //设置二度联系人的record
                     phoneRecord2 = getRid(tempPhoneRecordIn2).equals(getRid(phoneRecord1)) ? tempPhoneRecordOut2 : tempPhoneRecordIn2
 
-                    if (phoneRecord2.field('phone').length() <= 10) {
+                    if (checkPhone(phoneRecord2.field('phone'))) {
                         return
                     }
 
@@ -522,9 +522,8 @@ try {
 //########################从当前手机的通讯记录出发遍历组装数据 End########################
 
 //**********************************************************组装数据 End**********************************************************
-    myPrintln('nodes->' + result.nodes.size())
-    myPrintln('links->' + result.links.size())
+    myPrintln("nodes->${result.nodes.size()},links->${result.links.size()}")
     return result
 } finally {
-    myPrintln('Use time : ' + (System.currentTimeMillis() - startTime) + "ms")
+    myPrintln("Use time : ${System.currentTimeMillis() - startTime}ms")
 }
