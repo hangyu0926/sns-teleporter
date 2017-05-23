@@ -27,10 +27,15 @@ def errors = []//错误信息
 def config = [:]
 def result = ['nodes': nodes, 'links': links, 'errors': errors, 'config': config]
 
+def getRid = {
+    record ->
+        return record.field('@rid').getIdentity().toString()
+}
+
 try {
-/**
- * 检查入参
- **/
+    /**
+     * 检查入参
+     **/
     if (phone0 == null || "" == phone0.trim() || phone0.trim().length() < 11) {
         errors.add("手机号不能为空且手机号的长度不能小于11位!")
         return result
@@ -49,10 +54,22 @@ try {
         return result
     }
 
-/**
- * 定义全局变量
- **/
+    /**
+     * 定义全局变量
+     **/
     phoneRecord0 = phoneInfo.field('phoneRid0')
+    phoneRid0 = phoneRecord0.getIdentity().toString()
+    memberRecord0 = null
+    memberRid0 = null
+    memberId0 = null
+    for (it in memberRecords0) {
+        if (phone0 == it.field('phone')) {
+            memberRecord0 = it
+            memberRid0 = getRid(memberRecord0)
+            memberId0 = memberRecord0.field('memberId')
+            break
+        }
+    }
 
     def id2NodeMap = [:]//key为node的id, value为node的数据
     def id2LinkMap = [:]//key为link的id, value为link的数据
@@ -72,13 +89,9 @@ try {
                          'Device'   : ['modularity_class': '设备ID', 'symbol': 'image://images/device.png', 'symbolSize': 30, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': true],
                          'IP'       : ['modularity_class': 'IP', 'symbol': 'image://images/ip.png', 'symbolSize': 30, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': true]
     ]
+    config.currentUser = ['phone': phone0, 'phoneRid': phoneRid0, 'memberRid': memberRid0, 'memberId': memberId0]
 
-///*************************公共方法定义 Start*************************
-    def getRid = {
-        record ->
-            return record.field('@rid').getIdentity().toString()
-    }
-
+    //*************************公共方法定义 Start*************************
     def checkPhone = {
         phone ->
             matchResult = phone.length() < 10 || phone.matches('^(00|10|400|800|100)|13800138000')
