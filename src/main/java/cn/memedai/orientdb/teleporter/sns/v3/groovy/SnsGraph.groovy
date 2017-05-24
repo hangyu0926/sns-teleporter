@@ -62,6 +62,8 @@ try {
     memberRecord0 = null
     memberRid0 = null
     memberId0 = null
+    ipIds = []
+    deviceIds = []
     for (it in memberRecords0) {
         if (phone0 == it.field('phone')) {
             memberRecord0 = it
@@ -75,26 +77,26 @@ try {
     def id2LinkMap = [:]//key为link的id, value为link的数据
 
     def blackItemStyle = ['normal': ['color': "#4A4A4A"]]
-    config.attributes = ['Phone0'   : ['modularity_class': '当前手机号', 'symbol': 'image://images/phone0.png', 'symbolSize': 60, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': true],//当前查询手机号
-                         'Phone1'   : ['modularity_class': '一度手机号', 'symbol': 'image://images/phone1.png', 'symbolSize': 30, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': false],//一度联系人手机号
-                         'Phone2'   : ['modularity_class': '二度手机号', 'symbol': 'image://images/phone2.png', 'symbolSize': 30, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': false],//二度联系人手机号
-                         'Member0'  : ['modularity_class': '当前会员', 'symbol': 'image://images/member0.png', 'symbolSize': 60, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': true],//当前查询会员
-                         'Member'   : ['modularity_class': '会员', 'symbol': 'image://images/member.png', 'symbolSize': 30, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': false],
-                         'Applynull': ['modularity_class': '申请', 'symbol': 'image://images/apply.png', 'symbolSize': 30, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': false],//默认申请
-                         'Apply1'   : ['modularity_class': '申请', 'symbol': 'image://images/apply1.png', 'symbolSize': 30, 'itemStyle': blackItemStyle, 'isLegend': false, 'showLegendIfHasHugeData': false],//申请过件
-                         'Apply0'   : ['modularity_class': '申请', 'symbol': 'image://images/apply0.png', 'symbolSize': 30, 'itemStyle': blackItemStyle, 'isLegend': false, 'showLegendIfHasHugeData': false],//申请拒件
-                         'Order1'   : ['modularity_class': '订单', 'symbol': 'image://images/order1.png', 'symbolSize': 30, 'itemStyle': blackItemStyle, 'isLegend': false, 'showLegendIfHasHugeData': false],//订单过件
-                         'Ordernull': ['modularity_class': '订单', 'symbol': 'image://images/order0.png', 'symbolSize': 30, 'itemStyle': blackItemStyle, 'isLegend': false, 'showLegendIfHasHugeData': false],//订单拒件
-                         'Order0'   : ['modularity_class': '订单', 'symbol': 'image://images/order.png', 'symbolSize': 30, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': false],//默认订单
-                         'Device'   : ['modularity_class': '设备ID', 'symbol': 'image://images/device.png', 'symbolSize': 30, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': true],
-                         'IP'       : ['modularity_class': 'IP', 'symbol': 'image://images/ip.png', 'symbolSize': 30, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': true]
+    config.attributes = ['Phone0'   : ['modularity_class': '当前手机号', 'symbol': 'image://images/phone0.png', 'symbolSize': 40, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': true],//当前查询手机号
+                         'Phone1'   : ['modularity_class': '一度手机号', 'symbol': 'image://images/phone1.png', 'symbolSize': 20, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': false],//一度联系人手机号
+                         'Phone2'   : ['modularity_class': '二度手机号', 'symbol': 'image://images/phone2.png', 'symbolSize': 20, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': false],//二度联系人手机号
+                         'Member0'  : ['modularity_class': '当前会员', 'symbol': 'image://images/member0.png', 'symbolSize': 40, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': true],//当前查询会员
+                         'Member'   : ['modularity_class': '会员', 'symbol': 'image://images/member.png', 'symbolSize': 20, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': false],
+                         'Applynull': ['modularity_class': '申请', 'symbol': 'image://images/apply.png', 'symbolSize': 20, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': false],//默认申请
+                         'Apply1'   : ['modularity_class': '申请', 'symbol': 'image://images/apply1.png', 'symbolSize': 20, 'itemStyle': blackItemStyle, 'isLegend': false, 'showLegendIfHasHugeData': false],//申请过件
+                         'Apply0'   : ['modularity_class': '申请', 'symbol': 'image://images/apply0.png', 'symbolSize': 20, 'itemStyle': blackItemStyle, 'isLegend': false, 'showLegendIfHasHugeData': false],//申请拒件
+                         'Order1'   : ['modularity_class': '订单', 'symbol': 'image://images/order1.png', 'symbolSize': 20, 'itemStyle': blackItemStyle, 'isLegend': false, 'showLegendIfHasHugeData': false],//订单过件
+                         'Ordernull': ['modularity_class': '订单', 'symbol': 'image://images/order0.png', 'symbolSize': 20, 'itemStyle': blackItemStyle, 'isLegend': false, 'showLegendIfHasHugeData': false],//订单拒件
+                         'Order0'   : ['modularity_class': '订单', 'symbol': 'image://images/order.png', 'symbolSize': 20, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': false],//默认订单
+                         'Device'   : ['modularity_class': '设备ID', 'symbol': 'image://images/device.png', 'symbolSize': 20, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': true],
+                         'IP'       : ['modularity_class': 'IP', 'symbol': 'image://images/ip.png', 'symbolSize': 20, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': true]
     ]
-    config.currentUser = ['phone': phone0, 'phoneRid': phoneRid0, 'memberRid': memberRid0, 'memberId': memberId0]
+    config.currentUser = ['phone': phone0, 'phoneRid': phoneRid0, 'memberRid': memberRid0, 'memberId': memberId0, 'ipIds': ipIds, 'deviceIds': deviceIds]
 
     //*************************公共方法定义 Start*************************
     def checkPhone = {
         phone ->
-            matchResult = phone.length() < 10 || phone.matches('^(00|10|400|800|100)|13800138000')
+            matchResult = phone.length() < 10 || phone.matches('^(00|10|400|800|100)\\w*|13800138000')
             if (matchResult) {
                 myPrintln "filter phone->${phone}"
             }
@@ -437,6 +439,7 @@ try {
                 if ('00000000-0000-0000-0000-000000000000'.equals(deviceId.trim())) { //过滤掉特殊的deviceId
                     return
                 }
+                deviceIds.add(deviceId)
                 createDeviceNode(deviceRecord)
                 inMemberHasDevices = deviceRecord.field('in_MemberHasDevice')
                 if (inMemberHasDevices != null && inMemberHasDevices.size() > 0) {
@@ -458,7 +461,7 @@ try {
         if (outMemberHasIps != null && outMemberHasIps.size() > 0) {
             outMemberHasIps.each {
                 ipRecord = it.field('in')
-
+                ipIds.add(getRid(ipRecord))
                 createIpNode(ipRecord)
                 inMemberHasIps = ipRecord.field('in_MemberHasIp')
                 if (inMemberHasIps != null && inMemberHasIps.size() > 0) {
