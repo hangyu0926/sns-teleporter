@@ -77,19 +77,21 @@ try {
     def id2LinkMap = [:]//key为link的id, value为link的数据
 
     def blackItemStyle = ['normal': ['color': "#4A4A4A"]]
-    config.attributes = ['Phone0'   : ['modularity_class': '当前手机号', 'symbol': 'image://resources/images/phone0.png', 'symbolSize': 40, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': true],//当前查询手机号
-                         'Phone1'   : ['modularity_class': '一度手机号', 'symbol': 'image://resources/images/phone1.png', 'symbolSize': 25, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': false],//一度联系人手机号
-                         'Phone2'   : ['modularity_class': '二度手机号', 'symbol': 'image://resources/images/phone2.png', 'symbolSize': 25, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': false],//二度联系人手机号
-                         'Member0'  : ['modularity_class': '当前会员', 'symbol': 'image://resources/images/member0.png', 'symbolSize': 45, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': true],//当前查询会员
-                         'Member'   : ['modularity_class': '会员', 'symbol': 'image://resources/images/member.png', 'symbolSize': 25, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': false],
-                         'Applynull': ['modularity_class': '申请', 'symbol': 'image://resources/images/apply.png', 'symbolSize': 25, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': false],//默认申请
-                         'Apply1'   : ['modularity_class': '申请', 'symbol': 'image://resources/images/apply1.png', 'symbolSize': 25, 'itemStyle': blackItemStyle, 'isLegend': false, 'showLegendIfHasHugeData': false],//申请过件
-                         'Apply0'   : ['modularity_class': '申请', 'symbol': 'image://resources/images/apply0.png', 'symbolSize': 25, 'itemStyle': blackItemStyle, 'isLegend': false, 'showLegendIfHasHugeData': false],//申请拒件
-                         'Order1'   : ['modularity_class': '订单', 'symbol': 'image://resources/images/order1.png', 'symbolSize': 25, 'itemStyle': blackItemStyle, 'isLegend': false, 'showLegendIfHasHugeData': false],//订单过件
-                         'Ordernull': ['modularity_class': '订单', 'symbol': 'image://resources/images/order0.png', 'symbolSize': 25, 'itemStyle': blackItemStyle, 'isLegend': false, 'showLegendIfHasHugeData': false],//订单拒件
-                         'Order0'   : ['modularity_class': '订单', 'symbol': 'image://resources/images/order.png', 'symbolSize': 25, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': false],//默认订单
-                         'Device'   : ['modularity_class': '设备ID', 'symbol': 'image://resources/images/device.png', 'symbolSize': 25, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': true],
-                         'IP'       : ['modularity_class': 'IP', 'symbol': 'image://resources/images/ip.png', 'symbolSize': 25, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': true]
+    config.attributes = ['Phone0'         : ['modularity_class': '当前手机号', 'symbol': 'image://resources/images/phone0.png', 'symbolSize': 40, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': true],//当前查询手机号
+                         'Phone1'         : ['modularity_class': '一度手机号', 'symbol': 'image://resources/images/phone1.png', 'symbolSize': 25, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': false],//一度联系人手机号
+                         'Phone2'         : ['modularity_class': '二度手机号', 'symbol': 'image://resources/images/phone2.png', 'symbolSize': 25, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': false],//二度联系人手机号
+                         'Member0'        : ['modularity_class': '当前会员', 'symbol': 'image://resources/images/member0.png', 'symbolSize': 45, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': true],//当前查询会员
+                         'Member0_overdue': ['modularity_class': '当前会员', 'symbol': 'image://resources/images/member_overdue.png', 'symbolSize': 45, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': true],//当前查询会员
+                         'Member'         : ['modularity_class': '会员', 'symbol': 'image://resources/images/member.png', 'symbolSize': 25, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': false],
+                         'Member_overdue' : ['modularity_class': '逾期会员', 'symbol': 'image://resources/images/member_overdue.png', 'symbolSize': 25, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': false],//逾期会员
+                         'Applynull'      : ['modularity_class': '申请', 'symbol': 'image://resources/images/apply.png', 'symbolSize': 25, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': false],//默认申请
+                         'Apply1'         : ['modularity_class': '申请', 'symbol': 'image://resources/images/apply1.png', 'symbolSize': 25, 'itemStyle': blackItemStyle, 'isLegend': false, 'showLegendIfHasHugeData': false],//申请过件
+                         'Apply0'         : ['modularity_class': '申请', 'symbol': 'image://resources/images/apply0.png', 'symbolSize': 25, 'itemStyle': blackItemStyle, 'isLegend': false, 'showLegendIfHasHugeData': false],//申请拒件
+                         'Order1'         : ['modularity_class': '订单', 'symbol': 'image://resources/images/order1.png', 'symbolSize': 25, 'itemStyle': blackItemStyle, 'isLegend': false, 'showLegendIfHasHugeData': false],//订单过件
+                         'Ordernull'      : ['modularity_class': '订单', 'symbol': 'image://resources/images/order0.png', 'symbolSize': 25, 'itemStyle': blackItemStyle, 'isLegend': false, 'showLegendIfHasHugeData': false],//订单拒件
+                         'Order0'         : ['modularity_class': '订单', 'symbol': 'image://resources/images/order.png', 'symbolSize': 25, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': false],//默认订单
+                         'Device'         : ['modularity_class': '设备ID', 'symbol': 'image://resources/images/device.png', 'symbolSize': 25, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': true],
+                         'IP'             : ['modularity_class': 'IP', 'symbol': 'image://resources/images/ip.png', 'symbolSize': 25, 'itemStyle': blackItemStyle, 'isLegend': true, 'showLegendIfHasHugeData': true]
     ]
     config.currentUser = ['phone': phone0, 'phoneRid': phoneRid0, 'memberRid': memberRid0, 'memberId': memberId0, 'ipIds': ipIds, 'deviceIds': deviceIds]
 
@@ -157,6 +159,9 @@ try {
             name = memberRecord.field('name') == null ? '' : memberRecord.field('name')
             city = memberRecord.field('city') == null ? '' : memberRecord.field('city')
             phone = memberRecord.field('phone') == null ? '' : memberRecord.field('phone')
+            if (memberRecord.field('isOverdue')) {
+                attributes += "_overdue"
+            }
 
             nodeName = memberRecord.field('memberId') + "|" + name + "|" + city + "|" + phone
             nodeMap = ['id': id, 'name': nodeName, 'attributes': attributes]
