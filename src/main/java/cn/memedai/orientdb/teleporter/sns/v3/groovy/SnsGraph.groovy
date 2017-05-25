@@ -10,7 +10,7 @@ def executeSql = {
         return tx.command(new OCommandSQL(sql)).execute(args)
 }
 //phone0 = '15016681031'
-phone0 = '13826006620'
+phone0 = '15821180279'
 
 //**********************************************************准备工作 Start**********************************************************
 startTime = System.currentTimeMillis()
@@ -21,11 +21,9 @@ def myPrintln = {
 /**
  * 定义返回结果数据模型
  **/
-def nodes = []//顶点集合
-def links = []//边的集合
 def errors = []//错误信息
 def config = [:]
-def result = ['nodes': nodes, 'links': links, 'errors': errors, 'config': config]
+def result = ['errors': errors, 'config': config]
 
 def getRid = {
     record ->
@@ -98,11 +96,7 @@ try {
     //*************************公共方法定义 Start*************************
     def checkPhone = {
         phone ->
-            matchResult = phone.length() < 10 || phone.matches('^(00|10|400|800|100)\\w*|13800138000')
-            if (matchResult) {
-                myPrintln "filter phone->${phone}"
-            }
-            return matchResult
+            return phone.length() < 10 || phone.matches('^(00|10|400|800|100)\\w*|13800138000')
     }
 
     def getStoreInfo = {
@@ -128,7 +122,7 @@ try {
             //订单门店信息
             storeInfo = getStoreInfo(orderRecord.field('out_OrderHasStore'))
             nodeMap = ['id': id, 'name': orderNo + "|" + storeInfo.storeName + "|" + storeInfo.businessFirstType + "|" + amount, 'attributes': 'Order' + status]
-            nodes.add(nodeMap)
+            
             id2NodeMap.put(id, nodeMap)
             return nodeMap
     }
@@ -144,7 +138,6 @@ try {
             //申请门店信息
             storeInfo = getStoreInfo(applyRecord.field('out_ApplyHasStore'))
             nodeMap = ['id': id, 'name': applyNo + "|" + storeInfo.storeName + "|" + storeInfo.businessFirstType, 'attributes': 'Apply' + status]
-            nodes.add(nodeMap)
             id2NodeMap.put(id, nodeMap)
             return nodeMap
     }
@@ -165,19 +158,17 @@ try {
 
             nodeName = memberRecord.field('memberId') + "|" + name + "|" + city + "|" + phone
             nodeMap = ['id': id, 'name': nodeName, 'attributes': attributes]
-            nodes.add(nodeMap)
             id2NodeMap.put(id, nodeMap)
     }
 
     def createPhoneNode = {
         phoneRecord, attributes ->
             id = getRid(phoneRecord)
-            if (id2NodeMap.containsKey(id)) {
+            if (attributes != 'Phone1' && id2NodeMap.containsKey(id)) {
                 return id2NodeMap.get(id)
             }
 
             nodeMap = ['id': id, 'name': phoneRecord.field("phone"), 'attributes': attributes]
-            nodes.add(nodeMap)
             id2NodeMap.put(id, nodeMap)
     }
 
@@ -189,7 +180,6 @@ try {
             }
 
             nodeMap = ['id': id, 'name': phoneRecord.field("phone") + "|" + phoneMarks.toString(), 'attributes': attributes]
-            nodes.add(nodeMap)
             id2NodeMap.put(id, nodeMap)
     }
 
@@ -201,7 +191,6 @@ try {
             }
 
             linkMap = ['id': id, 'name': callToRecord.field('callInCnt') + "   " + callToRecord.field('callOutCnt'), 'source': bRid, 'target': aRid]
-            links.add(linkMap)
             id2LinkMap.put(id, linkMap)
     }
 
@@ -284,7 +273,6 @@ try {
             ipCity = ipRecord.field('ipCity') == null ? '' : ipRecord.field('ipCity')
             nodeName = ip + "|" + ipCity
             nodeMap = ['id': id, 'name': nodeName, 'attributes': 'IP']
-            nodes.add(nodeMap)
             id2NodeMap.put(id, nodeMap)
     }
 
@@ -295,7 +283,6 @@ try {
                 return id2NodeMap.get(id)
             }
             nodeMap = ['id': id, 'name': deviceRecord.field('deviceId'), 'attributes': 'Device']
-            nodes.add(nodeMap)
             id2NodeMap.put(id, nodeMap)
     }
 
@@ -306,7 +293,6 @@ try {
                 return id2LinkMap.get(id)
             }
             linkMap = ['id': id, 'name': '', 'source': bRid, 'target': aRid]
-            links.add(linkMap)
             id2LinkMap.put(id, linkMap)
     }
 
@@ -351,8 +337,8 @@ try {
                     tempPhoneRecordIn2 = it.field('in')
                     tempPhoneRecordOut2 = it.field('out')
                     //设置二度联系人的record
-                    phoneRecord2 = getRid(tempPhoneRecordIn2) == getRid(phoneRecord1) ? tempPhoneRecordOut2:
-                    tempPhoneRecordIn2
+                    phoneRecord2 = getRid(tempPhoneRecordIn2) == getRid(phoneRecord1) ? tempPhoneRecordOut2 :
+                            tempPhoneRecordIn2
                     if (checkPhone(tempPhoneRecordIn2.field('phone')) || checkPhone(tempPhoneRecordOut2.field('phone'))) {
                         return
                     }
@@ -515,7 +501,6 @@ try {
 
                 outCallTos2 = phoneRecord1.field('out_CallTo')
                 createCallTo2AndRelated1(phoneRecord1, outCallTos2)
-
             } else { //一级联系人手机非我司会员
                 hasSecondMember = false
 
@@ -544,6 +529,8 @@ try {
 
 //########################从当前手机的通讯记录出发遍历组装数据 End########################
 
+    result.nodes = id2NodeMap.values()
+    result.links = id2LinkMap.values()
 //**********************************************************组装数据 End**********************************************************
     myPrintln("nodes->${result.nodes.size()},links->${result.links.size()}")
     return result
