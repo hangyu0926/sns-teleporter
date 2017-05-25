@@ -213,41 +213,42 @@ try {
                     callOutCnt = callToRecord.field('callOutCnt') == null ? 0 : Integer.parseInt(callToRecord.field('callOutCnt') + "");
                     callInCnt = callToRecord.field('callInCnt') == null ? 0 : Integer.parseInt(callToRecord.field('callInCnt') + "");
                     callLen = callToRecord.field('callLen') == null ? 0 : Integer.parseInt(callToRecord.field('callLen') + "");
-                    if ('贷款中介'.equals(it)) {
+                    if (callLen < 30) {
+                        return
+                    }
+                    if ('贷款中介' == it) {
                         tempCallCnt = 0
-                        if (getRid(phoneRecord).equals(fromPhoneRid)) {
+                        if (getRid(phoneRecord) == fromPhoneRid) {
                             tempCallCnt = callOutCnt
                         } else {
                             tempCallCnt = callInCnt
                         }
-                        if (tempCallCnt >= 1 || callLen >= 15) {
+                        if (tempCallCnt >= 1) {
                             newPhoneMarks.add(it)
                         }
-                    } else if ('高风险号码'.equals(it)
-                            || '套现中介'.equals(it)
-                            || '分期竞品'.equals(it)
-                            || '渠道中介'.equals(it)
-                            || '商户联系人'.equals(it)
-                            || '合作商户固话'.equals(it)
-                            || '催收电话'.equals(it)) {
+                    } else if ('高风险号码' == it
+                            || '套现中介' == it
+                            || '分期竞品' == it
+                            || '渠道中介' == it
+                            || '商户联系人' == it
+                            || '合作商户固话' == it
+                            || '催收电话' == it) {
                         newPhoneMarks.add(it)
-                    } else if ('非合作医美商户'.equals(it)) {
-                        if (callLen >= 30) {
-                            newPhoneMarks.add(it)
-                        }
-                    } else if ('信用卡'.equals(it)) {
+                    } else if ('非合作医美商户' == it) {
+                        newPhoneMarks.add(it)
+                    } else if ('信用卡' == it) {
                         tempCallCnt = 0
-                        if (getRid(phoneRecord).equals(fromPhoneRid)) {
+                        if (getRid(phoneRecord) == fromPhoneRid) {
                             tempCallCnt = callOutCnt
                         } else {
                             tempCallCnt = callInCnt
                         }
-                        if (tempCallCnt >= 1 || callLen >= 30) {
+                        if (tempCallCnt >= 1) {
                             newPhoneMarks.add(it)
                         }
-                    } else if ('商户法人'.equals(it)) {
+                    } else if ('商户法人' == it) {
                         tempCallCnt = 0
-                        if (getRid(phoneRecord).equals(fromPhoneRid)) {
+                        if (getRid(phoneRecord) == fromPhoneRid) {
                             tempCallCnt = callOutCnt
                         } else {
                             tempCallCnt = callInCnt
@@ -255,11 +256,11 @@ try {
                         if (tempCallCnt >= 1 || callLen >= 60) {
                             newPhoneMarks.add(it)
                         }
-                    } else if ('银行'.equals(it)) {
+                    } else if ('银行' == it) {
                         if (callLen >= 60) {
                             newPhoneMarks.add(it)
                         }
-                    } else if ('小贷机构'.equals(it)) {
+                    } else if ('小贷机构' == it) {
                         if (callLen >= 60) {
                             newPhoneMarks.add(it)
                         }
@@ -342,7 +343,7 @@ try {
             createLink(getRid(memberRecord), getRid(phoneRecord))
     }
 
-//前提:一级联系人是我司会员
+    //前提:一级联系人是我司会员
     def createCallTo2AndRelated1 = {
         phoneRecord1, callTos2 ->
             if (callTos2 != null && callTos2.size() > 0) {
@@ -350,7 +351,8 @@ try {
                     tempPhoneRecordIn2 = it.field('in')
                     tempPhoneRecordOut2 = it.field('out')
                     //设置二度联系人的record
-                    phoneRecord2 = getRid(tempPhoneRecordIn2).equals(getRid(phoneRecord1)) ? tempPhoneRecordOut2 : tempPhoneRecordIn2
+                    phoneRecord2 = getRid(tempPhoneRecordIn2) == getRid(phoneRecord1) ? tempPhoneRecordOut2:
+                    tempPhoneRecordIn2
                     if (checkPhone(tempPhoneRecordIn2.field('phone')) || checkPhone(tempPhoneRecordOut2.field('phone'))) {
                         return
                     }
@@ -360,7 +362,7 @@ try {
                     if (inHasPhones2 != null && inHasPhones2.size() > 0) { //二级联系人手机号是我司会员手机号
                         inHasPhones2.each {
                             memberRecord2 = it.field('out')
-                            if (phoneRecord2.field('phone').equals(memberRecord2.field('phone'))) { //会员可能有多个手机号
+                            if (phoneRecord2.field('phone') == memberRecord2.field('phone')) { //会员可能有多个手机号
                                 createMemberAndPhoneAndRelatedNodeAndLink(memberRecord2, 'Member', phoneRecord2, 'Phone2')
                             }
                         }
@@ -381,7 +383,7 @@ try {
             }
     }
 
-//前提 ：一度联系人非公司会员
+    //前提 ：一度联系人非公司会员
     def createCallTo2AndRelated2 = {
         tempPhoneRecordOut1, tempPhoneRecordIn1, callToRecord1, phoneRecord1, callTos2 ->
             hasSecondMember = false
@@ -393,12 +395,12 @@ try {
                     tempPhoneRecordIn2 = it.field('in')
                     tempPhoneRecordOut2 = it.field('out')
 
-                    //设置二度联系人的record
-                    phoneRecord2 = getRid(tempPhoneRecordIn2).equals(getRid(phoneRecord1)) ? tempPhoneRecordOut2 : tempPhoneRecordIn2
-
                     if (checkPhone(phoneRecord2.field('phone'))) {
                         return
                     }
+
+                    //设置二度联系人的record
+                    phoneRecord2 = getRid(tempPhoneRecordIn2) == getRid(phoneRecord1) ? tempPhoneRecordOut2 : tempPhoneRecordIn2
 
                     inHasPhones2 = phoneRecord2.field('in_HasPhone')
 
@@ -412,7 +414,7 @@ try {
                         //设置二度联系人相关node及link
                         inHasPhones2.each {
                             memberRecord2 = it.field('out')
-                            if (phoneRecord2.field('phone').equals(memberRecord2.field('phone'))) { //会员可能有多个手机号
+                            if (phoneRecord2.field('phone') == memberRecord2.field('phone')) { //会员可能有多个手机号
                                 createMemberAndPhoneAndRelatedNodeAndLink(memberRecord2, 'Member', phoneRecord2, 'Phone2')
                             }
                         }
@@ -422,15 +424,14 @@ try {
             }
             return hasSecondMember
     }
+    //*************************公共方法定义 End*************************
 
-///*************************公共方法定义 End*************************
+    //**********************************************************准备工作 End**********************************************************
 
-//**********************************************************准备工作 End**********************************************************
-
-//**********************************************************组装数据 Start**********************************************************
+    //**********************************************************组装数据 Start**********************************************************
     createPhoneNode(phoneRecord0, 'Phone0')
 
-//########################从当前会员出发遍历组装数据 Start########################
+    //########################从当前会员出发遍历组装数据 Start########################
     memberRecords0.each {
         memberRid0 = it.field('@rid').getIdentity().toString()
         createMemberAndPhoneAndRelatedNodeAndLink(it, 'Member0', phoneRecord0, 'Phone0')
@@ -441,7 +442,7 @@ try {
             outMemberHasDevices.each {
                 deviceRecord = it.field('in')
                 deviceId = deviceRecord.field('deviceId')
-                if ('00000000-0000-0000-0000-000000000000'.equals(deviceId.trim())) { //过滤掉特殊的deviceId
+                if ('00000000-0000-0000-0000-000000000000' == deviceId.trim()) { //过滤掉特殊的deviceId
                     return
                 }
                 deviceIds.add(deviceId)
@@ -481,20 +482,21 @@ try {
             }
         }
     }
-//########################从当前会员出发遍历组装数据 End########################
+    //########################从当前会员出发遍历组装数据 End########################
 
-//########################从当前手机的通讯记录出发遍历组装数据 Start########################
+    //########################从当前手机的通讯记录出发遍历组装数据 Start########################
     callTos1 = phoneInfo.field('callTos')
     if (callTos1 != null && callTos1.size() > 0) {
         callTos1.each {
             callToRid = getRid(it)
             tempPhoneRecordIn1 = it.field('in')
             tempPhoneRecordOut1 = it.field('out')
-            //设置一级联系人的record
-            phoneRecord1 = getRid(tempPhoneRecordIn1).equals(getRid(phoneRecord0)) ? tempPhoneRecordOut1 : tempPhoneRecordIn1
             if (checkPhone(tempPhoneRecordIn1.field('phone')) || checkPhone(tempPhoneRecordOut1.field('phone'))) {
                 return
             }
+
+            //设置一级联系人的record
+            phoneRecord1 = getRid(tempPhoneRecordIn1) == getRid(phoneRecord0) ? tempPhoneRecordOut1 : tempPhoneRecordIn1
 
             inHasPhones1 = phoneRecord1.field('in_HasPhone')
 
@@ -502,7 +504,7 @@ try {
                 //设置一度联系人相关node及link
                 inHasPhones1.each {
                     memberRecord1 = it.field('out')
-                    if (phoneRecord1.field('phone').equals(memberRecord1.field('phone'))) { //会员可能有多个手机号
+                    if (phoneRecord1.field('phone') == memberRecord1.field('phone')) { //会员可能有多个手机号
                         createMemberAndPhoneAndRelatedNodeAndLink(memberRecord1, 'Member', phoneRecord1, 'Phone1')
                     }
                 }
