@@ -16,8 +16,9 @@ phone0 = '15821180279'
 startTime = System.currentTimeMillis()
 def myPrintln = {
     message ->
-        println("${new Date().toLocaleString()}(${Thread.currentThread().getId()}): ${message}")
+        println("${new Date().toLocaleString()} [thread-${Thread.currentThread().getId()}]: ${message}")
 }
+myPrintln("phone0->${phone0}")
 /**
  * 定义返回结果数据模型
  **/
@@ -122,7 +123,7 @@ try {
             //订单门店信息
             storeInfo = getStoreInfo(orderRecord.field('out_OrderHasStore'))
             nodeMap = ['id': id, 'name': orderNo + "|" + storeInfo.storeName + "|" + storeInfo.businessFirstType + "|" + amount, 'attributes': 'Order' + status]
-            
+
             id2NodeMap.put(id, nodeMap)
             return nodeMap
     }
@@ -527,11 +528,11 @@ try {
         }
     }
 
-//########################从当前手机的通讯记录出发遍历组装数据 End########################
+    //########################从当前手机的通讯记录出发遍历组装数据 End########################
 
     result.nodes = id2NodeMap.values()
     result.links = id2LinkMap.values()
-//**********************************************************组装数据 End**********************************************************
+    //**********************************************************组装数据 End**********************************************************
     myPrintln("nodes->${result.nodes.size()},links->${result.links.size()}")
     return result
 } finally {
