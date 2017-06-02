@@ -73,21 +73,19 @@ try {
     def id2NodeMap = [:]//key为node的id, value为node的数据
     def id2LinkMap = [:]//key为link的id, value为link的数据
 
-    result.config.category = ['当前手机号': ['icon': 'image://resources/images/phone0.png'],
-                              '当前会员' : ['icon': 'image://resources/images/member0.png'],
-                              '设备ID' : ['icon': 'image://resources/images/device.png'],
-                              'IP'   : ['icon': 'image://resources/images/ip.png'],
-                              '一度手机号': ['icon': 'image://resources/images/phone1.png'],
-                              '二度手机号': ['icon': 'image://resources/images/phone2.png'],
-                              '会员'   : ['icon': 'image://resources/images/member.png'],
-                              '申请'   : ['icon': 'image://resources/images/apply.png'],
-                              '订单'   : ['icon': 'image://resources/images/order.png']
+    result.config.category = ['当前手机号': ['icon': 'image://resources/images/phone0.png', 'show': false, 'selected': false, 'nodeCount': 0],
+                              '当前会员' : ['icon': 'image://resources/images/member0.png', 'show': false, 'selected': false, 'nodeCount': 0],
+                              '设备ID' : ['icon': 'image://resources/images/device.png', 'show': false, 'selected': false, 'nodeCount': 0],
+                              'IP'   : ['icon': 'image://resources/images/ip.png', 'show': false, 'selected': false, 'nodeCount': 0],
+                              '一度手机号': ['icon': 'image://resources/images/phone1.png', 'show': false, 'selected': false, 'nodeCount': 0],
+                              '二度手机号': ['icon': 'image://resources/images/phone2.png', 'show': false, 'selected': false, 'nodeCount': 0],
+                              '会员'   : ['icon': 'image://resources/images/member.png', 'show': false, 'selected': false, 'nodeCount': 0],
+                              '申请'   : ['icon': 'image://resources/images/apply.png', 'show': false, 'selected': false, 'nodeCount': 0],
+                              '订单'   : ['icon': 'image://resources/images/order.png', 'show': false, 'selected': false, 'nodeCount': 0]
     ]
-    result.config.selectedCategory = [:]
     categoryNodesMap = [:]
     for (it in result.config.category.keySet()) {
         categoryNodesMap[it] = []
-        result.config.selectedCategory[it] = false
     }
     def blackItemStyle = ['normal': ['color': "#4A4A4A"]]
     result.config.attributes = ['Phone0'         : ['modularity_class': '当前手机号', 'symbol': 'image://resources/images/phone0.png', 'symbolSize': 30, 'itemStyle': blackItemStyle],//当前查询手机号
@@ -106,8 +104,12 @@ try {
                                 'Device'         : ['modularity_class': '设备ID', 'symbol': 'image://resources/images/device.png', 'symbolSize': 15, 'itemStyle': blackItemStyle],
                                 'IP'             : ['modularity_class': 'IP', 'symbol': 'image://resources/images/ip.png', 'symbolSize': 15, 'itemStyle': blackItemStyle]
     ]
-    result.
-            config.currentUser = ['phone': phone0, 'phoneRid': phoneRid0, 'memberRid': memberRid0, 'memberId': memberId0, 'ipIds': ipIds, 'deviceIds': deviceIds]
+    result.config.currentUser = ['phone'    : phone0,
+                                 'phoneRid' : phoneRid0,
+                                 'memberRid': memberRid0,
+                                 'memberId' : memberId0,
+                                 'ipIds'    : ipIds,
+                                 'deviceIds': deviceIds]
 
     limitNodeCount = 1000
 
@@ -550,20 +552,23 @@ try {
     newNodeId = 0
     id2NewIdMap = [:]
     for (it in id2NodeMap.values()) {
-        id2NewIdMap[it.id] = newNodeId++
+        id2NewIdMap[it.id] = '' + newNodeId++
         it.id = id2NewIdMap[it.id]
         categoryNodesMap[result.config.attributes[it.attributes].modularity_class].add(it)
     }
 
     tempLimitNodeCount = 0
     for (it in categoryNodesMap) {
+        result.config.category[it.key].nodeCount = it.value.size()
+
         if (tempLimitNodeCount + it.value.size() <= limitNodeCount) {
             tempLimitNodeCount += it.value.size()
-            result.config.category[it.key].formatName = it.key + '(' + it.value.size() + ')'
-            result.config.selectedCategory[it.key] = true
+
+            result.config.category[it.key].selected = true
+            result.config.category[it.key].show = true
+
             result.nodes.addAll(it.value)
         } else {
-            result.config.category[it.key].formatName = it.key + '(' + it.value.size() + '-不显示)'
             categoryNodesMap[it.key] = null
         }
     }
@@ -574,7 +579,7 @@ try {
                 || categoryNodesMap[result.config.attributes[id2NodeMap[it.target].attributes].modularity_class] == null) {
             continue
         }
-        it.id = newLinkId++
+        it.id = '' + newLinkId++
         it.source = id2NewIdMap[it.source]
         it.target = id2NewIdMap[it.target]
         result.links.add(it)
