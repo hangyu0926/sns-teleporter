@@ -12,6 +12,17 @@
             <![CDATA[SELECT a.MEMBER_ID,a.MOBILE_NO,b.`NAME`,b.ID_NO,c.PROVINCE,c.CITY FROM memedai.MEMBER a LEFT JOIN memedai.ID_CARD b ON a.MEMBER_ID = b.MEMBER_ID LEFT JOIN credit_audit.ca_sys_value_id_area c ON left(b.id_no,6) = c.id_prefix WHERE 	a.MOBILE_NO IS NOT NULL limit ?,?]]>
         </prop>
 
+        <prop key="memberIncrementPrefix">
+        </prop>
+
+        <prop key="memberIncrement">
+            <![CDATA[SELECT a.MEMBER_ID,a.MOBILE_NO,b.`NAME`,b.ID_NO,c.PROVINCE,c.CITY FROM memedai.MEMBER a LEFT JOIN memedai.ID_CARD b ON a.MEMBER_ID = b.MEMBER_ID LEFT JOIN credit_audit.ca_sys_value_id_area c ON left(b.id_no,6) = c.id_prefix WHERE a.MOBILE_NO IS NOT NULL ]]>
+        </prop>
+
+        <prop key="memberIncrementSuffix">
+            <![CDATA[  limit ?,?]]>
+        </prop>
+
         <prop key="store">
             <![CDATA[SELECT a.STOREID,a.MERCHANTID,a.STORENAME,a.PROVINCE,a.CITY,a.CREDIT_LIMIT_TYPE,b.POLICY_BRACKET,b.BUSINESS_FIRST_TYPE FROM MERCHANTAUDIT.ma_store_baseinfo AS a LEFT JOIN MERCHANTAUDIT.ma_execution_strategy AS b ON a.storeid = b.storeid limit ?,?]]>
         </prop>

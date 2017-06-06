@@ -20,7 +20,7 @@
         <property name="jdbcTemplate" ref="sqlserverJdbcTemplate"/>
         <property name="blockingQueue" ref="memberBlockingQueue"/>
         <property name="sql"
-                  value="#{snsSqlProp.member}"/>
+                  value="#{snsSqlProp.memberIncrementPrefix} #{snsSqlProp.memberIncrement} AND (a.CREATE_TIME BETWEEN '#{snsService.getStartDatetime('',-1)}' AND '#{snsService.getEndDatetime('',-1)}' OR a.LAST_UPDATE_TIME BETWEEN '#{snsService.getStartDatetime('',-1)}' AND '#{snsService.getEndDatetime('',-1)}' OR b.CREATE_TIME BETWEEN '#{snsService.getStartDatetime('',-1)}' AND '#{snsService.getEndDatetime('',-1)}' OR b.LAST_UPDATE_TIME BETWEEN '#{snsService.getStartDatetime('',-1)}' AND '#{snsService.getEndDatetime('',-1)}') #{snsSqlProp.memberIncrementSuffix}"/>
     </bean>
     <bean id="memberIncrementConsumer"
           class="cn.memedai.orientdb.teleporter.sns.increment.consumer.MemberIncrementConsumer"

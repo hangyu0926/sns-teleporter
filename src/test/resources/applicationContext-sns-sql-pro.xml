@@ -15,6 +15,19 @@
             <![CDATA[select * from (SELECT row_number () OVER (ORDER BY a.MEMBER_ID) as rownum, a.MEMBER_ID,a.MOBILE_NO,b.NAME,b.ID_NO,b.ID_PROVINCE as PROVINCE,b.ID_CITY as CITY FROM memedaidb.CRM.MEMBER a LEFT JOIN memedaidb.CRM.ID_CARD b ON a.MEMBER_ID = b.MEMBER_ID WHERE a.MOBILE_NO IS NOT NULL) a where a.rownum BETWEEN ? and ?]]>
         </prop>
 
+        <prop key="memberIncrementPrefix">
+            <![CDATA[select * from (]]>
+        </prop>
+
+        <prop key="memberIncrement">
+            <!--SqlServer-->
+            <![CDATA[SELECT row_number () OVER (ORDER BY a.MEMBER_ID) as rownum, a.MEMBER_ID,a.MOBILE_NO,b.NAME,b.ID_NO,b.ID_PROVINCE as PROVINCE,b.ID_CITY as CITY FROM memedaidb.CRM.MEMBER a LEFT JOIN memedaidb.CRM.ID_CARD b ON a.MEMBER_ID = b.MEMBER_ID WHERE a.MOBILE_NO IS NOT NULL ]]>
+        </prop>
+
+        <prop key="memberIncrementSuffix">
+            <![CDATA[ ) a where a.rownum BETWEEN ? and ? ]]>
+        </prop>
+
         <prop key="store">
             <!--SqlServer-->
             <![CDATA[select * from (SELECT row_number () OVER (ORDER BY a.STOREID) as rownum,a.STOREID,a.MERCHANTID,a.STORENAME,a.PROVINCE,a.CITY,a.CREDIT_LIMIT_TYPE,b.POLICY_BRACKET,b.BUSINESS_FIRST_TYPE FROM MERCHANTAUDIT.mas.ma_store_baseinfo AS a LEFT JOIN MERCHANTAUDIT.mas.ma_execution_strategy AS b ON a.storeid = b.storeid) a where a.rownum between ? and ?]]>

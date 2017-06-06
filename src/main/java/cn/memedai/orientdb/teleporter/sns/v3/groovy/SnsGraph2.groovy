@@ -10,7 +10,7 @@ def executeSql = {
         return tx.command(new OCommandSQL(sql)).execute(args)
 }
 //phone0 = '15016681031'
-phone0 = '15821180279'
+phone0 = '13816619230'
 
 //**********************************************************准备工作 Start**********************************************************
 startTime = System.currentTimeMillis()
@@ -575,7 +575,9 @@ try {
 
     newLinkId = 0
     for (it in id2LinkMap.values()) {
-        if (categoryNodesMap[result.config.attributes[id2NodeMap[it.source].attributes].modularity_class] == null
+        if (id2NodeMap[it.source] == null
+                || id2NodeMap[it.target] == null
+                || categoryNodesMap[result.config.attributes[id2NodeMap[it.source].attributes].modularity_class] == null
                 || categoryNodesMap[result.config.attributes[id2NodeMap[it.target].attributes].modularity_class] == null) {
             continue
         }
