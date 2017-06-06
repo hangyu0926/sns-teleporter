@@ -152,11 +152,10 @@
 
                 <ref bean="memberIncrementProducer"/>
                 <ref bean="memberIncrementConsumer"/>
-                <ref bean="memberIncrementConsumer"/>
-                <ref bean="memberIncrementConsumer"/>
-
 
                 <ref bean="phoneWithCallTo2IncrementProducer"/>
+                <ref bean="phoneWithCallTo2IncrementConsumer"/>
+                <ref bean="phoneWithCallTo2IncrementConsumer"/>
                 <ref bean="phoneWithCallTo2IncrementConsumer"/>
             </list>
         </entry>
