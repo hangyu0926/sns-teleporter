@@ -9,16 +9,21 @@ def executeSql = {
         tx.open('admin', 'admin')
         return tx.command(new OCommandSQL(sql)).execute(args)
 }
-//phone0 = '15016681031'
-phone0 = '13816619230'
+//queryVal = '15016681031'
+queryType = 'phone0'
+queryVal = '13826006620'
+//queryVal = '1432193'
+callOutCnt = 1
+callInCnt = null
 
 //**********************************************************准备工作 Start**********************************************************
 startTime = System.currentTimeMillis()
+LOGGER = org.slf4j.LoggerFactory.getLogger("SnsGraph")
 def myPrintln = {
     message ->
-        println("${new Date().toLocaleString()} [thread-${Thread.currentThread().getId()}]: ${message}")
+        LOGGER.info("${message}")
 }
-myPrintln("phone0->${phone0}")
+myPrintln("queryType->${queryType},queryVal->${queryVal},callOutCnt->${callOutCnt},callInCnt->${callInCnt}")
 /**
  * 定义返回结果数据模型
  **/
@@ -33,21 +38,46 @@ try {
     /**
      * 检查入参
      **/
-    if (phone0 == null || "" == phone0.trim() || phone0.trim().length() < 11) {
-        errors.add("手机号不能为空且手机号的长度不能小于11位!")
+    if (queryVal == null || "" == queryVal.trim()) {
+        result.errors.add("查询条件不能为空!")
         return result
     }
 
-    startSql = "select @rid as phoneRid0, unionall(in_CallTo,out_CallTo) as callTos,in('HasPhone') as members0 from Phone where phone = ?"
-    phoneInfos = executeSql(startSql, phone0)
+    if (queryType == 'phone0' && queryVal.trim().length() < 11) {
+        result.errors.add("手机号的长度不能小于11位!")
+        return result
+    }
+
+    newCallOutCnt = 0
+    if (callOutCnt != null && callOutCnt.toString().trim() != '') {
+        try {
+            newCallOutCnt = Integer.parseInt(callOutCnt.toString().trim())
+        } catch (e) {
+        }
+    }
+    newCallInCnt = 0
+    if (callInCnt != null && callInCnt.toString().trim() != '') {
+        try {
+            newCallInCnt = Integer.parseInt(callInCnt.toString().trim())
+        } catch (e) {
+        }
+    }
+
+    //默认为会员
+    startSql = "select @rid as phoneRid0, unionall(in_CallTo,out_CallTo) as callTos,in('HasPhone') as members0 from (select expand(out('HasPhone')) from Member where memberId = ?)"
+    if (queryType == 'phone0') {
+        startSql = "select @rid as phoneRid0, unionall(in_CallTo,out_CallTo) as callTos,in('HasPhone') as members0 from Phone where phone = ?"
+    }
+    LOGGER.debug("startSql->{}", startSql)
+    phoneInfos = executeSql(startSql, queryVal)
     if (phoneInfos == null || phoneInfos.size() == 0) {
-        errors.add("根据手机号查询不到任何信息!")
+        result.errors.add("根据手机号查询不到任何信息!")
         return result
     }
     phoneInfo = phoneInfos[0]
     memberRecords0 = phoneInfo.field('members0')
     if (memberRecords0 == null || memberRecords0.size() == 0) {
-        errors.add("非会员手机号！")
+        result.errors.add("非会员手机号！")
         return result
     }
 
@@ -62,7 +92,7 @@ try {
     ipIds = []
     deviceIds = []
     for (it in memberRecords0) {
-        if (phone0 == it.field('phone')) {
+        if (queryVal == it.field('phone')) {
             memberRecord0 = it
             memberRid0 = getRid(memberRecord0)
             memberId0 = memberRecord0.field('memberId')
@@ -88,7 +118,7 @@ try {
         categoryNodesMap[it] = []
     }
     def blackItemStyle = ['normal': ['color': "#4A4A4A"]]
-    result.config.attributes = ['Phone0'         : ['modularity_class': '当前手机号', 'symbol': 'image://resources/images/phone0.png', 'symbolSize': 30, 'itemStyle': blackItemStyle],//当前查询手机号
+    result.config.attributes = ['queryVal'       : ['modularity_class': '当前手机号', 'symbol': 'image://resources/images/phone0.png', 'symbolSize': 30, 'itemStyle': blackItemStyle],//当前查询手机号
                                 'Phone1'         : ['modularity_class': '一度手机号', 'symbol': 'image://resources/images/phone1.png', 'symbolSize': 15, 'itemStyle': blackItemStyle],//一度联系人手机号
                                 'Phone2'         : ['modularity_class': '二度手机号', 'symbol': 'image://resources/images/phone2.png', 'symbolSize': 15, 'itemStyle': blackItemStyle],//二度联系人手机号
                                 'Member0'        : ['modularity_class': '当前会员', 'symbol': 'image://resources/images/member0.png', 'symbolSize': 30, 'itemStyle': blackItemStyle],//当前查询会员
@@ -104,7 +134,7 @@ try {
                                 'Device'         : ['modularity_class': '设备ID', 'symbol': 'image://resources/images/device.png', 'symbolSize': 15, 'itemStyle': blackItemStyle],
                                 'IP'             : ['modularity_class': 'IP', 'symbol': 'image://resources/images/ip.png', 'symbolSize': 15, 'itemStyle': blackItemStyle]
     ]
-    result.config.currentUser = ['phone'    : phone0,
+    result.config.currentUser = ['phone'    : queryVal,
                                  'phoneRid' : phoneRid0,
                                  'memberRid': memberRid0,
                                  'memberId' : memberId0,
@@ -203,6 +233,26 @@ try {
             id2NodeMap.put(id, nodeMap)
     }
 
+    def checkCallToCondition = {
+        callToRecord ->
+            boolean checkResult = true
+            curCallOutCnt = 0
+            if (callToRecord.field('callOutCnt') != null && callToRecord.field('callOutCnt').toString().trim() != '') {
+                curCallOutCnt = Integer.parseInt(callToRecord.field('callOutCnt').toString().trim())
+            }
+            if (newCallOutCnt > 0 && newCallOutCnt > curCallOutCnt) {
+                checkResult = false
+            }
+            curCallInCnt = 0
+            if (callToRecord.field('callInCnt') != null && callToRecord.field('callInCnt').toString().trim() != '') {
+                curCallInCnt = Integer.parseInt(callToRecord.field('callInCnt').toString().trim())
+            }
+            if (newCallInCnt > 0 && newCallInCnt > curCallInCnt) {
+                checkResult = false
+            }
+            return checkResult
+    }
+
     def createLink4CallTo = {
         aRid, bRid, callToRecord ->
             id = getRid(callToRecord)
@@ -216,6 +266,9 @@ try {
 
     def createPhoneMarkAndRelated = {
         phoneRecord, phoneMarks, attributes, fromPhoneRid, toPhoneRid, callToRecord ->
+            if (!checkCallToCondition(callToRecord)) {
+                return
+            }
             newPhoneMarks = []
             phoneMarks.each {
                 it ->
@@ -354,6 +407,9 @@ try {
         phoneRecord1, callTos2 ->
             if (callTos2 != null && callTos2.size() > 0) {
                 callTos2.each {
+                    if (!checkCallToCondition(it)) {
+                        return
+                    }
                     tempPhoneRecordIn2 = it.field('in')
                     tempPhoneRecordOut2 = it.field('out')
                     //设置二度联系人的record
@@ -398,6 +454,9 @@ try {
                     if (it == null) {
                         return
                     }
+                    if (!checkCallToCondition(it)) {
+                        return
+                    }
                     tempPhoneRecordIn2 = it.field('in')
                     tempPhoneRecordOut2 = it.field('out')
 
@@ -435,12 +494,12 @@ try {
     //**********************************************************准备工作 End**********************************************************
 
     //**********************************************************组装数据 Start**********************************************************
-    createPhoneNode(phoneRecord0, 'Phone0')
+    createPhoneNode(phoneRecord0, 'queryVal')
 
     //########################从当前会员出发遍历组装数据 Start########################
     memberRecords0.each {
         memberRid0 = it.field('@rid').getIdentity().toString()
-        createMemberAndPhoneAndRelatedNodeAndLink(it, 'Member0', phoneRecord0, 'Phone0')
+        createMemberAndPhoneAndRelatedNodeAndLink(it, 'Member0', phoneRecord0, 'queryVal')
 
         //**********************************************************当前查询会员设备相关信息**********************************************************
         outMemberHasDevices = it.field('out_MemberHasDevice')
@@ -494,6 +553,9 @@ try {
     callTos1 = phoneInfo.field('callTos')
     if (callTos1 != null && callTos1.size() > 0) {
         callTos1.each {
+            if (!checkCallToCondition(it)) {
+                return
+            }
             callToRid = getRid(it)
             tempPhoneRecordIn1 = it.field('in')
             tempPhoneRecordOut1 = it.field('out')
@@ -590,8 +652,10 @@ try {
     result.config.nodeCount = id2NodeMap.size()
     result.config.linkCount = id2LinkMap.size()
     //**********************************************************组装数据 End**********************************************************
-    myPrintln("nodes->${result.nodes.size()},links->${result.links.size()}")
     return result
+} catch (Throwable e) {
+    LOGGER.error("", e)
 } finally {
+    myPrintln("nodes->${result.nodes.size()},links->${result.links.size()}")
     myPrintln("Use time : ${System.currentTimeMillis() - startTime}ms")
 }
