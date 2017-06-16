@@ -11,10 +11,12 @@ def executeSql = {
 }
 //queryVal = '15016681031'
 queryType = 'phone0'
-queryVal = '13826006620'
+//queryVal = '13866129993'
+queryVal = '18628110523'
+
 //queryVal = '1432193'
-callOutCnt = 1
-callInCnt = null
+callOutCnt = 2
+callInCnt = 2
 
 //**********************************************************准备工作 Start**********************************************************
 startTime = System.currentTimeMillis()
@@ -118,7 +120,7 @@ try {
         categoryNodesMap[it] = []
     }
     def blackItemStyle = ['normal': ['color': "#4A4A4A"]]
-    result.config.attributes = ['queryVal'       : ['modularity_class': '当前手机号', 'symbol': 'image://resources/images/phone0.png', 'symbolSize': 30, 'itemStyle': blackItemStyle],//当前查询手机号
+    result.config.attributes = ['Phone0'       : ['modularity_class': '当前手机号', 'symbol': 'image://resources/images/phone0.png', 'symbolSize': 30, 'itemStyle': blackItemStyle],//当前查询手机号
                                 'Phone1'         : ['modularity_class': '一度手机号', 'symbol': 'image://resources/images/phone1.png', 'symbolSize': 15, 'itemStyle': blackItemStyle],//一度联系人手机号
                                 'Phone2'         : ['modularity_class': '二度手机号', 'symbol': 'image://resources/images/phone2.png', 'symbolSize': 15, 'itemStyle': blackItemStyle],//二度联系人手机号
                                 'Member0'        : ['modularity_class': '当前会员', 'symbol': 'image://resources/images/member0.png', 'symbolSize': 30, 'itemStyle': blackItemStyle],//当前查询会员
@@ -161,7 +163,7 @@ try {
 
     def createOrderNode = {
         orderRecord ->
-            id = orderRecord.field("@rid").getIdentity().toString()
+            id = getRid(orderRecord)
             if (id2NodeMap.containsKey(id)) {
                 return id2NodeMap.get(id)
             }
@@ -217,8 +219,19 @@ try {
             if (attributes != 'Phone1' && id2NodeMap.containsKey(id)) {
                 return id2NodeMap.get(id)
             }
+            nodeName = phoneRecord.field("phone")
 
-            nodeMap = ['id': id, 'name': phoneRecord.field("phone"), 'attributes': attributes]
+            outHasPhoneMarks = phoneRecord.field('out_HasPhoneMark')
+            phoneMarkList = []
+            if (outHasPhoneMarks != null && outHasPhoneMarks.size() > 0) {
+                outHasPhoneMarks.each {
+                    phoneMark = it.field('in')
+                    phoneMarkList.add(phoneMark.field('mark'))
+                }
+                nodeName += phoneMarkList.toString()
+            }
+
+            nodeMap = ['id': id, 'name': nodeName, 'attributes': attributes]
             id2NodeMap.put(id, nodeMap)
     }
 
@@ -269,12 +282,14 @@ try {
             if (!checkCallToCondition(callToRecord)) {
                 return
             }
+
+            callOutCnt = callToRecord.field('callOutCnt') == null ? 0 : Integer.parseInt(callToRecord.field('callOutCnt') + "");
+            callInCnt = callToRecord.field('callInCnt') == null ? 0 : Integer.parseInt(callToRecord.field('callInCnt') + "");
+            callLen = callToRecord.field('callLen') == null ? 0 : Integer.parseInt(callToRecord.field('callLen') + "");
+
             newPhoneMarks = []
             phoneMarks.each {
                 it ->
-                    callOutCnt = callToRecord.field('callOutCnt') == null ? 0 : Integer.parseInt(callToRecord.field('callOutCnt') + "");
-                    callInCnt = callToRecord.field('callInCnt') == null ? 0 : Integer.parseInt(callToRecord.field('callInCnt') + "");
-                    callLen = callToRecord.field('callLen') == null ? 0 : Integer.parseInt(callToRecord.field('callLen') + "");
                     if (callLen < 30) {
                         return
                     }
@@ -447,25 +462,37 @@ try {
 
     //前提 ：一度联系人非公司会员
     def createCallTo2AndRelated2 = {
-        tempPhoneRecordOut1, tempPhoneRecordIn1, callToRecord1, phoneRecord1, callTos2 ->
+        phoneRecord0,
+        tempPhoneRecordOut1,
+        tempPhoneRecordIn1,
+        callToRecord1,
+        phoneRecord1,
+        callTos2 ->
             hasSecondMember = false
-            if (callTos2 != null && callTos2.size() > 0) {
+            if (callTos2 != null && callTos2.size() > 1) {
                 callTos2.each {
                     if (it == null) {
                         return
                     }
+                    if (checkPhone(phoneRecord1.field('phone'))) {
+                        return
+                    }
+
                     if (!checkCallToCondition(it)) {
                         return
                     }
                     tempPhoneRecordIn2 = it.field('in')
                     tempPhoneRecordOut2 = it.field('out')
 
-                    if (checkPhone(phoneRecord2.field('phone'))) {
+                    //设置二度联系人的record
+                    phoneRecord2 = getRid(tempPhoneRecordIn2) == getRid(phoneRecord1) ? tempPhoneRecordOut2 : tempPhoneRecordIn2
+                    if (getRid(phoneRecord0) == getRid(phoneRecord2)) {
                         return
                     }
 
-                    //设置二度联系人的record
-                    phoneRecord2 = getRid(tempPhoneRecordIn2) == getRid(phoneRecord1) ? tempPhoneRecordOut2 : tempPhoneRecordIn2
+                    if (checkPhone(phoneRecord2.field('phone'))) {
+                        return
+                    }
 
                     inHasPhones2 = phoneRecord2.field('in_HasPhone')
 
@@ -489,12 +516,13 @@ try {
             }
             return hasSecondMember
     }
+
     //*************************公共方法定义 End*************************
 
     //**********************************************************准备工作 End**********************************************************
 
     //**********************************************************组装数据 Start**********************************************************
-    createPhoneNode(phoneRecord0, 'queryVal')
+    createPhoneNode(phoneRecord0, 'Phone0')
 
     //########################从当前会员出发遍历组装数据 Start########################
     memberRecords0.each {
@@ -587,11 +615,11 @@ try {
                 hasSecondMember = false
 
                 inCallTos2 = phoneRecord1.field('in_CallTo')
-                tempResult = createCallTo2AndRelated2(tempPhoneRecordOut1, tempPhoneRecordIn1, it, phoneRecord1, inCallTos2)
+                tempResult = createCallTo2AndRelated2(phoneRecord0, tempPhoneRecordOut1, tempPhoneRecordIn1, it, phoneRecord1, inCallTos2)
                 hasSecondMember = tempResult ? true : hasSecondMember
 
                 outCallTos2 = phoneRecord1.field('out_CallTo')
-                tempResult = createCallTo2AndRelated2(tempPhoneRecordOut1, tempPhoneRecordIn1, it, phoneRecord1, outCallTos2)
+                tempResult = createCallTo2AndRelated2(phoneRecord0, tempPhoneRecordOut1, tempPhoneRecordIn1, it, phoneRecord1, outCallTos2)
                 hasSecondMember = tempResult ? true : hasSecondMember
 
                 if (!hasSecondMember) { //一级联系人没有二级联系会员
