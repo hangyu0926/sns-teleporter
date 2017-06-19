@@ -50,6 +50,14 @@
                   value="#{snsSqlProp.apply} where created_datetime between '#{snsService.getStartDatetime('',-1)}' and '#{snsService.getEndDatetime('',-1)}' or modified_datetime between '#{snsService.getStartDatetime('',-1)}' and '#{snsService.getEndDatetime('',-1)}'  limit ?,?"/>
     </bean>
 
+    <bean id="cashLoanApplyIncrementProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
+          scope="prototype">
+        <property name="jdbcTemplate" ref="walletAndSnsJdbcTemplate"/>
+        <property name="blockingQueue" ref="cashLoanApplyBlockingQueue"/>
+        <property name="sql"
+                  value="#{snsSqlProp.cashLoanApply} where created_datetime between '#{snsService.getStartDatetime('',-1)}' and '#{snsService.getEndDatetime('',-1)}' limit ?,?"/>
+    </bean>
+
 
     <bean id="orderIncrementProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
         <property name="jdbcTemplate" ref="walletAndSnsJdbcTemplate"/>
@@ -58,6 +66,12 @@
                   value="#{snsSqlProp.order} where created_datetime between '#{snsService.getStartDatetime('',-1)}' and '#{snsService.getEndDatetime('',-1)}' or modified_datetime between '#{snsService.getStartDatetime('',-1)}' and '#{snsService.getEndDatetime('',-1)}'  limit ?,?"/>
     </bean>
 
+    <bean id="cashLoanOrderIncrementProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
+        <property name="jdbcTemplate" ref="walletAndSnsJdbcTemplate"/>
+        <property name="blockingQueue" ref="cashLoanOrderBlockingQueue"/>
+        <property name="sql"
+                  value="#{snsSqlProp.cashLoanOrder}  where created_datetime between '#{snsService.getStartDatetime('',-1)}' and '#{snsService.getEndDatetime('',-1)}' or modified_datetime between '#{snsService.getStartDatetime('',-1)}' and '#{snsService.getEndDatetime('',-1)}'  limit ?,?"/>
+    </bean>
 
     <bean id="device2CaIncrementProducer"
           class="cn.memedai.orientdb.teleporter.sns.increment.producer.Device2CaIncrementProducer"
@@ -68,6 +82,12 @@
                   value="#{snsSqlProp.device2Ca} AND APPL_NO IN (#inDataList)"/>
     </bean>
 
+    <bean id="cashLoanDeviceIncrementProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
+        <property name="jdbcTemplate" ref="walletAndSnsJdbcTemplate"/>
+        <property name="blockingQueue" ref="cashLoanDeviceBlockingQueue"/>
+        <property name="sql"
+                  value="#{snsSqlProp.cashLoanDevice}  and created_datetime between '#{snsService.getStartDatetime('',-1)}' and '#{snsService.getEndDatetime('',-1)}' or modified_datetime between '#{snsService.getStartDatetime('',-1)}' and '#{snsService.getEndDatetime('',-1)}'  limit ?,?"/>
+    </bean>
 
     <bean id="ip2CaIncrementProducer"
           class="cn.memedai.orientdb.teleporter.sns.increment.producer.Ip2CaIncrementProducer"
@@ -76,6 +96,13 @@
         <property name="blockingQueue" ref="ip2CaBlockingQueue"/>
         <property name="sql"
                   value="#{snsSqlProp.ip2Ca} and APPL_NO IN (#inDataList)"/>
+    </bean>
+
+    <bean id="cashLoanIpIncrementProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
+        <property name="jdbcTemplate" ref="walletAndSnsJdbcTemplate"/>
+        <property name="blockingQueue" ref="cashLoanIpBlockingQueue"/>
+        <property name="sql"
+                  value="#{snsSqlProp.cashLoanIp}  and created_datetime between '#{snsService.getStartDatetime('',-1)}' and '#{snsService.getEndDatetime('',-1)}' or modified_datetime between '#{snsService.getStartDatetime('',-1)}' and '#{snsService.getEndDatetime('',-1)}'  limit ?,?"/>
     </bean>
 
 
@@ -104,6 +131,14 @@
                   value="#{snsSqlProp.phoneWithPhoneMarkAndPhoneSource} and UP_DATE between '#{snsService.getStartDatetime('',-1)}' and '#{snsService.getEndDatetime('',-1)}'  limit ?,?"/>
     </bean>
 
+    <bean id="cashLoanPhoneWithPhoneMarkAndPhoneSourceIncrementProducer"
+          class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
+        <property name="jdbcTemplate" ref="caJdbcTemplate"/>
+        <property name="blockingQueue" ref="cashLoanPhoneWithPhoneMarkAndPhoneSourceBlockingQueue"/>
+        <property name="sql"
+                  value="#{snsSqlProp.cashLoanPhoneWithPhoneMarkAndPhoneSource} and UP_DATE between '#{snsService.getStartDatetime('',-1)}' and '#{snsService.getEndDatetime('',-1)}'  limit ?,?"/>
+    </bean>
+
 
     <bean id="phoneWithCall2BlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
         <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
@@ -123,12 +158,33 @@
         <property name="documentTxFactory" ref="documentTxFactory"/>
     </bean>
 
+    <bean id="cashLoanCaResultBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="cashLoanCaResultIncrementProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
+          scope="prototype">
+        <property name="jdbcTemplate" ref="walletAndSnsJdbcTemplate"/>
+        <property name="blockingQueue" ref="cashLoanCaResultBlockingQueue"/>
+        <property name="sql"
+                  value="#{snsSqlProp.cashLoanCaResult}"/>
+    </bean>
+    <bean id="cashLoanCaResultIncrementConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.common.consumer.CashCaResultCommonConsumer"
+          scope="prototype">
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+        <property name="blockingQueue" ref="cashLoanCaResultBlockingQueue"/>
+    </bean>
+
+
     <util:map id="teleporterMap" key-type="java.lang.Integer" value-type="java.util.List">
         <!-- key的大小决定着优先执行顺序, 同一个key的producer和consumer会并发执行-->
         <entry key="10">
             <list>
                 <ref bean="applyIncrementProducer"/>
                 <ref bean="applyCommonConsumer"/>
+
+                <ref bean="cashLoanCaResultIncrementProducer"/>
+                <ref bean="cashLoanCaResultIncrementConsumer"/>
 
                 <ref bean="updateMemberOverdueToDefaultCommonConsumer"/>
 
@@ -138,6 +194,9 @@
 
         <entry key="20">
             <list>
+                <ref bean="cashLoanApplyIncrementProducer"/>
+                <ref bean="cashLoanApplyCommonConsumer"/>
+
                 <ref bean="storeCommonProducer"/>
                 <ref bean="storeCommonConsumer"/>
 
@@ -145,9 +204,15 @@
                 <ref bean="orderIncrementProducer"/>
                 <ref bean="orderCommonConsumer"/>
 
+                <ref bean="cashLoanOrderIncrementProducer"/>
+                <ref bean="cashLoanOrderCommonConsumer"/>
+
 
                 <ref bean="phoneWithPhoneMarkAndPhoneSourceIncrementProducer"/>
                 <ref bean="phoneWithPhoneMarkAndPhoneSourceCommonConsumer"/>
+
+                <ref bean="cashLoanPhoneWithPhoneMarkAndPhoneSourceIncrementProducer"/>
+                <ref bean="cashLoanPhoneWithPhoneMarkAndPhoneSourceCommonConsumer"/>
 
 
                 <ref bean="memberIncrementProducer"/>
@@ -168,8 +233,14 @@
                 <ref bean="device2CaIncrementProducer"/>
                 <ref bean="device2CaCommonConsumer"/>
 
+                <ref bean="cashLoanDeviceIncrementProducer"/>
+                <ref bean="cashLoanDeviceCommonConsumer"/>
+
                 <ref bean="ip2CaIncrementProducer"/>
                 <ref bean="ip2CaCommonConsumer"/>
+
+                <ref bean="cashLoanIpIncrementProducer"/>
+                <ref bean="cashLoanIpCommonConsumer"/>
 
                 <ref bean="device2CtaIncrementProducer"/>
                 <ref bean="device2CtaCommonConsumer"/>

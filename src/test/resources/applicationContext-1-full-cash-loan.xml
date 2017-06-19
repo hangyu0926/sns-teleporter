@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+				http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <context:annotation-config/>
+    <context:component-scan base-package="cn.memedai.orientdb.teleporter"/>
+
+    <import resource="applicationContext-sns-common.xml"/>
+    <import resource="applicationContext-sns-full-common.xml"/>
+
+
+    <bean id="cashLoanCaResultBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="cashLoanCaResultFullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
+          scope="prototype">
+        <property name="jdbcTemplate" ref="walletAndSnsJdbcTemplate"/>
+        <property name="blockingQueue" ref="cashLoanCaResultBlockingQueue"/>
+        <property name="sql"
+                  value="#{snsSqlProp.cashLoanCaResult}"/>
+    </bean>
+    <bean id="cashLoanCaResultFullConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.common.consumer.CashCaResultCommonConsumer"
+          scope="prototype">
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+        <property name="blockingQueue" ref="cashLoanCaResultBlockingQueue"/>
+    </bean>
+
+    <bean id="cashLoanApplyFullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
+          scope="prototype">
+        <property name="jdbcTemplate" ref="walletAndSnsJdbcTemplate"/>
+        <property name="blockingQueue" ref="cashLoanApplyBlockingQueue"/>
+        <property name="sql"
+                  value="#{snsSqlProp.cashLoanApply} limit ?,?"/>
+    </bean>
+
+    <bean id="cashLoanOrderFullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
+        <property name="jdbcTemplate" ref="walletAndSnsJdbcTemplate"/>
+        <property name="blockingQueue" ref="cashLoanOrderBlockingQueue"/>
+        <property name="sql"
+                  value="#{snsSqlProp.cashLoanOrder} limit ?,?"/>
+    </bean>
+
+    <bean id="cashLoanIpFullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
+          scope="prototype">
+        <property name="jdbcTemplate" ref="caJdbcTemplate"/>
+        <property name="blockingQueue" ref="cashLoanIpBlockingQueue"/>
+        <property name="sql"
+                  value="#{snsSqlProp.cashLoanIp} limit ?,?"/>
+    </bean>
+
+    <bean id="cashLoanDeviceFullProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
+        <property name="jdbcTemplate" ref="caJdbcTemplate"/>
+        <property name="blockingQueue" ref="cashLoanDeviceBlockingQueue"/>
+        <property name="sql"
+                  value="#{snsSqlProp.cashLoanDevice} limit ?,?"/>
+    </bean>
+
+    <bean id="cashLoanPhoneWithPhoneMarkAndPhoneSourceFullProducer"
+          class="cn.memedai.orientdb.teleporter.JdbcDataProducer">
+        <property name="jdbcTemplate" ref="caJdbcTemplate"/>
+        <property name="blockingQueue" ref="phoneWithPhoneMarkAndPhoneSourceBlockingQueue"/>
+        <property name="sql"
+                  value="#{snsSqlProp.cashLoanPhoneWithPhoneMarkAndPhoneSource} limit ?,?"/>
+    </bean>
+
+    <util:map id="teleporterMap" key-type="java.lang.Integer" value-type="java.util.List">
+        <!-- key的大小决定着优先执行顺序-->
+        <entry key="10">
+            <list>
+                <ref bean="cashLoanCaResultFullProducer"/>
+                <ref bean="cashLoanCaResultFullConsumer"/>
+            </list>
+        </entry>
+
+        <entry key="20">
+            <list>
+                <ref bean="cashLoanApplyFullProducer"/>
+                <ref bean="cashLoanApplyCommonConsumer"/>
+
+                <ref bean="cashLoanOrderFullProducer"/>
+                <ref bean="cashLoanOrderCommonConsumer"/>
+
+                <ref bean="cashLoanIpFullProducer"/>
+                <ref bean="cashLoanIpCommonConsumer"/>
+
+                <ref bean="cashLoanDeviceFullProducer"/>
+                <ref bean="cashLoanDeviceCommonConsumer"/>
+
+                <!--<ref bean="cashLoanPhoneWithPhoneMarkAndPhoneSourceFullProducer"/>-->
+                <!--<ref bean="phoneWithPhoneMarkAndPhoneSourceCommonConsumer"/>-->
+                <!--<ref bean="phoneWithPhoneMarkAndPhoneSourceCommonConsumer"/>-->
+                <!--<ref bean="phoneWithPhoneMarkAndPhoneSourceCommonConsumer"/>-->
+            </list>
+        </entry>
+
+        <entry key="40">
+            <list>
+                <ref bean="memberHasApplyIncrementConsumer"/>
+                <ref bean="orderHasDeviceIncrementConsumer"/>
+                <ref bean="applyHasIpIncrementConsumer"/>
+            </list>
+        </entry>
+
+        <entry key="41">
+            <list>
+                <ref bean="memberHasDeviceIncrementConsumer"/>
+                <ref bean="orderHasIpIncrementConsumer"/>
+                <ref bean="applyHasStoreIncrementConsumer"/>
+            </list>
+        </entry>
+
+        <entry key="42">
+            <list>
+                <ref bean="memberHasIpIncrementConsumer"/>
+                <ref bean="orderHasStoreIncrementConsumer"/>
+                <ref bean="applyHasDeviceIncrementConsumer"/>
+            </list>
+        </entry>
+
+        <entry key="43">
+            <list>
+                <ref bean="memberHasOrderIncrementConsumer"/>
+                <ref bean="phoneHasApplyIncrementConsumer"/>
+            </list>
+        </entry>
+
+        <entry key="44">
+            <list>
+                <ref bean="applyHasOrderIncrementConsumer"/>
+                <ref bean="hasPhoneIncrementConsumer"/>
+            </list>
+        </entry>
+
+        <entry key="45">
+            <list>
+                <ref bean="phoneHasOrderIncrementConsumer"/>
+            </list>
+        </entry>
+
+    </util:map>
+
+</beans>

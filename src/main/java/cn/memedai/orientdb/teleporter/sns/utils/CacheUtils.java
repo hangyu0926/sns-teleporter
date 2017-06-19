@@ -37,6 +37,8 @@ public final class CacheUtils {
 
     public static final Map<String, Map<String, String>> ID_ADDRESS = new HashMap<>();
 
+    public static final Map<String,String> CASH_LOAN_CA_RESULT = new HashMap<>();
+
     public static void setStoreRid(String key, String value) {
         CACHE_STORE_RID.put(key, value);
     }

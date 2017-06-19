@@ -12,7 +12,8 @@ def executeSql = {
 //queryVal = '15016681031'
 queryType = 'phone0'
 //queryVal = '13866129993'
-queryVal = '18628110523'
+//queryVal = '18628110523'
+//queryVal = '18628110523'
 
 //queryVal = '1432193'
 callOutCnt = 2

@@ -50,6 +50,9 @@ public class SnsService {
     @Value("#{snsOrientSqlProp.selectMember}")
     private String selectMember;
 
+    @Value("#{snsOrientSqlProp.member2}")
+    private String updateMember2;
+
     @Value("#{snsOrientSqlProp.createCallTo2}")
     private String createCallTo2;
 
@@ -160,7 +163,12 @@ public class SnsService {
         String memberRid = CacheUtils.getMemberRid(memberId);
         if (StringUtils.isBlank(memberRid)) {
             memberRid = getRid(execute(tx, selectMember, selectMember, new Object[]{memberId}));
-            CacheUtils.setMemberRid(memberId, memberRid);
+            if (StringUtils.isBlank(memberRid)) {
+                memberRid = getRid(execute(tx, updateMember2, updateMember2, new Object[]{memberId, memberId}));
+            }
+            if (StringUtils.isNotBlank(memberRid)) {
+                CacheUtils.setMemberRid(memberId, memberRid);
+            }
         }
         return memberRid;
     }

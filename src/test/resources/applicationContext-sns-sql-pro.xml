@@ -85,6 +85,30 @@
             <![CDATA[select max(ID) from credit_audit.ca_bur_operator_contact]]>
         </prop>
 
+        <prop key="cashLoanCaResult">
+            <![CDATA[select appl_no as apply_no, pass from credit_audit.ca_str_result limit ?,?]]>
+        </prop>
+
+        <prop key="cashLoanApply">
+            <![CDATA[SELECT member_id, apply_no, cellphone, CASE WHEN source = 4 THEN '3709' WHEN source = 0 THEN '3515' ELSE NULL END store_id,  apply_no order_no,  created_datetime FROM cashloan.apply_info]]>
+        </prop>
+
+        <prop key="cashLoanOrder">
+            <![CDATA[SELECT member_id, order_no, phoneNo AS mobile, amount, STATUS AS original_status, 	CASE WHEN STATUS IN ('40', '70', '80') THEN 	1 WHEN STATUS IN ('10') THEN 	NULL ELSE 	0 END 'status',  CASE WHEN source = '4' THEN '3709' WHEN source = '0' THEN '3515' ELSE '3515' END store_id,  created_datetime FROM cashloan.cash_loan_order]]>
+        </prop>
+
+        <prop key="cashLoanIp">
+            <![CDATA[SELECT apply_no as APPL_NO,ip1 AS IP, ip1_city AS ip_city FROM cashloan.apply_info where ip1 is not null]]>
+        </prop>
+
+        <prop key="cashLoanDevice">
+            <![CDATA[SELECT apply_no as APPL_NO,device_id as DEVICE_ID FROM cashloan.apply_info where device_id is not null]]>
+        </prop>
+
+        <prop key="cashLoanPhoneWithPhoneMarkAndPhoneSource">
+            <![CDATA[SELECT PHONE_NO, PHONE_TYPE,SOURCE  FROM antifraud.phone_tag_merge_crawler_all where PHONE_NO is not null]]>
+        </prop>
+
     </util:properties>
 
     <util:properties id="snsOrientSqlProp">
@@ -98,6 +122,10 @@
 
         <prop key="member">
             <![CDATA[update Member set memberId=?,name=?,idNo=?,province=?,city=?,phone=?,isBlack=false,isOverdue=false upsert return after where memberId=?]]>
+        </prop>
+
+        <prop key="member2">
+            <![CDATA[update Member set memberId=?,isBlack=false,isOverdue=false upsert return after where memberId=?]]>
         </prop>
 
         <prop key="store">

@@ -76,6 +76,16 @@
         <property name="blockingQueue" ref="phoneWithPhoneMarkAndPhoneSourceBlockingQueue"/>
     </bean>
 
+    <bean id="cashLoanPhoneWithPhoneMarkAndPhoneSourceBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="cashLoanPhoneWithPhoneMarkAndPhoneSourceCommonConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.common.consumer.PhoneAndPhoneMarkAndPhoneSourceCommonConsumer"
+          scope="prototype">
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+        <property name="blockingQueue" ref="cashLoanPhoneWithPhoneMarkAndPhoneSourceBlockingQueue"/>
+    </bean>
+
 
     <bean id="applyBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
         <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
@@ -83,6 +93,27 @@
     <bean id="applyCommonConsumer" class="cn.memedai.orientdb.teleporter.sns.common.consumer.ApplyCommonConsumer"
           scope="prototype">
         <property name="blockingQueue" ref="applyBlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+        <property name="sql"
+                  value="#{snsOrientSqlProp.apply}"/>
+        <property name="sqlParameterNames">
+            <array>
+                <value>apply_no</value>
+                <value>status</value>
+                <value>original_status</value>
+                <value>created_datetime</value>
+                <value>apply_no</value>
+            </array>
+        </property>
+    </bean>
+
+    <bean id="cashLoanApplyBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="cashLoanApplyCommonConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.common.consumer.CashLoanApplyCommonConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="cashLoanApplyBlockingQueue"/>
         <property name="documentTxFactory" ref="documentTxFactory"/>
         <property name="sql"
                   value="#{snsOrientSqlProp.apply}"/>
@@ -120,6 +151,29 @@
     </bean>
 
 
+    <bean id="cashLoanOrderBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="cashLoanOrderCommonConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.common.consumer.OrderCommonConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="cashLoanOrderBlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+        <property name="sql"
+                  value="#{snsOrientSqlProp.order}"/>
+        <property name="sqlParameterNames">
+            <array>
+                <value>order_no</value>
+                <value>status</value>
+                <value>original_status</value>
+                <value>pay_amount</value>
+                <value>created_datetime</value>
+                <value>order_no</value>
+            </array>
+        </property>
+    </bean>
+
+
     <bean id="device2CaBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
         <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
     </bean>
@@ -127,6 +181,16 @@
           class="cn.memedai.orientdb.teleporter.sns.common.consumer.Device2CaCommonConsumer"
           scope="prototype">
         <property name="blockingQueue" ref="device2CaBlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+    </bean>
+
+    <bean id="cashLoanDeviceBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="cashLoanDeviceCommonConsumer"
+          class="cn.memedai.orientdb.teleporter.sns.common.consumer.Device2CaCommonConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="cashLoanDeviceBlockingQueue"/>
         <property name="documentTxFactory" ref="documentTxFactory"/>
     </bean>
 
@@ -140,6 +204,15 @@
         <property name="documentTxFactory" ref="documentTxFactory"/>
     </bean>
 
+    <bean id="cashLoanIpBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
+        <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
+    </bean>
+    <bean id="cashLoanIpCommonConsumer" class="cn.memedai.orientdb.teleporter.sns.common.consumer.Ip2CaCommonConsumer"
+          scope="prototype">
+        <property name="blockingQueue" ref="cashLoanIpBlockingQueue"/>
+        <property name="documentTxFactory" ref="documentTxFactory"/>
+    </bean>
+
     <bean id="device2CtaBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
         <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
     </bean>
@@ -149,6 +222,7 @@
         <property name="blockingQueue" ref="device2CtaBlockingQueue"/>
         <property name="documentTxFactory" ref="documentTxFactory"/>
     </bean>
+
 
     <bean id="ip2CtaBlockingQueue" class="java.util.concurrent.ArrayBlockingQueue">
         <constructor-arg index="0" value="#{snsProp.defaultBlockingQueueSize}"/>
