@@ -94,7 +94,7 @@
         </prop>
 
         <prop key="cashLoanOrder">
-            <![CDATA[SELECT member_id, order_no, phoneNo AS mobile, amount, STATUS AS original_status, 	CASE WHEN STATUS IN ('40', '70', '80') THEN 	1 WHEN STATUS IN ('10') THEN 	NULL ELSE 	0 END 'status',  CASE WHEN source = '4' THEN '3709' WHEN source = '0' THEN '3515' ELSE '3515' END store_id,  created_datetime FROM cashloan.cash_loan_order]]>
+            <![CDATA[SELECT member_id, order_no, phoneNo AS mobile, amount/100 as pay_amount, STATUS AS original_status, 	CASE WHEN STATUS IN ('40', '70', '80') THEN 	1 WHEN STATUS IN ('10') THEN 	NULL ELSE 	0 END 'status',  CASE WHEN source = '4' THEN '3709' WHEN source = '0' THEN '3515' ELSE '3515' END store_id,  created_datetime FROM cashloan.cash_loan_order]]>
         </prop>
 
         <prop key="cashLoanIp">
