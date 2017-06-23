@@ -46,7 +46,7 @@
     </bean>
     <bean id="memberOverdueCommonProducer" class="cn.memedai.orientdb.teleporter.JdbcDataProducer"
           scope="prototype">
-        <property name="jdbcTemplate" ref="sqlserverJdbcTemplate"/>
+        <property name="jdbcTemplate" ref="caJdbcTemplate"/>
         <property name="blockingQueue" ref="memberOverdueBlockingQueue"/>
         <property name="sql"
                   value="#{snsSqlProp.memberOverdue}"/>

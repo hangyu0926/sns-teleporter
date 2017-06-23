@@ -6,8 +6,7 @@
 
     <util:properties id="snsSqlProp">
         <prop key="memberOverdue">
-            <!--SqlServer-->
-            <![CDATA[SELECT a.BORROWER_ID FROM (SELECT row_number () OVER (ORDER BY BORROWER_ID) rownumber,BORROWER_ID FROM memedaidb.FSS.LOANS WHERE CREDIT_DATE IS NOT NULL GROUP BY BORROWER_ID HAVING	MAX (OVERDUE_DAYS) > 3 ) a WHERE rownumber BETWEEN ? AND ?]]>
+            <![CDATA[SELECT BORROWER_ID FROM accounting.FSS_LOANS WHERE CREDIT_DATE IS NOT NULL GROUP BY BORROWER_ID HAVING max(OVERDUE_DAYS) > 3 limit ?,?]]>
         </prop>
 
         <prop key="member">
